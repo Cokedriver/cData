@@ -350,6 +350,9 @@ if datatext.classcolor then
 	hexa = string.format('|c%02x%02x%02x%02x', 255, ccolor.r * 255, ccolor.g * 255, ccolor.b * 255)
 end
 
+---------------
+-- Threat Text
+---------------
 
 if threatbar.enable == true then
 
@@ -628,10 +631,10 @@ if datatext.calltoarms and datatext.calltoarms > 0 then
 	local function MakeIconString(tank, healer, damage)
 		local str = ""
 		if tank then 
-			str = str..'T'
+			str = str..'T, '
 		end
 		if healer then
-			str = str..'H'
+			str = str..'H, '
 		end
 		if damage then
 			str = str..'D'
@@ -643,10 +646,10 @@ if datatext.calltoarms and datatext.calltoarms > 0 then
 	local function MakeString(tank, healer, damage)
 		local str = ""
 		if tank then 
-			str = str..'Tank'
+			str = str..'Tank, '
 		end
 		if healer then
-			str = str..'Healer'
+			str = str..'Healer, '
 		end
 		if damage then
 			str = str..'DPS'
