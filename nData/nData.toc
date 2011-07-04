@@ -1,6 +1,6 @@
 ## Interface: 40200
 ## Title: |cffCC3333 n|rData
-## Version: 1.0.6
+## Version: 2.0
 ## Author: Cokedriver
 ## OptionalDeps: !Beautycase
 ## Notes: Special Thanks to Tuk from Tukui.org without his UI this addon would not exist.
