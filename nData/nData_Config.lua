@@ -9,6 +9,9 @@ media = {
 }
 
 datatext = {
+
+	fontsize = 15,                                  	-- font size for panels.
+
 	system = 0,                                     	-- show total memory and others systems info (FPS/MS) on panel.
 	bags = 9,                                       	-- show space used in bags on panel.
 	gold = 7,                                       	-- show your current gold on panel.
@@ -27,17 +30,17 @@ datatext = {
 	stat1 = 1,											-- Stat Based on your Role (Avoidance-Tank, AP-Melee, SP/HP-Caster)
 	stat2 = 3,											-- Stat Based on your Role (Armor-Tank, Crit-Melee, Crit-Caster)
 	recount = 2,										-- Stat Based on Recount's DPS
-	recountraiddps = true,								-- Enables tracking or Recounts Raid DPS
+	recountraiddps = false,								-- Enables tracking or Recounts Raid DPS
 	calltoarms = 6,										-- Show Current Call to Arms.
 	
 
 
 	-- Color Datatext
-	classcolor = true,               			    	-- classcolored datatexts
-	color = '|cff00AAFF',                           	-- datatext color if classcolor = false (|cffFFFFFF = white)
+	classcolor = false,               			    	-- classcolored datatexts
+	color = '|cffFFFF33',                           	-- datatext color if classcolor = false (|cffFFFF33 = yellow)
 	
 	battleground = true,                            	-- enable 3 stats in battleground only that replace stat1,stat2,stat3.
-	fontsize = 14,                                  	-- font size for panels.
+	
 	
 	-- Clock Settings
 	time24 = false,                                  	-- set time to 24h format.
