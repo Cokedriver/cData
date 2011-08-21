@@ -1,7 +1,8 @@
-##nData
+# nData
 This is a stand alone data text bar that goes with Neav UI or Default Blizzard UI.
 
-Optional Data Text are as follows:
+###Optional Data Text are as follows: 
+
 ## Bags
  -- show space used in bags on panel.
  
