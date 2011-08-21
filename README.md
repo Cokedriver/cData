@@ -1,61 +1,62 @@
 # nData
 This is a stand alone data text bar that goes with Neav UI or Default Blizzard UI.
 
-###Optional Data Text are as follows: 
+##Optional Data Text are as follows: 
 
-## Bags
+### Bags
  -- show space used in bags on panel.
  
-## Battleground
+### Battleground
  -- enable 3 stats in battleground only that replace stat1,stat2,stat3.
  
-## Coordanents
+### Coordanents
  -- show your current coords on panel.
  
-## Currency
+### Currency
  -- show your tracked currency on panel.
-## Damage Per Second
+ 
+### Damage Per Second
  -- show a dps meter on panel.
  
-## Heals Per Second
+### Heals Per Second
  -- show a hps meter on panel.
  
-## Durability
+### Durability
  -- show your equipment durability on panel.
  
-## Friends
+### Friends
  -- show number of friends connected.
  
-## Gold
+### Gold
  -- show your current gold on panel.
  
-## Guild
+### Guild
  -- show number on guildmate connected on panel.
  
-## Micromenu
+### Micromenu
  -- show the micromenu on panel.
  
-## Spec Switch
+### Spec Switch
  -- show your current spec on panel.
  
-## System
+### System
  -- show total fps/ms & memory usage info on panel.
  
-## Zone
+### Zone
  -- show your current zone on panel.
  
-## Profession
+### Profession
  -- show your current professions with mouse over on panel.
  
-## Stat1
+### Stat1
  -- Stat Based on your Role (Avoidance-Tank, AP-Melee, SP/HP-Caster)
  
-## Stat2
+### Stat2
  -- Stat Based on your Role (Armor-Tank, Crit-Melee, Crit-Caster)
  
-## Recount
+### Recount
  -- Stat Based on Recount's DPS. "MUST HAVE RECOUNT INSTALLED"
  
-## Call To Arms
+### Call To Arms
  -- Show Current Call to Arms.
  
