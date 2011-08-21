@@ -993,7 +993,7 @@ if datatext.friends and datatext.friends > 0 then
 	Text:SetFont(media.font, datatext.fontsize)
 	PP(datatext.friends, Text)
 
-	local menuFrame = CreateFrame("Frame", "ElvuiFriendRightClickMenu", E.UIParent, "UIDropDownMenuTemplate")
+	local menuFrame = CreateFrame("Frame", "ElvuiFriendRightClickMenu", UIParent, "UIDropDownMenuTemplate")
 	local menuList = {
 		{ text = OPTIONS_MENU, isTitle = true,notCheckable=true},
 		{ text = INVITE, hasArrow = true,notCheckable=true, },
