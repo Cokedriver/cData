@@ -1,11 +1,10 @@
 ## Interface: 40200
 ## Title: |cffCC3333 n|rData
-## Version: 2.0
+## Version: 2.1
 ## Author: Cokedriver
-## OptionalDeps: !Beautycase
 ## Notes: Special Thanks to Tuk from Tukui.org without his UI this addon would not exist.
-## SavedVariables: nDataData
+## SavedVariables: nData
 ## SavedVariablesPerCharacter: nDataPerChar
 
-nData_Config.lua
+Config.lua
 nData.lua

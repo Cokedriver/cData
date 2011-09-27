@@ -5,76 +5,65 @@
 -- Bar Left = 1 - 2 - 3 - 4 - 5 - 6 - 7 - 8 - 9
 ----------------------------------------------------------
 media = {
-	font = 'Fonts\\ARIALN.ttf',
+	['font'] = 'Fonts\\ARIALN.ttf',
 }
 
 datatext = {
 
-	fontsize = 15,                                  	-- font size for panels.
+	['enable'] = true,
 
-	system = 0,                                     	-- show total memory and others systems info (FPS/MS) on panel.
-	bags = 9,                                       	-- show space used in bags on panel.
-	gold = 7,                                       	-- show your current gold on panel.
-	wowtime = 0,                                    	-- show time on panel.
-	guild = 0,                                      	-- show number on guildmate connected on panel.
-	dur = 8,                                        	-- show your equipment durability on panel.
-	friends = 0,                                    	-- show number of friends connected.
-	dps_text = 0,                                   	-- show a dps meter on panel.
-	hps_text = 0,                                   	-- show a heal meter on panel.
-	currency = 0,                                   	-- show your tracked currency on panel.
-	micromenu = 0,										-- show the micromenu on panel.
-	spec = 5,											-- show your current spec on panel.
-	zone = 0,											-- show your current zone on panel.
-	coords = 0,											-- show your current coords on panel.
-	pro = 4,											-- shows your professions and tradeskills
-	stat1 = 1,											-- Stat Based on your Role (Avoidance-Tank, AP-Melee, SP/HP-Caster)
-	stat2 = 3,											-- Stat Based on your Role (Armor-Tank, Crit-Melee, Crit-Caster)
-	recount = 2,										-- Stat Based on Recount's DPS
-	recountraiddps = false,								-- Enables tracking or Recounts Raid DPS
-	calltoarms = 6,										-- Show Current Call to Arms.
+	['top'] = true,										-- if = true then panel on top of screen, if = false panel below mainmenubar
 	
-
-
+	['fontsize'] = 15,                                  	-- font size for panels.
+	['bags'] = 0,                                       	-- show space used in bags on panel.
+	['system'] = 0,                                     	-- show total memory and others systems info (FPS/MS) on panel.
+	['gold'] = 9,                                       	-- show your current gold on panel.
+	['wowtime'] = 0,                                    	-- show time on panel.
+	['guild'] = 0,                                      	-- show number on guildmate connected on panel.
+	['dur'] = 8,                                        	-- show your equipment durability on panel.
+	['friends'] = 7,                                    	-- show number of friends connected.
+	['dps_text'] = 2,                                   	-- show a dps meter on panel.
+	['hps_text'] = 0,                                   	-- show a heal meter on panel.
+	['currency'] = 0,                                   	-- show your tracked currency on panel.
+	['micromenu'] = 0,										-- show the micromenu on panel.
+	['spec'] = 5,											-- show your current spec on panel.
+	['zone'] = 0,											-- show your current zone on panel.
+	['coords'] = 0,											-- show your current coords on panel.
+	['pro'] = 4,											-- shows your professions and tradeskills
+	['stat1'] = 1,											-- Stat Based on your Role (Avoidance-Tank, AP-Melee, SP/HP-Caster)
+	['stat2'] = 3,											-- Stat Based on your Role (Armor-Tank, Crit-Melee, Crit-Caster)
+	['recount'] = 0,										-- Stat Based on Recount's DPS
+	['recountraiddps'] = false,								-- Enables tracking or Recounts Raid DPS
+	['calltoarms'] = 6,										-- Show Current Call to Arms.
+	
 	-- Color Datatext
-	classcolor = false,               			    	-- classcolored datatexts
-	color = '|cffFFFF33',                           	-- datatext color if classcolor = false (|cffFFFF33 = yellow)
-	
-	battleground = true,                            	-- enable 3 stats in battleground only that replace stat1,stat2,stat3.
-	
-	
-	-- Clock Settings
-	time24 = false,                                  	-- set time to 24h format.
-	localtime = true,                              		-- set time to local time instead of server time.	
-	
-	-- FPS Settings
-	fps = {
-		enable = true,									-- enable the FPS on the System Tooltip
-		-- ONLY ONE OF THESE CAN BE TRUE	
-		home = false,									-- Only Show Home Latency
-		world = false,									-- Only Show World Latency
-		both = true,									-- Show both Home and World Latency
-	}
-}
-
-datapanel = {	
-	enable = true,										-- enable panel/panels
-	
-	border = {
-		beautycase = false,								-- add !Beautycase Border (!Beautycase needs to be installed to do this)
+	['colors'] = {
+		['classcolor'] = true,               			    -- classcolored datatexts
+		['color'] = { r = 0, g = 0, b = 1},                  				-- datatext color if classcolor = false 
 	},
+	
+	['battleground'] = true,                            	-- enable 3 stats in battleground only that replace stat1,stat2,stat3.
+
+	['bag'] = false,										-- True = Open Backpack; False = Open All bags
+
+	-- Clock Settings
+	['time24'] = false,                                  	-- set time to 24h format.
+	['localtime'] = true,                              		-- set time to local time instead of server time.	
+		
+	-- FPS Settings
+	['fps'] = {
+		['enable'] = true,									-- enable the FPS on the System Tooltip
+		-- ONLY ONE OF THESE CAN BE TRUE	
+		['home'] = false,									-- Only Show Home Latency
+		['world'] = false,									-- Only Show World Latency
+		['both'] = true,									-- Show both Home and World Latency
+	},
+		
+	['threatbar'] = true,									-- Enable the threatbar over the Center Panel.
+
+		
 }
 
-tooltip = {											
-	enable = true,										-- Move the tooltip up so its not overlapping the MainMenubar
-}
-
-threatbar = {
-	enable = true,										-- Enable the threatbar over the Center Panel.
-}
-
-bags = {
-	single = false,										-- true = open backpack, false = open all bags
-}
 --local text (source Tukui)
 
 L = {
@@ -85,7 +74,7 @@ L = {
 	datatext_bags = 'Bags: ',
 	datatext_friends = 'Friends',
 	datatext_online = 'Online: ',
-	datatext_armor = 'Armor',
+	datatext_armor = 'Armor: ',
 	datatext_earned = 'Earned:',
 	datatext_spent = 'Spent:',
 	datatext_deficit = 'Deficit:',
@@ -95,8 +84,8 @@ L = {
 	datatext_playersp = 'SP: ',
 	datatext_playerap = 'AP: ',
 	datatext_playerhaste = 'Haste',
-	datatext_dps = 'DPS',
-	datatext_hps = 'HPS',
+	datatext_dps = 'DPS: ',
+	datatext_hps = 'HPS: ',
 	datatext_playerarp = 'ArP',
 	datatext_session = 'Session: ',
 	datatext_character = 'Character: ',

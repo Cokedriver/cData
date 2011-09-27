@@ -3,211 +3,165 @@
 -- All Credit goes to programmers at www.tukui.org
 ---------------------------------------------------
 
-if datapanel.enable == true then
- 
-	local DataBorderPanel = CreateFrame('Frame', 'DataBorderPanel', UIParent)
-	if datapanel.border.beautycase == false then
-		DataBorderPanel:SetPoint('BOTTOM', UIParent, 0, 3)
-		DataBorderPanel:SetHeight(35)
-		DataBorderPanel:SetWidth(1200)
-		DataBorderPanel:SetFrameStrata('LOW')
-		DataBorderPanel:SetFrameLevel(0)
-		DataBorderPanel:SetBackdrop({
+if datatext.enable == true then
+
+	local DataPanel = CreateFrame('Frame', 'DataPanel', UIParent)
+	local PanelLeft = CreateFrame('Frame', 'PanelLeft', UIParent)
+	local PanelCenter = CreateFrame('Frame', 'PanelCenter', UIParent)
+	local PanelRight = CreateFrame('Frame', 'PanelRight', UIParent)
+	local BattleGroundPanel = CreateFrame('Frame', 'BattleGroundPanel', UIParent)
+	local ccolor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[select(2,UnitClass("player"))]
+	local getscreenwidth = tonumber(string.match(({GetScreenResolutions()})[GetCurrentResolution()], "(%d+)x+%d"))
+	
+	if datatext.top == true then
+		DataPanel:SetPoint('TOP', UIParent, 0, 0)
+		DataPanel:SetHeight(28)
+		DataPanel:SetWidth(getscreenwidth)
+		DataPanel:SetFrameStrata('LOW')
+		DataPanel:SetFrameLevel(0)
+		DataPanel:SetBackdrop({
+			bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
+			edgeFile = "Interface\\AddOns\\BasicUI\\BasicMedia\\UI-Tooltip-Border",							
+			tile = true, tileSize = 16, edgeSize = 18,
+			insets = {left = 3, right = 3, top = 3, bottom = 3},
+		})
+		DataPanel:SetBackdropBorderColor(ccolor.r, ccolor.g, ccolor.b, 1)
+
+		-- Left Panel
+		PanelLeft:SetPoint('LEFT', DataPanel, 5, 0)
+		PanelLeft:SetHeight(35)
+		PanelLeft:SetWidth(getscreenwidth / 3)
+		PanelLeft:SetFrameStrata('LOW')
+		PanelLeft:SetFrameLevel(1)		
+
+		-- Center Panel
+		PanelCenter:SetPoint('CENTER', DataPanel, 0, 0)
+		PanelCenter:SetHeight(35)
+		PanelCenter:SetWidth(getscreenwidth / 3)
+		PanelCenter:SetFrameStrata('LOW')
+		PanelCenter:SetFrameLevel(1)		
+
+		-- Right Panel
+		PanelRight:SetPoint('RIGHT', DataPanel, -5, 0)
+		PanelRight:SetHeight(35)
+		PanelRight:SetWidth(getscreenwidth / 3)
+		PanelRight:SetFrameStrata('LOW')
+		PanelRight:SetFrameLevel(1)		
+
+		-- Battleground Panel
+		BattleGroundPanel:SetAllPoints(PanelLeft)
+		BattleGroundPanel:SetFrameStrata('LOW')
+		BattleGroundPanel:SetFrameLevel(1)	
+	else
+		DataPanel:SetPoint('BOTTOM', UIParent, 0, 0)
+		DataPanel:SetHeight(35)
+		DataPanel:SetWidth(1200)
+		DataPanel:SetFrameStrata('LOW')
+		DataPanel:SetFrameLevel(0)
+		DataPanel:SetBackdrop({
 			bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
 			edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
 			edgeSize = 25,
 			insets = {left = 9, right = 9, top = 9, bottom = 8}
 		})
-		DataBorderPanel:SetBackdropColor(0, 0, 0, 1)
-	elseif datapanel.border.beautycase == true then 
-		DataBorderPanel:SetPoint('BOTTOM', UIParent, 0, 3)
-		DataBorderPanel:SetHeight(20)
-		DataBorderPanel:SetWidth(400)
-		DataBorderPanel:SetFrameStrata('LOW')
-		DataBorderPanel:SetFrameLevel(0)
-		DataBorderPanel:SetBackdrop({
-			bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
-			insets = {top = 1, left = 4.5, bottom = 1, right = 1},
-		})
-		DataBorderPanel:SetBackdropColor(0, 0, 0, 1)
-		DataBorderPanel:CreateBorder(11)
-		DataBorderPanel:SetBorderPadding(-2, 2, 1, 2, -2, 2, 1, 2)
-	end
-
-
-	local DataPanelLeft = CreateFrame('Frame', 'DataPanelLeft', UIParent)
-	if datapanel.border.beautycase == false then
-		DataPanelLeft:SetPoint('LEFT', DataBorderPanel, 5, 0)
-		DataPanelLeft:SetHeight(35)
-		DataPanelLeft:SetWidth(400)
-		DataPanelLeft:SetFrameStrata('LOW')
-		DataPanelLeft:SetFrameLevel(1)
-	elseif datapanel.border.beautycase == true then
-		DataPanelLeft:SetPoint('LEFT', DataBorderPanel, 5, 0)
-		DataPanelLeft:SetHeight(20)
-		DataPanelLeft:SetWidth(400)
-		DataPanelLeft:SetFrameStrata('LOW')
-		DataPanelLeft:SetFrameLevel(1)
-	end
-
-	local DataPanelCenter = CreateFrame('Frame', 'DataPanelCenter', UIParent)
-	if datapanel.border.beautycase == false then
-		DataPanelCenter:SetPoint('CENTER', DataBorderPanel, 0, 0)
-		DataPanelCenter:SetHeight(35)
-		DataPanelCenter:SetWidth(400)
-		DataPanelCenter:SetFrameStrata('LOW')
-		DataPanelCenter:SetFrameLevel(1)
-	elseif datapanel.border.beautycase == true then
-		DataPanelCenter:SetPoint('CENTER', DataBorderPanel, 0, 0)
-		DataPanelCenter:SetHeight(20)
-		DataPanelCenter:SetWidth(400)
-		DataPanelCenter:SetFrameStrata('LOW')
-		DataPanelCenter:SetFrameLevel(1)
-	end
-
-	local DataPanelRight = CreateFrame('Frame', 'DataPanelRight', UIParent)
-	if datapanel.border.beautycase == false then
-		DataPanelRight:SetPoint('RIGHT', DataBorderPanel, -5, 0)
-		DataPanelRight:SetHeight(35)
-		DataPanelRight:SetWidth(400)
-		DataPanelRight:SetFrameStrata('LOW')
-		DataPanelRight:SetFrameLevel(1)
-	elseif datapanel.border.beautycase == true then
-		DataPanelRight:SetPoint('RIGHT', DataBorderPanel, -5, 0)
-		DataPanelRight:SetHeight(20)
-		DataPanelRight:SetWidth(400)
-		DataPanelRight:SetFrameStrata('LOW')
-		DataPanelRight:SetFrameLevel(1)
-	end
-
-		 
-	local BattleGroundPanel = CreateFrame('Frame', 'BattleGroundPanel', UIParent)
-	BattleGroundPanel:SetAllPoints(DataPanelLeft)
-	BattleGroundPanel:SetFrameStrata('LOW')
-	BattleGroundPanel:SetFrameLevel(1)
-	BattleGroundPanel:SetBackdrop({
-		bgFile = [[Interface\Buttons\WHITE8x8]],
-		insets = {top = 1, left = 4.5, bottom = 1, right = 1},
-	})
-	BattleGroundPanel:SetBackdropColor(0, 0, 0, 0)
-
-
-
-	 -- Move the Bottom Action Bar Up on Top of the Datapanel
-	 -- Code help from Nibelheim on Wowinterface Forums
-	local Movebar = CreateFrame("Frame")
-	local NeedsUpdate = false
-	local function RaiseBars(self)
-		-- Check if in combat lockdown, and set NeedsUpdate
-		if InCombatLockdown() then
-			NeedsUpdate = true
-			return
-		end
+		DataPanel:SetBackdropColor(0, 0, 0, 1)
 		
-		MainMenuBar:ClearAllPoints()
-		VehicleMenuBar:ClearAllPoints()
-		
-		--Update bars
-		if datapanel.border.beautycase == false then
-			MainMenuBar:SetPoint('BOTTOM', DataBorderPanel, 0, 32)
-			VehicleMenuBar:SetPoint('BOTTOM', DataBorderPanel, 0, 40)
-		elseif datapanel.border.beautycase == true then
-			MainMenuBar:SetPoint('BOTTOM', DataBorderPanel, 0, 26)
-			VehicleMenuBar:SetPoint('BOTTOM', DataBorderPanel, 0, 30)
-		end
-	end
-	Movebar:SetScript("OnUpdate", function(MainMenuBar) RaiseBars(); end)
-	RaiseBars()
+		-- Left Panel
+		PanelLeft:SetPoint('LEFT', DataPanel, 5, 0)
+		PanelLeft:SetHeight(35)
+		PanelLeft:SetWidth(1200 / 3)
+		PanelLeft:SetFrameStrata('LOW')
+		PanelLeft:SetFrameLevel(1)		
 
-	
-	 -- Move the tooltip above the Actionbar
-	if tooltip.enable == true then
+		-- Center Panel
+		PanelCenter:SetPoint('CENTER', DataPanel, 0, 0)
+		PanelCenter:SetHeight(35)
+		PanelCenter:SetWidth(1200 / 3)
+		PanelCenter:SetFrameStrata('LOW')
+		PanelCenter:SetFrameLevel(1)		
+
+		-- Right panel
+		PanelRight:SetPoint('RIGHT', DataPanel, -5, 0)
+		PanelRight:SetHeight(35)
+		PanelRight:SetWidth(1200 / 3)
+		PanelRight:SetFrameStrata('LOW')
+		PanelRight:SetFrameLevel(1)		
+
+		-- Battleground Panel
+		BattleGroundPanel:SetAllPoints(PanelLeft)
+		BattleGroundPanel:SetFrameStrata('LOW')
+		BattleGroundPanel:SetFrameLevel(1)
+		
+	end
+
+
+		-- move some frames to make way for the datapanel
+	if datatext.top == true then
+
+		local top = function() end
+		PlayerFrame:ClearAllPoints() PlayerFrame:SetPoint("TOPLEFT", -19, -20) PlayerFrame.ClearAllPoints = top PlayerFrame.SetPoint = top
+		TargetFrame:ClearAllPoints() TargetFrame:SetPoint("TOPLEFT", 250, -20) TargetFrame.ClearAllPoints = top TargetFrame.SetPoint = top
+		MinimapCluster:ClearAllPoints() MinimapCluster:SetPoint('TOPRIGHT', 0, -32) MinimapCluster.ClearAllPoints = top MinimapCluster.SetPoint = top
+		BuffFrame:ClearAllPoints() BuffFrame:SetPoint('TOP', MinimapCluster, -100, 0) BuffFrame.ClearAllPoints = top BuffFrame.SetPoint = top
+
+	else
+
+		-- Move some stuff for the panel on bottom.
+
+		local bottom = function() end
+		MainMenuBar:ClearAllPoints() MainMenuBar:SetPoint("BOTTOM",DataPanel,"TOP", 0, -4) MainMenuBar.ClearAllPoints = bottom MainMenuBar.SetPoint = bottom
+		PetActionBarFrame:ClearAllPoints() PetActionBarFrame:SetPoint("BOTTOM",MainMenuBar,"TOP", 40, 47) PetActionBarFrame.ClearAllPoints = bottom PetActionBarFrame.SetPoint = bottom		
+
+		-- Move the tooltip above the Actionbar
+
 		hooksecurefunc('GameTooltip_SetDefaultAnchor', function(self)
-			self:SetPoint('BOTTOMRIGHT', UIParent, -95, 175)
+			self:SetPoint('BOTTOMRIGHT', UIParent, -95, 135)
 		end)
-	end
+		
+		 -- Move the Bags above the Actionbar
+		CONTAINER_WIDTH = 192;
+		CONTAINER_SPACING = 5;
+		VISIBLE_CONTAINER_SPACING = 3;
+		CONTAINER_OFFSET_Y = 70;
+		CONTAINER_OFFSET_X = 0;
 
-	 -- Move the Bags above the Actionbar
-	CONTAINER_WIDTH = 192;
-	CONTAINER_SPACING = 5;
-	VISIBLE_CONTAINER_SPACING = 3;
-	CONTAINER_OFFSET_Y = 70;
-	CONTAINER_OFFSET_X = 0;
-	CONTAINER_SCALE = 0.75;
-	BACKPACK_HEIGHT = 240; 
-	 
-	function updateContainerFrameAnchors()
-		local frame, xOffset, yOffset, screenHeight, freeScreenHeight, leftMostPoint, column;
-		local screenWidth = GetScreenWidth();
-		local containerScale = 1;
-		local leftLimit = 0;
-		if ( BankFrame:IsShown() ) then
-			leftLimit = BankFrame:GetRight() - 25;
-		end
 		 
-		while ( containerScale > CONTAINER_SCALE ) do
+		function updateContainerFrameAnchors()
+			local _, xOffset, yOffset, _, _, _, _;
+			local containerScale = 1;
 			screenHeight = GetScreenHeight() / containerScale;
 			-- Adjust the start anchor for bags depending on the multibars
-			xOffset = CONTAINER_OFFSET_X / containerScale; 
-			yOffset = CONTAINER_OFFSET_Y / containerScale; 
+			xOffset = CONTAINER_OFFSET_X / containerScale;
+			yOffset = CONTAINER_OFFSET_Y / containerScale + 25;
 			-- freeScreenHeight determines when to start a new column of bags
 			freeScreenHeight = screenHeight - yOffset;
-			leftMostPoint = screenWidth - xOffset;
-			column = 1;
-			local frameHeight;
+			column = 0;
 			for index, frameName in ipairs(ContainerFrame1.bags) do
-				frameHeight = _G[frameName]:GetHeight();
-				if ( freeScreenHeight < frameHeight ) then
+				frame = _G[frameName];
+				frame:SetScale(containerScale);
+				if ( index == 1 ) then
+					-- First bag
+					frame:SetPoint('BOTTOMRIGHT', frame:GetParent(), 'BOTTOMRIGHT', -xOffset, yOffset );
+				elseif ( freeScreenHeight < frame:GetHeight() ) then
 					-- Start a new column
 					column = column + 1;
-					leftMostPoint = screenWidth - ( column * CONTAINER_WIDTH * containerScale ) - xOffset;
 					freeScreenHeight = screenHeight - yOffset;
+					frame:SetPoint('BOTTOMRIGHT', frame:GetParent(), 'BOTTOMRIGHT', -(column * CONTAINER_WIDTH) - xOffset, yOffset );
+				else
+					-- Anchor to the previous bag
+					frame:SetPoint('BOTTOMRIGHT', ContainerFrame1.bags[index - 1], 'TOPRIGHT', 0, CONTAINER_SPACING);   
 				end
-				freeScreenHeight = freeScreenHeight - frameHeight - VISIBLE_CONTAINER_SPACING;
+				freeScreenHeight = freeScreenHeight - frame:GetHeight() - VISIBLE_CONTAINER_SPACING;
 			end
-			if ( leftMostPoint < leftLimit ) then
-				containerScale = containerScale - 0.01;
-			else
-				break;
-			end
-		end
-		 
-		if ( containerScale < CONTAINER_SCALE ) then
-			containerScale = CONTAINER_SCALE;
-		end
-		 
-		screenHeight = GetScreenHeight() / containerScale;
-		-- Adjust the start anchor for bags depending on the multibars
-		xOffset = CONTAINER_OFFSET_X / containerScale;
-		yOffset = CONTAINER_OFFSET_Y / containerScale;
-		-- freeScreenHeight determines when to start a new column of bags
-		freeScreenHeight = screenHeight - yOffset;
-		column = 0;
-		for index, frameName in ipairs(ContainerFrame1.bags) do
-			frame = _G[frameName];
-			frame:SetScale(containerScale);
-			if ( index == 1 ) then
-				-- First bag
-				frame:SetPoint('BOTTOMRIGHT', frame:GetParent(), 'BOTTOMRIGHT', -xOffset, yOffset+20 );
-			elseif ( freeScreenHeight < frame:GetHeight() ) then
-				-- Start a new column
-				column = column + 1;
-				freeScreenHeight = screenHeight - yOffset;
-				frame:SetPoint('BOTTOMRIGHT', frame:GetParent(), 'BOTTOMRIGHT', -(column * CONTAINER_WIDTH) - xOffset, yOffset+20 );
-			else
-				-- Anchor to the previous bag
-				frame:SetPoint('BOTTOMRIGHT', ContainerFrame1.bags[index - 1], 'TOPRIGHT', 0, CONTAINER_SPACING);   
-			end
-			freeScreenHeight = freeScreenHeight - frame:GetHeight() - VISIBLE_CONTAINER_SPACING;
-		end
-	end
+		end	 
+	end	
 end
 
 PP = function(p, obj)
 
-	local left = DataPanelLeft
-	local center = DataPanelCenter
-	local right = DataPanelRight
+	local left = PanelLeft
+	local center = PanelCenter
+	local right = PanelRight
 	
 		-- Left Panel Data
 	if p == 1 then
@@ -284,19 +238,24 @@ DataTextTooltipAnchor = function(self)
 	local xoff = 1
 	local yoff = 3
 	
-	if panel == DataPanelLeft then
-		anchor = 'ANCHOR_TOPLEFT'
-	elseif panel == DataPanelCenter then
-		anchor = 'ANCHOR_TOP'
-	elseif panel == DataPanelRight then
-		anchor = 'ANCHOR_TOPRIGHT'
-	end
+	for _, panel in pairs ({
+		PanelLeft,
+		PanelCenter,
+		PanelRight,
+	})	do
+		if datatext.top == true then
+			anchor = 'ANCHOR_BOTTOM'
+		else
+			anchor = 'ANCHOR_TOP'
+		end
+	end	
 	
 	return anchor, panel, xoff, yoff
 end
 
-_, myclass = UnitClass("player")
-_, myname = select(1, UnitName("player"))
+myclass = UnitClass("player")
+myname = select(1, UnitName("player"))
+toc = select(4, GetBuildInfo())
 
 --Check Player's Role
 
@@ -344,9 +303,9 @@ CheckRole()
 ---------------------------------------------------
 
 local ccolor = RAID_CLASS_COLORS[select(2, UnitClass('player'))]
-hexa, hexb = datatext.color, '|r'
+hexa, hexb = datatext.colors.color, '|r'
 
-if datatext.classcolor then
+if datatext.colors.classcolor then
 	hexa = string.format('|c%02x%02x%02x%02x', 255, ccolor.r * 255, ccolor.g * 255, ccolor.b * 255)
 end
 
@@ -354,7 +313,7 @@ end
 -- Threat Text
 ---------------
 
-if threatbar.enable == true then
+if datatext.threatbar == true then
 
 	local aggroColors = {
 		[1] = {1, 0, 0},
@@ -363,8 +322,8 @@ if threatbar.enable == true then
 	}
 
 	local nDataThreatBar = CreateFrame("StatusBar", "nDataThreatBar", UIParent)
-	nDataThreatBar:SetPoint("TOPLEFT", DataPanelCenter, 2, -2)
-	nDataThreatBar:SetPoint("BOTTOMRIGHT", DataPanelCenter, -2, 2)
+	nDataThreatBar:SetPoint("TOPLEFT", PanelCenter, 2, -2)
+	nDataThreatBar:SetPoint("BOTTOMRIGHT", PanelCenter, -2, 2)
 	nDataThreatBar:SetFrameLevel(1)
 
 	nDataThreatBar.text = SetFontString(nDataThreatBar, media.font, 18)
@@ -413,10 +372,10 @@ if threatbar.enable == true then
 					
 			if threatval > 0 then
 				self:SetAlpha(1)
-				DataPanelCenter:SetAlpha(0)
+				PanelCenter:SetAlpha(0)
 			else
 				self:SetAlpha(0)
-				DataPanelCenter:SetAlpha(1)
+				PanelCenter:SetAlpha(1)
 			end		
 		end
 	end
@@ -497,17 +456,17 @@ if datatext.battleground == true then
 	local Text1  = BattleGroundPanel:CreateFontString(nil, 'OVERLAY')
 	Text1:SetFont(media.font, datatext.fontsize)
 	Text1:SetPoint('LEFT', BattleGroundPanel, 30, 0)
-	Text1:SetHeight(DataPanelLeft:GetHeight())
+	Text1:SetHeight(PanelLeft:GetHeight())
 
 	local Text2  = BattleGroundPanel:CreateFontString(nil, 'OVERLAY')
 	Text2:SetFont(media.font, datatext.fontsize)
 	Text2:SetPoint('CENTER', BattleGroundPanel, 0, 0)
-	Text2:SetHeight(DataPanelLeft:GetHeight())
+	Text2:SetHeight(PanelLeft:GetHeight())
 
 	local Text3  = BattleGroundPanel:CreateFontString(nil, 'OVERLAY')
 	Text3:SetFont(media.font, datatext.fontsize)
 	Text3:SetPoint('RIGHT', BattleGroundPanel, -30, 0)
-	Text3:SetHeight(DataPanelLeft:GetHeight())
+	Text3:SetHeight(PanelLeft:GetHeight())
 
 	local int = 2
 	local function Update(self, t)
@@ -541,13 +500,13 @@ if datatext.battleground == true then
 			local inInstance, instanceType = IsInInstance()
 			if inInstance and (instanceType == 'pvp') then			
 				bgframe:Show()
-				DataPanelLeft:Hide()
+				PanelLeft:Hide()
 			else
 				Text1:SetText('')
 				Text2:SetText('')
 				Text3:SetText('')
 				bgframe:Hide()
-				DataPanelLeft:Show()
+				PanelLeft:Show()
 			end
 		end
 	end
@@ -568,7 +527,7 @@ if datatext.bags and datatext.bags > 0 then
 	Stat:SetFrameStrata('BACKGROUND')
 	Stat:SetFrameLevel(3)
 
-	local Text  = DataPanelLeft:CreateFontString(nil, 'OVERLAY')
+	local Text  = PanelLeft:CreateFontString(nil, 'OVERLAY')
 	Text:SetFont(media.font, datatext.fontsize)
 	PP(datatext.bags, Text)
 
@@ -604,9 +563,9 @@ if datatext.bags and datatext.bags > 0 then
 	Stat:RegisterEvent('BAG_UPDATE')
 	Stat:SetScript('OnMouseDown', 
 		function()
-			if bags.single == true then
+			if datatext.bag == true then
 				ToggleBag(0)
-			elseif bags.single == false then
+			elseif datatext.bag == false then
 				ToggleAllBags()
 			end
 		end)
@@ -624,7 +583,7 @@ if datatext.calltoarms and datatext.calltoarms > 0 then
 	Stat:SetFrameStrata("MEDIUM")
 	Stat:SetFrameLevel(3)
 
-	local Text  = DataPanelLeft:CreateFontString(nil, "OVERLAY")
+	local Text  = PanelLeft:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(media.font, datatext.fontsize)
 	PP(datatext.calltoarms, Text)
 	
@@ -741,7 +700,7 @@ if datatext.coords and datatext.coords > 0 then
 	Stat:SetFrameStrata('BACKGROUND')
 	Stat:SetFrameLevel(3)
 
-	local Text = DataPanelLeft:CreateFontString(nil, "OVERLAY")
+	local Text = PanelLeft:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(media.font, datatext.fontsize)
 	PP(datatext.coords, Text)
 
@@ -764,7 +723,7 @@ if datatext.currency and datatext.currency > 0 then
 	Stat:SetFrameStrata('BACKGROUND')
 	Stat:SetFrameLevel(3)
 
-	local Text  = DataPanelLeft:CreateFontString(nil, 'OVERLAY')
+	local Text  = PanelLeft:CreateFontString(nil, 'OVERLAY')
 	Text:SetFont(media.font, datatext.fontsize)
 	PP(datatext.currency, Text)
 	
@@ -810,9 +769,9 @@ if datatext.dps_text and datatext.dps_text > 0 then
 
 	local pet_id = UnitGUID('pet')
      
-	local dText = DataPanelLeft:CreateFontString(nil, 'OVERLAY')
+	local dText = PanelLeft:CreateFontString(nil, 'OVERLAY')
 	dText:SetFont(media.font, datatext.fontsize)
-	dText:SetText('0 ',L.datatext_dps)
+	dText:SetText(L.datatext_dps, '0')
 
 	PP(datatext.dps_text, dText)
 
@@ -858,10 +817,18 @@ if datatext.dps_text and datatext.dps_text > 0 then
 		local id = select(4, ...)
 		   
 		if id == player_id or id == pet_id then
-			if select(2, ...) == 'SWING_DAMAGE' then
-				last_dmg_amount = select(10, ...)
+			if select(2, ...) == "SWING_DAMAGE" then
+				if toc < 40200 then
+					last_dmg_amount = select(10, ...)
+				else
+					last_dmg_amount = select(12, ...)
+				end
 			else
-				last_dmg_amount = select(13, ...)
+				if toc < 40200 then
+					last_dmg_amount = select(13, ...)
+				else
+					last_dmg_amount = select(15, ...)
+				end
 			end
 			dmg_total = dmg_total + last_dmg_amount
 		end       
@@ -869,7 +836,7 @@ if datatext.dps_text and datatext.dps_text > 0 then
      
 	function getDPS()
 		if (dmg_total == 0) then
-			return ('0 ' .. hexa..L.datatext_dps..hexb)
+			return (hexa..L.datatext_dps..hexb..'0')
 		else
 			return string.format('%.1f ' ..hexa..L.datatext_dps..hexb, (dmg_total or 0) / (cmbt_time or 1))
 		end
@@ -902,7 +869,7 @@ if datatext.dur and datatext.dur > 0 then
 	Stat:SetFrameStrata("BACKGROUND")
 	Stat:SetFrameLevel(3)
 
-	local Text  = DataPanelLeft:CreateFontString(nil, "OVERLAY")
+	local Text  = PanelLeft:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(media.font, datatext.fontsize)
 	PP(datatext.dur, Text)
 
@@ -922,9 +889,9 @@ if datatext.dur and datatext.dur > 0 then
 		table.sort(L.Slots, function(a, b) return a[3] < b[3] end)
 		
 		if Total > 0 then
-			Text:SetText(floor(L.Slots[1][3]*100).."% "..hexa..L.datatext_armor..hexb)
+			Text:SetText(hexa..L.datatext_armor..hexb..floor(L.Slots[1][3]*100).."%")
 		else
-			Text:SetText("100% "..hexa..L.datatext_armor..hexb)
+			Text:SetText(hexa..L.datatext_armor..hexb.."100%")
 		end
 		-- Setup Durability Tooltip
 		self:SetAllPoints(Text)
@@ -989,7 +956,7 @@ if datatext.friends and datatext.friends > 0 then
 	Stat:SetFrameStrata("BACKGROUND")
 	Stat:SetFrameLevel(3)
 
-	local Text  = DataPanelLeft:CreateFontString(nil, "OVERLAY")
+	local Text  = PanelLeft:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(media.font, datatext.fontsize)
 	PP(datatext.friends, Text)
 
@@ -1244,7 +1211,7 @@ if datatext.gold and datatext.gold > 0 then
 	Stat:SetFrameStrata('BACKGROUND')
 	Stat:SetFrameLevel(3)
 
-	local Text  = DataPanelLeft:CreateFontString(nil, 'OVERLAY')
+	local Text  = PanelLeft:CreateFontString(nil, 'OVERLAY')
 	Text:SetFont(media.font, datatext.fontsize)
 	PP(datatext.gold, Text)
 
@@ -1292,10 +1259,10 @@ if datatext.gold and datatext.gold > 0 then
 		self:SetAllPoints(Text)
 
 		local myname  = UnitName('player');				
-		if (nDataData == nil) then nDataData = {}; end
-		if (nDataData.gold == nil) then nDataData.gold = {}; end
-		if (nDataData.gold[myPlayerRealm]==nil) then nDataData.gold[myPlayerRealm]={}; end
-		nDataData.gold[myPlayerRealm][myname] = GetMoney();
+		if (nData == nil) then nData = {}; end
+		if (nData.gold == nil) then nData.gold = {}; end
+		if (nData.gold[myPlayerRealm]==nil) then nData.gold[myPlayerRealm]={}; end
+		nData.gold[myPlayerRealm][myname] = GetMoney();
 				
 		OldMoney = NewMoney
 	end
@@ -1325,7 +1292,7 @@ if datatext.gold and datatext.gold > 0 then
 		
 			local totalGold = 0				
 			GameTooltip:AddLine(L.datatext_character)			
-			local thisRealmList = nDataData.gold[myPlayerRealm];
+			local thisRealmList = nData.gold[myPlayerRealm];
 			for k,v in pairs(thisRealmList) do
 				GameTooltip:AddDoubleLine(k, FormatTooltipMoney(v), 1, 1, 1, 1, 1, 1)
 				totalGold=totalGold+v;
@@ -1353,9 +1320,9 @@ if datatext.gold and datatext.gold > 0 then
 		local myPlayerRealm = GetCVar('realmName');
 		local myname  = UnitName('player');
 		
-		nDataData.gold = {}
-		nDataData.gold[myPlayerRealm]={}
-		nDataData.gold[myPlayerRealm][myname] = GetMoney();
+		nData.gold = {}
+		nData.gold[myPlayerRealm]={}
+		nData.gold[myPlayerRealm][myname] = GetMoney();
 	end
 	SLASH_RESETGOLD1 = '/resetgold'
 	SlashCmdList['RESETGOLD'] = RESETGOLD
@@ -1402,7 +1369,7 @@ if datatext.guild and datatext.guild > 0 then
 	local tthead = {r=0.4,g=0.78,b=1}
 	local ttsubh = {r=0.75,g=0.9,b=1}
 
-	local Text  = DataPanelLeft:CreateFontString(nil, "OVERLAY")
+	local Text  = PanelLeft:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(media.font, datatext.fontsize)
 	PP(datatext.guild, Text)
 
@@ -1681,9 +1648,9 @@ if datatext.hps_text and datatext.hps_text > 0 then
 	local player_id = UnitGUID('player')
 	local actual_heals_total, cmbt_time = 0
  
-	local hText = DataPanelLeft:CreateFontString(nil, 'OVERLAY')
+	local hText = PanelLeft:CreateFontString(nil, 'OVERLAY')
 	hText:SetFont(media.font, datatext.fontsize)
-	hText:SetText('0 ',L.datatext_hps)
+	hText:SetText(L.datatext_hps, '0')
  
 	PP(datatext.hps_text, hText)
  
@@ -1723,8 +1690,13 @@ if datatext.hps_text and datatext.hps_text > 0 then
 		-- only use events from the player
 		local id = select(4, ...)
 		if id == player_id then
-			amount_healed = select(13, ...)
-			amount_over_healed = select(14, ...)
+			if toc < 40200 then
+				amount_healed = select(13, ...)
+				amount_over_healed = select(14, ...)
+			else
+				amount_healed = select(15, ...)
+				amount_over_healed = select(16, ...)
+			end
 			-- add to the total the healed amount subtracting the overhealed amount
 			actual_heals_total = actual_heals_total + math.max(0, amount_healed - amount_over_healed)
 		end
@@ -1732,7 +1704,7 @@ if datatext.hps_text and datatext.hps_text > 0 then
 	
  	function get_hps()
 		if (actual_heals_total == 0) then
-			return ('0 '..hexa..L.datatext_hps..hexb)
+			return (hexa..L.datatext_hps..hexb..'0')
 		else
 			return string.format('%.1f '..hexa..L.datatext_hps..hexb, (actual_heals_total or 0) / (cmbt_time or 1))
 		end
@@ -1767,7 +1739,7 @@ if datatext.micromenu and datatext.micromenu > 0 then
 	Stat:SetFrameStrata("BACKGROUND")
 	Stat:SetFrameLevel(3)
 
-	local Text  = DataPanelLeft:CreateFontString(nil, "OVERLAY")
+	local Text  = PanelLeft:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(media.font, datatext.fontsize)
 	PP(datatext.micromenu, Text)
 
@@ -1821,14 +1793,14 @@ end
 ---------------------------
 if datatext.pro and datatext.pro > 0 then
 
-	local Stat = CreateFrame('Frame')
+	local Stat = CreateFrame('Button')
 	Stat:RegisterEvent('PLAYER_ENTERING_WORLD')
 	Stat:SetFrameStrata('BACKGROUND')
 	Stat:SetFrameLevel(3)
 	Stat:EnableMouse(true)
 	Stat.tooltip = false
 
-	local Text  = DataPanelLeft:CreateFontString(nil, 'OVERLAY')
+	local Text  = PanelLeft:CreateFontString(nil, 'OVERLAY')
 	Text:SetFont(media.font, datatext.fontsize)
 	PP(datatext.pro, Text)
 
@@ -1853,19 +1825,50 @@ if datatext.pro and datatext.pro > 0 then
 				GameTooltip:AddDoubleLine(name, rank..' / '..maxRank,.75,.9,1,.3,1,.3)
 			end
 		end
+		GameTooltip:AddLine' '
+		GameTooltip:AddLine("|cffeda55fLeft Click|r to Open Profession #1")
+		GameTooltip:AddLine("|cffeda55fMiddle Click|r to Open Spell Book")
+		GameTooltip:AddLine("|cffeda55fRight Click|r to Open Profession #2")		
 		GameTooltip:Show()
 	end)
 
 
-	Stat:SetScript('OnMouseDown', function(self, btn)
-
-		if btn == 'LeftButton' then
-			ToggleFrame(SpellBookFrame)
+	Stat:SetScript("OnClick",function(self,btn)
+		local prof1, prof2 = GetProfessions()
+		if btn == "LeftButton" then
+			if prof1 then
+				if (GetProfessionInfo(prof1) == 'Herbalism')then
+						print('|cff00B4FFBasic|rUI: |cffFF0000Herbalism has no options!|r')
+				elseif(GetProfessionInfo(prof1) == 'Skinning') then
+						print('|cff00B4FFBasic|rUI: |cffFF0000Skinning has no options!|r')
+				elseif(GetProfessionInfo(prof1) == 'Mining') then
+						CastSpellByName("Smelting")							
+				else	
+					CastSpellByName((GetProfessionInfo(prof1)))
+				end
+			else
+				print('|cff00B4FFBasic|rUI: |cffFF0000No Profession Found!|r')
+			end
+		elseif btn == 'MiddleButton' then
+			ToggleFrame(SpellBookFrame)		
+		elseif btn == "RightButton" then
+			if prof2 then
+				if (GetProfessionInfo(prof2) == 'Herbalism')then
+						print('nData: |cffFF0000Herbalism has no options!|r')
+				elseif(GetProfessionInfo(prof2) == 'Skinning') then
+						print('nData: |cffFF0000Skinning has no options!|r')
+				elseif(GetProfessionInfo(prof2) == 'Mining') then
+						CastSpellByName("Smelting")						
+				else	
+					CastSpellByName((GetProfessionInfo(prof2)))
+				end
+			else
+				print('nData: |cffFF0000No Profession Found!|r')
+			end
 		end
-
 	end)
 
-
+	Stat:RegisterForClicks("AnyUp")
 	Stat:SetScript('OnUpdate', Update)
 	Stat:SetScript('OnLeave', function() GameTooltip:Hide() end)
 end
@@ -1882,7 +1885,7 @@ if datatext.recount and datatext.recount > 0 then
 	RecountDPS:SetFrameStrata("MEDIUM")
 	RecountDPS:SetFrameLevel(3)
 
-	local Text  = DataPanelLeft:CreateFontString(nil, "OVERLAY")
+	local Text  = PanelLeft:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(media.font, datatext.fontsize)
 	PP(datatext.recount, Text)
 	RecountDPS:SetAllPoints(Text)
@@ -2014,7 +2017,7 @@ if datatext.spec and datatext.spec > 0 then
 	Stat:SetFrameStrata('BACKGROUND')
 	Stat:SetFrameLevel(3)
 
-	local Text  = DataPanelLeft:CreateFontString(nil, 'OVERLAY')
+	local Text  = PanelLeft:CreateFontString(nil, 'OVERLAY')
 	Text:SetFont(media.font, datatext.fontsize)
 	PP(datatext.spec, Text)
 
@@ -2111,7 +2114,7 @@ if datatext.stat1 and datatext.stat1 > 0 then
 	Stat:SetFrameLevel(3)
 	Stat:EnableMouse(true)
 
-	local Text  = DataPanelLeft:CreateFontString(nil, "OVERLAY")
+	local Text  = PanelLeft:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(media.font, datatext.fontsize)
 	PP(datatext.stat1, Text)
 
@@ -2311,7 +2314,7 @@ if datatext.stat2 and datatext.stat2 > 0 then
 	Stat:SetFrameLevel(3)
 	Stat:EnableMouse(true)
 
-	local Text  = DataPanelLeft:CreateFontString(nil, "OVERLAY")
+	local Text  = PanelLeft:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(media.font, datatext.fontsize)
 	PP(datatext.stat2, Text)
 
@@ -2449,7 +2452,7 @@ if datatext.system and datatext.system > 0 then
 	Stat:EnableMouse(true)
 	Stat.tooltip = false
 
-	local Text  = DataPanelLeft:CreateFontString(nil, "OVERLAY")
+	local Text  = PanelLeft:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(media.font, datatext.fontsize)
 	PP(datatext.system, Text)
 
@@ -2608,7 +2611,7 @@ if datatext.wowtime and datatext.wowtime > 0 then
 	Stat:SetFrameStrata("MEDIUM")
 	Stat:SetFrameLevel(3)
 
-	local Text  = DataPanelLeft:CreateFontString(nil, 'OVERLAY')
+	local Text  = PanelLeft:CreateFontString(nil, 'OVERLAY')
 	Text:SetFont(media.font, datatext.fontsize)
 	PP(datatext.wowtime, Text)
 
@@ -2803,7 +2806,7 @@ if datatext.zone and datatext.zone > 0 then
 	Stat:SetFrameStrata('BACKGROUND')
 	Stat:SetFrameLevel(3)
 
-	local Text = DataPanelLeft:CreateFontString(nil, "OVERLAY")
+	local Text = PanelLeft:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(media.font, datatext.fontsize)
 	PP(datatext.zone, Text)
 
