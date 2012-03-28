@@ -13,7 +13,7 @@ datatext = {
 	['enable'] = true,
 
 	['top'] = false,											-- if = true then panel on top of screen, if = false panel below mainmenubar
-	['outline'] = 'DialogBox',								-- choose either 'Tooltip' or 'DialogBox' for your nData Outline.
+	['border'] = 'DialogBox',									-- choose either 'Tooltip' or 'DialogBox' or 'NeavUI' for your nData Border.
 	['fontsize'] = 15,                                  	-- font size for panels.
 	['bags'] = 9,                                       	-- show space used in bags on panel.
 	['system'] = 0,                                     	-- show total memory and others systems info (FPS/MS) on panel.

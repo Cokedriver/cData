@@ -84,20 +84,31 @@ if datatext.enable == true then
 		
 	end
 	
-	if datatext.outline == 'Tooltip' then
+	if datatext.border == 'Tooltip' then
 		DataPanel:SetBackdrop({
 			bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
 			edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",							
 			edgeSize = 18,
 			insets = {left = 3, right = 3, top = 3, bottom = 3},
 		})
-	elseif datatext.outline == 'DialogBox' then
+	elseif datatext.border == 'DialogBox' then
 		DataPanel:SetBackdrop({
 			bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
 			edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
 			edgeSize = 25,
 			insets = {left = 9, right = 9, top = 9, bottom = 8}
 		})
+	elseif datatext.border == 'NeavUI' then
+		DataPanel:SetHeight(30)
+		DataPanel:SetBackdrop({
+			bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
+			edgeSize = 25
+		})		
+		if (IsAddOnLoaded('!Beautycase')) then
+			DataPanel:CreateBorder(12)
+		else
+			print('|cff00B4FFn|rData: |cffFF0000!Beautycase needs to be installed for NeavUI Border. Get it at http://www.wowinterface.com/downloads/info19675-Beautycase.html|r')
+		end
 	end
 
 		-- move some frames to make way for the datapanel
@@ -115,14 +126,19 @@ if datatext.enable == true then
 		-- Move some stuff for the panel on bottom.
 
 		local bottom = function() end
-		MainMenuBar:ClearAllPoints() MainMenuBar:SetPoint("BOTTOM", DataPanel, "TOP", 0, -3) MainMenuBar.ClearAllPoints = bottom MainMenuBar.SetPoint = bottom
-		VehicleMenuBar:ClearAllPoints() VehicleMenuBar:SetPoint("BOTTOM", DataPanel, "TOP", 0, 4) VehicleMenuBar.ClearAllPoints = bottom VehicleMenuBar.SetPoint = bottom
-		PetActionBarFrame:ClearAllPoints() PetActionBarFrame:SetPoint("BOTTOM", MainMenuBar, "TOP", 40, 47) PetActionBarFrame.ClearAllPoints = bottom PetActionBarFrame.SetPoint = bottom	
-
+		if (IsAddOnLoaded('!Beautycase')) then
+			MainMenuBar:ClearAllPoints() MainMenuBar:SetPoint("BOTTOM", DataPanel, "TOP", 0, 0) MainMenuBar.ClearAllPoints = bottom MainMenuBar.SetPoint = bottom
+			VehicleMenuBar:ClearAllPoints() VehicleMenuBar:SetPoint("BOTTOM", DataPanel, "TOP", 0, 4) VehicleMenuBar.ClearAllPoints = bottom VehicleMenuBar.SetPoint = bottom
+			PetActionBarFrame:ClearAllPoints() PetActionBarFrame:SetPoint("BOTTOM", MainMenuBar, "TOP", 40, 47) PetActionBarFrame.ClearAllPoints = bottom PetActionBarFrame.SetPoint = bottom			
+		else
+			MainMenuBar:ClearAllPoints() MainMenuBar:SetPoint("BOTTOM", DataPanel, "TOP", 0, -3) MainMenuBar.ClearAllPoints = bottom MainMenuBar.SetPoint = bottom
+			VehicleMenuBar:ClearAllPoints() VehicleMenuBar:SetPoint("BOTTOM", DataPanel, "TOP", 0, 4) VehicleMenuBar.ClearAllPoints = bottom VehicleMenuBar.SetPoint = bottom
+			PetActionBarFrame:ClearAllPoints() PetActionBarFrame:SetPoint("BOTTOM", MainMenuBar, "TOP", 40, 47) PetActionBarFrame.ClearAllPoints = bottom PetActionBarFrame.SetPoint = bottom	
+		end
 		-- Move the tooltip above the Actionbar
 
 		hooksecurefunc('GameTooltip_SetDefaultAnchor', function(self)
-			self:SetPoint('BOTTOMRIGHT', UIParent, -95, 135)
+			self:SetPoint('BOTTOMRIGHT', UIParent, -100, 140)
 		end)
 		
 		 -- Move the Bags above the Actionbar
@@ -1115,7 +1131,7 @@ if datatext.dur and datatext.dur > 0 then
 				end
 			end
 			GameTooltip:AddLine(" ")
-			GameTooltip:AddLine("|cffeda55fClick|r to Show Character Panel")
+			GameTooltip:AddLine("|cffeda55fClick|r to Open Character Panel")
 			GameTooltip:Show()
 		end
 	end)
@@ -1383,7 +1399,8 @@ if datatext.friends and datatext.friends > 0 then
 				end
 			end
 		end
-
+		GameTooltip:AddLine' '
+		GameTooltip:AddLine("|cffeda55fClick|r to Open Friend's List")		
 		GameTooltip:Show()	
 	end)
 
@@ -1702,7 +1719,7 @@ if datatext.guild and datatext.guild > 0 then
 					end
 				end
 			GameTooltip:AddLine(" ")
-			GameTooltip:AddLine("|cffeda55fClick|r to Show Guild Panel")
+			GameTooltip:AddLine("|cffeda55fClick|r to Open Guild Panel")
 			GameTooltip:Show()
 			end
 		end
@@ -1915,32 +1932,32 @@ if datatext.pro and datatext.pro > 0 then
 		if btn == "LeftButton" then
 			if prof1 then
 				if (GetProfessionInfo(prof1) == 'Herbalism')then
-						print('|cff00B4FFBasic|rUI: |cffFF0000Herbalism has no options!|r')
+						print('|cff00B4FFn|rData: |cffFF0000Herbalism has no options!|r')
 				elseif(GetProfessionInfo(prof1) == 'Skinning') then
-						print('|cff00B4FFBasic|rUI: |cffFF0000Skinning has no options!|r')
+						print('|cff00B4FFn|rData: |cffFF0000Skinning has no options!|r')
 				elseif(GetProfessionInfo(prof1) == 'Mining') then
 						CastSpellByName("Smelting")							
 				else	
 					CastSpellByName((GetProfessionInfo(prof1)))
 				end
 			else
-				print('nData: |cffFF0000No Profession Found!|r')
+				print('|cff00B4FFn|rData: |cffFF0000No Profession Found!|r')
 			end
 		elseif btn == 'MiddleButton' then
 			ToggleFrame(SpellBookFrame)		
 		elseif btn == "RightButton" then
 			if prof2 then
 				if (GetProfessionInfo(prof2) == 'Herbalism')then
-						print('nData: |cffFF0000Herbalism has no options!|r')
+						print('|cff00B4FFn|rData: |cffFF0000Herbalism has no options!|r')
 				elseif(GetProfessionInfo(prof2) == 'Skinning') then
-						print('nData: |cffFF0000Skinning has no options!|r')
+						print('|cff00B4FFn|rData: |cffFF0000Skinning has no options!|r')
 				elseif(GetProfessionInfo(prof2) == 'Mining') then
 						CastSpellByName("Smelting")						
 				else	
 					CastSpellByName((GetProfessionInfo(prof2)))
 				end
 			else
-				print('nData: |cffFF0000No Profession Found!|r')
+				print('|cff00B4FFn|rData: |cffFF0000No Profession Found!|r')
 			end
 		end
 	end)
@@ -2046,9 +2063,9 @@ if datatext.recount and datatext.recount > 0 then
 			GameTooltip:AddDoubleLine("Raid Damage:", raid_damage, 1, 1, 1, 0.8, 0.8, 0.8)
 			GameTooltip:AddDoubleLine("Raid DPS:", raid_dps, 1, 1, 1, 0.8, 0.8, 0.8)
 			GameTooltip:AddLine(" ")
-			GameTooltip:AddLine("|cffeda55fLeft Click|r to toggle Recount")
-			GameTooltip:AddLine("|cffeda55fRight Click|r to reset data")
-			GameTooltip:AddLine("|cffeda55fShift + Right Click|r to open config")
+			GameTooltip:AddLine("|cffeda55fLeft Click|r to Open Recount")
+			GameTooltip:AddLine("|cffeda55fRight Click|r to Reset Data")
+			GameTooltip:AddLine("|cffeda55fShift + Right Click|r to Open Config")
 		else
 			GameTooltip:AddLine("Recount is not loaded.", 255, 0, 0)
 			GameTooltip:AddLine("Enable Recount and reload your UI.")
@@ -2179,8 +2196,12 @@ if datatext.spec and datatext.spec > 0 then
 	Stat:SetScript('OnEvent', OnEvent)
 	Stat:SetScript('OnUpdate', Update)
 
-	Stat:SetScript('OnMouseDown', function()
-		SetActiveTalentGroup(active == 1 and 2 or 1)
+	Stat:SetScript("OnMouseDown", function(self, button)
+		if button == "LeftButton" then
+			SetActiveTalentGroup(active == 1 and 2 or 1)
+		elseif button == "RightButton" then
+			ToggleTalentFrame()
+		end
 	end)
 end
 
