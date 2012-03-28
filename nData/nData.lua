@@ -88,7 +88,7 @@ if datatext.enable == true then
 		DataPanel:SetBackdrop({
 			bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
 			edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",							
-			edgeSize = 18,
+			edgeSize = 20,
 			insets = {left = 3, right = 3, top = 3, bottom = 3},
 		})
 	elseif datatext.border == 'DialogBox' then
@@ -289,7 +289,7 @@ end
 
 Flash = function(self, duration)
 	if not self.anim then
-		B.SetUpAnimGroup(self)
+		SetUpAnimGroup(self)
 	end
 
 	self.anim.fadein:SetDuration(duration)
