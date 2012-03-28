@@ -27,9 +27,6 @@ This is a stand alone data text bar that goes with Neav UI or Default Blizzard U
 ### Friends
  -- show number of friends connected.
  
-### Gold
- -- show your current gold on panel.
- 
 ### Guild
  -- show number on guildmate connected on panel.
  

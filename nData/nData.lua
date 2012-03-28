@@ -13,18 +13,14 @@ if datatext.enable == true then
 	local ccolor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[select(2,UnitClass("player"))]
 	local getscreenwidth = tonumber(string.match(({GetScreenResolutions()})[GetCurrentResolution()], "(%d+)x+%d"))
 	
+	
+	
 	if datatext.top == true then
 		DataPanel:SetPoint('TOP', UIParent, 0, 0)
-		DataPanel:SetHeight(28)
+		DataPanel:SetHeight(35)
 		DataPanel:SetWidth(getscreenwidth)
 		DataPanel:SetFrameStrata('LOW')
 		DataPanel:SetFrameLevel(0)
-		DataPanel:SetBackdrop({
-			bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
-			edgeFile = "Interface\\AddOns\\BasicUI\\BasicMedia\\UI-Tooltip-Border",							
-			tile = true, tileSize = 16, edgeSize = 18,
-			insets = {left = 3, right = 3, top = 3, bottom = 3},
-		})
 		DataPanel:SetBackdropBorderColor(ccolor.r, ccolor.g, ccolor.b, 1)
 
 		-- Left Panel
@@ -58,12 +54,6 @@ if datatext.enable == true then
 		DataPanel:SetWidth(1200)
 		DataPanel:SetFrameStrata('LOW')
 		DataPanel:SetFrameLevel(0)
-		DataPanel:SetBackdrop({
-			bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
-			edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-			edgeSize = 25,
-			insets = {left = 9, right = 9, top = 9, bottom = 8}
-		})
 		DataPanel:SetBackdropColor(0, 0, 0, 1)
 		
 		-- Left Panel
@@ -93,24 +83,41 @@ if datatext.enable == true then
 		BattleGroundPanel:SetFrameLevel(1)
 		
 	end
-
+	
+	if datatext.outline == 'Tooltip' then
+		DataPanel:SetBackdrop({
+			bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
+			edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",							
+			edgeSize = 18,
+			insets = {left = 3, right = 3, top = 3, bottom = 3},
+		})
+	elseif datatext.outline == 'DialogBox' then
+		DataPanel:SetBackdrop({
+			bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
+			edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+			edgeSize = 25,
+			insets = {left = 9, right = 9, top = 9, bottom = 8}
+		})
+	end
 
 		-- move some frames to make way for the datapanel
 	if datatext.top == true then
 
 		local top = function() end
-		PlayerFrame:ClearAllPoints() PlayerFrame:SetPoint("TOPLEFT", -19, -20) PlayerFrame.ClearAllPoints = top PlayerFrame.SetPoint = top
-		TargetFrame:ClearAllPoints() TargetFrame:SetPoint("TOPLEFT", 250, -20) TargetFrame.ClearAllPoints = top TargetFrame.SetPoint = top
+		PlayerFrame:ClearAllPoints() PlayerFrame:SetPoint("TOPLEFT", -19, -32) PlayerFrame.ClearAllPoints = top PlayerFrame.SetPoint = top
+		TargetFrame:ClearAllPoints() TargetFrame:SetPoint("TOPLEFT", 250, -32) TargetFrame.ClearAllPoints = top TargetFrame.SetPoint = top
 		MinimapCluster:ClearAllPoints() MinimapCluster:SetPoint('TOPRIGHT', 0, -32) MinimapCluster.ClearAllPoints = top MinimapCluster.SetPoint = top
-		BuffFrame:ClearAllPoints() BuffFrame:SetPoint('TOP', MinimapCluster, -100, 0) BuffFrame.ClearAllPoints = top BuffFrame.SetPoint = top
+		BuffFrame:ClearAllPoints() BuffFrame:SetPoint('TOP', MinimapCluster, -110, -5) BuffFrame.ClearAllPoints = top BuffFrame.SetPoint = top
+		WorldStateAlwaysUpFrame:ClearAllPoints() WorldStateAlwaysUpFrame:SetPoint('TOP', 0, -32) WorldStateAlwaysUpFrame.ClearAllpoints = top WorldStateAlwaysUpFrame.Setpoint = top
 
 	else
 
 		-- Move some stuff for the panel on bottom.
 
 		local bottom = function() end
-		MainMenuBar:ClearAllPoints() MainMenuBar:SetPoint("BOTTOM",DataPanel,"TOP", 0, -4) MainMenuBar.ClearAllPoints = bottom MainMenuBar.SetPoint = bottom
-		PetActionBarFrame:ClearAllPoints() PetActionBarFrame:SetPoint("BOTTOM",MainMenuBar,"TOP", 40, 47) PetActionBarFrame.ClearAllPoints = bottom PetActionBarFrame.SetPoint = bottom		
+		MainMenuBar:ClearAllPoints() MainMenuBar:SetPoint("BOTTOM", DataPanel, "TOP", 0, -3) MainMenuBar.ClearAllPoints = bottom MainMenuBar.SetPoint = bottom
+		VehicleMenuBar:ClearAllPoints() VehicleMenuBar:SetPoint("BOTTOM", DataPanel, "TOP", 0, 4) VehicleMenuBar.ClearAllPoints = bottom VehicleMenuBar.SetPoint = bottom
+		PetActionBarFrame:ClearAllPoints() PetActionBarFrame:SetPoint("BOTTOM", MainMenuBar, "TOP", 40, 47) PetActionBarFrame.ClearAllPoints = bottom PetActionBarFrame.SetPoint = bottom	
 
 		-- Move the tooltip above the Actionbar
 
@@ -253,9 +260,52 @@ DataTextTooltipAnchor = function(self)
 	return anchor, panel, xoff, yoff
 end
 
+SetUpAnimGroup = function(self)
+	self.anim = self:CreateAnimationGroup("Pulse")
+	self.anim.fadein = self.anim:CreateAnimation("ALPHA", "FadeIn")
+	self.anim.fadein:SetChange(1)
+	self.anim.fadein:SetOrder(2)
+
+	self.anim.fadeout = self.anim:CreateAnimation("ALPHA", "FadeOut")
+	self.anim.fadeout:SetChange(-1)
+	self.anim.fadeout:SetOrder(1)
+end
+
+Flash = function(self, duration)
+	if not self.anim then
+		B.SetUpAnimGroup(self)
+	end
+
+	self.anim.fadein:SetDuration(duration)
+	self.anim.fadeout:SetDuration(duration)
+	self.anim:SetLooping("REPEAT")
+	self.anim:Play()
+end
+
+StopFlash = function(self)
+	if self.anim then
+		self.anim:Finish()
+	end
+end
+
+Slots = {
+	[1] = {1, 'Head', 1000},
+	[2] = {3, 'Shoulder', 1000},
+	[3] = {5, 'Chest', 1000},
+	[4] = {6, 'Waist', 1000},
+	[5] = {9, 'Wrist', 1000},
+	[6] = {10, 'Hands', 1000},
+	[7] = {7, 'Legs', 1000},
+	[8] = {8, 'Feet', 1000},
+	[9] = {16, 'Main Hand', 1000},
+	[10] = {17, 'Off Hand', 1000},
+	[11] = {18, 'Ranged', 1000}
+}
+
 myclass = UnitClass("player")
 myname = select(1, UnitName("player"))
 toc = select(4, GetBuildInfo())
+myrealm = GetRealmName()
 
 --Check Player's Role
 
@@ -360,7 +410,7 @@ if datatext.threatbar == true then
 			local threatval = threatpct or 0
 			
 			self:SetValue(threatval)
-			self.text:SetFormattedText("%s ".."%3.1f%%|r", L.unitframes_ouf_threattext, threatval)
+			self.text:SetFormattedText("%s ".."%3.1f%%|r", 'Threat on current target:', threatval)
 			
 			if( threatval < 30 ) then
 				self.text:SetTextColor(unpack(self.Colors[3]))
@@ -417,31 +467,31 @@ if datatext.battleground == true then
 					GameTooltip:ClearLines()
 					GameTooltip:SetPoint('BOTTOM', self, 'TOP', 0, 1)
 					GameTooltip:ClearLines()
-					GameTooltip:AddLine(L.datatext_ttstatsfor..hexa..name..hexb)
+					GameTooltip:AddLine('Stats for '..hexa..name..hexb)
 					GameTooltip:AddLine' '
-					GameTooltip:AddDoubleLine(L.datatext_ttkillingblows, killingBlows,1,1,1)
-					GameTooltip:AddDoubleLine(L.datatext_tthonorkills, honorableKills,1,1,1)
-					GameTooltip:AddDoubleLine(L.datatext_ttdeaths, deaths,1,1,1)
-					GameTooltip:AddDoubleLine(L.datatext_tthonorgain, format('%d', honorGained),1,1,1)
-					GameTooltip:AddDoubleLine(L.datatext_ttdmgdone, damageDone,1,1,1)
-					GameTooltip:AddDoubleLine(L.datatext_tthealdone, healingDone,1,1,1)
+					GameTooltip:AddDoubleLine('Killing Blows : ', killingBlows,1,1,1)
+					GameTooltip:AddDoubleLine('Honorable Kills:', honorableKills,1,1,1)
+					GameTooltip:AddDoubleLine('Deaths:', deaths,1,1,1)
+					GameTooltip:AddDoubleLine('Honor Gained:', format('%d', honorGained),1,1,1)
+					GameTooltip:AddDoubleLine('Damage Done:', damageDone,1,1,1)
+					GameTooltip:AddDoubleLine('Healing Done:', healingDone,1,1,1)
 					--Add extra statistics to watch based on what BG you are in.
 					if curmapid == WSG or curmapid == TP then 
-						GameTooltip:AddDoubleLine(L.datatext_flagscaptured,GetBattlefieldStatData(i, 1),1,1,1)
-						GameTooltip:AddDoubleLine(L.datatext_flagsreturned,GetBattlefieldStatData(i, 2),1,1,1)
+						GameTooltip:AddDoubleLine('Flags Captured:',GetBattlefieldStatData(i, 1),1,1,1)
+						GameTooltip:AddDoubleLine('Flags Returned:',GetBattlefieldStatData(i, 2),1,1,1)
 					elseif curmapid == EOTS then
-						GameTooltip:AddDoubleLine(L.datatext_flagscaptured,GetBattlefieldStatData(i, 1),1,1,1)
+						GameTooltip:AddDoubleLine('Flags Captured:',GetBattlefieldStatData(i, 1),1,1,1)
 					elseif curmapid == AV then
-						GameTooltip:AddDoubleLine(L.datatext_graveyardsassaulted,GetBattlefieldStatData(i, 1),1,1,1)
-						GameTooltip:AddDoubleLine(L.datatext_graveyardsdefended,GetBattlefieldStatData(i, 2),1,1,1)
-						GameTooltip:AddDoubleLine(L.datatext_towersassaulted,GetBattlefieldStatData(i, 3),1,1,1)
-						GameTooltip:AddDoubleLine(L.datatext_towersdefended,GetBattlefieldStatData(i, 4),1,1,1)
+						GameTooltip:AddDoubleLine('Graveyards Assaulted:',GetBattlefieldStatData(i, 1),1,1,1)
+						GameTooltip:AddDoubleLine('Graveyards Defended:',GetBattlefieldStatData(i, 2),1,1,1)
+						GameTooltip:AddDoubleLine('Towers Assaulted:',GetBattlefieldStatData(i, 3),1,1,1)
+						GameTooltip:AddDoubleLine('Towers Defended:',GetBattlefieldStatData(i, 4),1,1,1)
 					elseif curmapid == SOTA then
-						GameTooltip:AddDoubleLine(L.datatext_demolishersdestroyed,GetBattlefieldStatData(i, 1),1,1,1)
-						GameTooltip:AddDoubleLine(L.datatext_gatesdestroyed,GetBattlefieldStatData(i, 2),1,1,1)
+						GameTooltip:AddDoubleLine('Demolishers Destroyed:',GetBattlefieldStatData(i, 1),1,1,1)
+						GameTooltip:AddDoubleLine('Gates Destroyed:',GetBattlefieldStatData(i, 2),1,1,1)
 					elseif curmapid == IOC or curmapid == TBFG or curmapid == AB then
-						GameTooltip:AddDoubleLine(L.datatext_basesassaulted,GetBattlefieldStatData(i, 1),1,1,1)
-						GameTooltip:AddDoubleLine(L.datatext_basesdefended,GetBattlefieldStatData(i, 2),1,1,1)
+						GameTooltip:AddDoubleLine('Bases Assaulted:',GetBattlefieldStatData(i, 1),1,1,1)
+						GameTooltip:AddDoubleLine('Bases Defended:',GetBattlefieldStatData(i, 2),1,1,1)
 					end					
 					GameTooltip:Show()
 				end
@@ -478,15 +528,15 @@ if datatext.battleground == true then
 			for i=1, numScores do
 				local name, killingBlows, honorableKills, deaths, honorGained, faction, race, class, classToken, damageDone, healingDone, bgRating, ratingChange = GetBattlefieldScore(i)
 				if healingDone > damageDone then
-					dmgtxt = (L.datatext_healing..hexa..healingDone..hexb)
+					dmgtxt = ('Healing : '..hexa..healingDone..hexb)
 				else
-					dmgtxt = (L.datatext_damage..hexa..damageDone..hexb)
+					dmgtxt = ('Damage : '..hexa..damageDone..hexb)
 				end
 				if ( name ) then
 					if ( name == myname ) then
-						Text2:SetText(L.datatext_honor..hexa..format('%d', honorGained)..hexb)
+						Text2:SetText('Honor : '..hexa..format('%d', honorGained)..hexb)
 						Text1:SetText(dmgtxt)
-						Text3:SetText(L.datatext_killingblows..hexa..killingBlows..hexb)
+						Text3:SetText('Killing Blows : '..hexa..killingBlows..hexb)
 					end   
 				end
 			end 
@@ -527,11 +577,108 @@ if datatext.bags and datatext.bags > 0 then
 	Stat:SetFrameStrata('BACKGROUND')
 	Stat:SetFrameLevel(3)
 
-	local Text  = PanelLeft:CreateFontString(nil, 'OVERLAY')
-	Text:SetFont(media.font, datatext.fontsize)
+	local Text  = DataPanel:CreateFontString(nil, 'OVERLAY')
+	Text:SetFont(media.font, datatext.fontsize,'THINOUTLINE')
 	PP(datatext.bags, Text)
 
-	local function OnEvent(self, event, ...)
+	local defaultColor = { 1, 1, 1 }
+	local Profit	= 0
+	local Spent		= 0
+	local OldMoney	= 0	
+	
+	local function formatMoney(c)
+		local str = ""
+		if not c or c < 0 then 
+			return str 
+		end
+		
+		if c >= 10000 then
+			local g = math.floor(c/10000)
+			c = c - g*10000
+			str = str.."|cFFFFD800"..g.."|r|TInterface\\MoneyFrame\\UI-GoldIcon.blp:0:0:0:0|t"
+		end
+		if c >= 100 then
+			local s = math.floor(c/100)
+			c = c - s*100
+			str = str.."|cFFC7C7C7"..s.."|r|TInterface\\MoneyFrame\\UI-SilverIcon.blp:0:0:0:0|t"
+		end
+		if c >= 0 then
+			str = str.."|cFFEEA55F"..c.."|r|TInterface\\MoneyFrame\\UI-CopperIcon.blp:0:0:0:0|t"
+		end
+		
+		return str
+	end
+	
+	local function FormatTooltipMoney(c)
+		if not c then return end
+		local str = ""
+		if not c or c < 0 then 
+			return str 
+		end
+		
+		if c >= 10000 then
+			local g = math.floor(c/10000)
+			c = c - g*10000
+			str = str.."|cFFFFD800"..g.."|r|TInterface\\MoneyFrame\\UI-GoldIcon.blp:0:0:0:0|t"
+		end
+		if c >= 100 then
+			local s = math.floor(c/100)
+			c = c - s*100
+			str = str.."|cFFC7C7C7"..s.."|r|TInterface\\MoneyFrame\\UI-SilverIcon.blp:0:0:0:0|t"
+		end
+		if c >= 0 then
+			str = str.."|cFFEEA55F"..c.."|r|TInterface\\MoneyFrame\\UI-CopperIcon.blp:0:0:0:0|t"
+		end
+		
+		return str
+	end	
+	Stat:SetScript("OnEnter", function(self)
+		if InCombatLockdown() then return end
+		
+		local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
+		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
+		GameTooltip:ClearLines()
+		GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Gold")
+		GameTooltip:AddLine' '			
+		GameTooltip:AddLine("Session: ")
+		GameTooltip:AddDoubleLine("Earned:", formatMoney(Profit), 1, 1, 1, 1, 1, 1)
+		GameTooltip:AddDoubleLine("Spent:", formatMoney(Spent), 1, 1, 1, 1, 1, 1)
+		if Profit < Spent then
+			GameTooltip:AddDoubleLine("Deficit:", formatMoney(Profit-Spent), 1, 0, 0, 1, 1, 1)
+		elseif (Profit-Spent)>0 then
+			GameTooltip:AddDoubleLine("Profit:", formatMoney(Profit-Spent), 0, 1, 0, 1, 1, 1)
+		end				
+		GameTooltip:AddLine' '								
+	
+		local totalGold = 0				
+		GameTooltip:AddLine("Character: ")			
+		for k,_ in pairs(nData[myrealm]) do
+			if nData[myrealm][k]["gold"] then 
+				GameTooltip:AddDoubleLine(k, FormatTooltipMoney(nData[myrealm][k]["gold"]), 1, 1, 1, 1, 1, 1)
+				totalGold=totalGold+nData[myrealm][k]["gold"]
+			end
+		end 
+		GameTooltip:AddLine' '
+		GameTooltip:AddLine("Server: ")
+		GameTooltip:AddDoubleLine("Total: ", FormatTooltipMoney(totalGold), 1, 1, 1, 1, 1, 1)
+
+		for i = 1, MAX_WATCHED_TOKENS do
+			local name, count, extraCurrencyType, icon, itemID = GetBackpackCurrencyInfo(i)
+			if name and i == 1 then
+				GameTooltip:AddLine(" ")
+				GameTooltip:AddLine(CURRENCY)
+			end
+			if name and count then GameTooltip:AddDoubleLine(name, count, 1, 1, 1) end
+		end
+		GameTooltip:AddLine' '
+		GameTooltip:AddLine("|cffeda55fClick|r to Open Bags")			
+		GameTooltip:Show()
+		
+	end)
+	
+	Stat:SetScript("OnLeave", function() GameTooltip:Hide() end)		
+	
+	local function OnEvent(self, event)
 		local totalSlots, freeSlots = 0, 0
 		local itemLink, subtype, isBag
 		for i = 0,NUM_BAG_SLOTS do
@@ -549,16 +696,50 @@ if datatext.bags and datatext.bags > 0 then
 				totalSlots = totalSlots + GetContainerNumSlots(i)
 				freeSlots = freeSlots + GetContainerNumFreeSlots(i)
 			end
-			Text:SetText(hexa..L.datatext_bags..hexb.. freeSlots.. '/' ..totalSlots)
-				if freeSlots < 10 then
+			Text:SetText(hexa.."Bags: "..hexb.. freeSlots.. '/' ..totalSlots)
+				if freeSlots < 6 then
 					Text:SetTextColor(1,0,0)
+					Flash(Text, .5)
+				elseif freeSlots < 10 then
+					Text:SetTextColor(1,0,0)
+					Flash(Text, 1)
 				elseif freeSlots > 10 then
 					Text:SetTextColor(1,1,1)
+					StopFlash(Text)
 				end
 			self:SetAllPoints(Text)
+			
+		end	
+		if event == "PLAYER_LOGIN" then
+			OldMoney = GetMoney()
 		end
+		
+		local NewMoney	= GetMoney()
+		local Change = NewMoney-OldMoney -- Positive if we gain money
+		
+		if OldMoney>NewMoney then		-- Lost Money
+			Spent = Spent - Change
+		else							-- Gained Moeny
+			Profit = Profit + Change
+		end
+		
+		-- Setup Money Tooltip
+		self:SetAllPoints(Text)
+
+		if (nData == nil) then nData = {}; end
+		if (nData[myrealm] == nil) then nData[myrealm] = {} end
+		if (nData[myrealm][myname] == nil) then nData[myrealm][myname] = {} end
+		nData[myrealm][myname]["gold"] = GetMoney()
+		nData.gold = nil -- old
+			
+		OldMoney = NewMoney			
 	end
-          
+	
+	Stat:RegisterEvent("PLAYER_MONEY")
+	Stat:RegisterEvent("SEND_MAIL_MONEY_CHANGED")
+	Stat:RegisterEvent("SEND_MAIL_COD_CHANGED")
+	Stat:RegisterEvent("PLAYER_TRADE_MONEY")
+	Stat:RegisterEvent("TRADE_MONEY_CHANGED")         
 	Stat:RegisterEvent('PLAYER_LOGIN')
 	Stat:RegisterEvent('BAG_UPDATE')
 	Stat:SetScript('OnMouseDown', 
@@ -568,7 +749,22 @@ if datatext.bags and datatext.bags > 0 then
 			elseif datatext.bag == false then
 				ToggleAllBags()
 			end
-		end)
+		end
+	)	
+
+
+		-- reset gold data
+	local function RESETGOLD()		
+		for k,_ in pairs(nData[myrealm]) do
+			nData[myrealm][k].gold = nil
+		end 
+		if (nData == nil) then nData = {}; end
+		if (nData[myrealm] == nil) then nData[myrealm] = {} end
+		if (nData[myrealm][myname] == nil) then nData[myrealm][myname] = {} end
+		nData[myrealm][myname]["gold"] = GetMoney()		
+	end
+	SLASH_RESETGOLD1 = "/resetgold"
+	SlashCmdList["RESETGOLD"] = RESETGOLD	
 	Stat:SetScript('OnEvent', OnEvent)
 end
 
@@ -590,13 +786,13 @@ if datatext.calltoarms and datatext.calltoarms > 0 then
 	local function MakeIconString(tank, healer, damage)
 		local str = ""
 		if tank then 
-			str = str..'T, '
+			str = str..'T'
 		end
 		if healer then
-			str = str..'H, '
+			str = str..', H'
 		end
 		if damage then
-			str = str..'D'
+			str = str..', D'
 		end	
 		
 		return str
@@ -605,13 +801,13 @@ if datatext.calltoarms and datatext.calltoarms > 0 then
 	local function MakeString(tank, healer, damage)
 		local str = ""
 		if tank then 
-			str = str..'Tank, '
+			str = str..'Tank'
 		end
 		if healer then
-			str = str..'Healer, '
+			str = str..', Healer'
 		end
 		if damage then
-			str = str..'DPS'
+			str = str..', DPS'
 		end	
 		
 		return str
@@ -646,8 +842,8 @@ if datatext.calltoarms and datatext.calltoarms > 0 then
 		local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
 		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 		GameTooltip:ClearLines()
-		GameTooltip:AddLine(BATTLEGROUND_HOLIDAY)
-		GameTooltip:AddLine(' ')
+		GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Call to Arms")
+		GameTooltip:AddLine(' ')		
 		
 		local allUnavailable = true
 		local numCTA = 0
@@ -675,11 +871,13 @@ if datatext.calltoarms and datatext.calltoarms > 0 then
 		end
 		
 		if allUnavailable then 
-			GameTooltip:AddLine(L.datatext_cta_allunavailable)
+			GameTooltip:AddLine('Could not get Call To Arms information.')
 		elseif numCTA == 0 then 
-			GameTooltip:AddLine(L.datatext_cta_nodungeons) 
+			GameTooltip:AddLine('No dungeons are currently offering a Call To Arms.') 
 		end
-		GameTooltip:Show()	
+		GameTooltip:AddLine' '
+		GameTooltip:AddLine("|cffeda55fClick|r to Open Dungeon Finder")		
+		GameTooltip:Show()		
 	end
     
 	Stat:RegisterEvent("LFG_UPDATE_RANDOM_INFO")
@@ -771,7 +969,7 @@ if datatext.dps_text and datatext.dps_text > 0 then
      
 	local dText = PanelLeft:CreateFontString(nil, 'OVERLAY')
 	dText:SetFont(media.font, datatext.fontsize)
-	dText:SetText(L.datatext_dps, '0')
+	dText:SetText('DPS: ', '0')
 
 	PP(datatext.dps_text, dText)
 
@@ -836,9 +1034,9 @@ if datatext.dps_text and datatext.dps_text > 0 then
      
 	function getDPS()
 		if (dmg_total == 0) then
-			return (hexa..L.datatext_dps..hexb..'0')
+			return (hexa..'DPS: '..hexb..'0')
 		else
-			return string.format('%.1f ' ..hexa..L.datatext_dps..hexb, (dmg_total or 0) / (cmbt_time or 1))
+			return string.format('%.1f ' ..hexa..'DPS: '..hexb, (dmg_total or 0) / (cmbt_time or 1))
 		end
 	end
 
@@ -878,20 +1076,20 @@ if datatext.dur and datatext.dur > 0 then
 
 	local function OnEvent(self)
 		for i = 1, 11 do
-			if GetInventoryItemLink("player", L.Slots[i][1]) ~= nil then
-				current, max = GetInventoryItemDurability(L.Slots[i][1])
+			if GetInventoryItemLink("player", Slots[i][1]) ~= nil then
+				current, max = GetInventoryItemDurability(Slots[i][1])
 				if current then 
-					L.Slots[i][3] = current/max
+					Slots[i][3] = current/max
 					Total = Total + 1
 				end
 			end
 		end
-		table.sort(L.Slots, function(a, b) return a[3] < b[3] end)
+		table.sort(Slots, function(a, b) return a[3] < b[3] end)
 		
 		if Total > 0 then
-			Text:SetText(hexa..L.datatext_armor..hexb..floor(L.Slots[1][3]*100).."%")
+			Text:SetText(hexa..'Armor: '..hexb..floor(Slots[1][3]*100).."%")
 		else
-			Text:SetText(hexa..L.datatext_armor..hexb.."100%")
+			Text:SetText(hexa..'Armor: '..hexb.."100%")
 		end
 		-- Setup Durability Tooltip
 		self:SetAllPoints(Text)
@@ -908,13 +1106,16 @@ if datatext.dur and datatext.dur > 0 then
 			local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
 			GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 			GameTooltip:ClearLines()
+			GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Armor")			
 			for i = 1, 11 do
-				if L.Slots[i][3] ~= 1000 then
-					green = L.Slots[i][3]*2
+				if Slots[i][3] ~= 1000 then
+					green = Slots[i][3]*2
 					red = 1 - green
-					GameTooltip:AddDoubleLine(L.Slots[i][2], floor(L.Slots[i][3]*100).."%",1 ,1 , 1, red + 1, green, 0)
+					GameTooltip:AddDoubleLine(Slots[i][2], floor(Slots[i][3]*100).."%",1 ,1 , 1, red + 1, green, 0)
 				end
 			end
+			GameTooltip:AddLine(" ")
+			GameTooltip:AddLine("|cffeda55fClick|r to Show Character Panel")
 			GameTooltip:Show()
 		end
 	end)
@@ -997,7 +1198,7 @@ if datatext.friends and datatext.friends > 0 then
 	local tthead, ttsubh, ttoff = {r=0.4, g=0.78, b=1}, {r=0.75, g=0.9, b=1}, {r=.3,g=1,b=.3}
 	local activezone, inactivezone = {r=0.3, g=1.0, b=0.3}, {r=0.65, g=0.65, b=0.65}
 	local displayString = join("", "%s: ", "%d|r")
-	local statusTable = { L.chat_FLAG_AFK, L.chat_FLAG_DND, "" }
+	local statusTable = { 'AFK', 'DND', "" }
 	local groupedTable = { "|cffaaaaaa*|r", "" } 
 	local friendTable, BNTable = {}, {}
 	local friendOnline, friendOffline = gsub(ERR_FRIEND_ONLINE_SS,"\124Hplayer:%%s\124h%[%%s%]\124h",""), gsub(ERR_FRIEND_OFFLINE_S,"%%s","")
@@ -1056,7 +1257,7 @@ if datatext.friends and datatext.friends > 0 then
 		-- force update when showing tooltip
 		dataValid = false
 
-		Text:SetFormattedText(displayString, hexa..L.datatext_friends..hexb, onlineFriends + numBNetOnline)
+		Text:SetFormattedText(displayString, hexa..'Friends'..hexb, onlineFriends + numBNetOnline)
 		self:SetAllPoints(Text)
 	end
 
@@ -1138,7 +1339,7 @@ if datatext.friends and datatext.friends > 0 then
 		local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
 		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 		GameTooltip:ClearLines()
-		GameTooltip:AddDoubleLine(L.datatext_friendlist, format(totalOnlineString, totalonline, totalfriends),tthead.r,tthead.g,tthead.b,tthead.r,tthead.g,tthead.b)
+		GameTooltip:AddDoubleLine('Friends list:', format(totalOnlineString, totalonline, totalfriends),tthead.r,tthead.g,tthead.b,tthead.r,tthead.g,tthead.b)
 		if onlineFriends > 0 then
 			GameTooltip:AddLine(' ')
 			GameTooltip:AddLine(worldOfWarcraftString)
@@ -1225,18 +1426,18 @@ if datatext.gold and datatext.gold > 0 then
 		local silver = mod(floor(math.abs(money) / 100), 100)
 		local copper = mod(floor(math.abs(money)), 100)
 		if gold ~= 0 then
-			return format('%s'..L.goldabbrev..' %s'..L.silverabbrev..' %s'..L.copperabbrev, gold, silver, copper)
+			return format('%s'..'|cffffd700g|r'..' %s'..'|cffc7c7cfs|r'..' %s'..'|cffeda55fc|r', gold, silver, copper)
 		elseif silver ~= 0 then
-			return format('%s'..L.silverabbrev..' %s'..L.copperabbrev, silver, copper)
+			return format('%s'..'|cffc7c7cfs|r'..' %s'..'|cffeda55fc|r', silver, copper)
 		else
-			return format('%s'..L.copperabbrev, copper)
+			return format('%s'..'|cffeda55fc|r', copper)
 		end
 	end
 
 	local function FormatTooltipMoney(money)
 		local gold, silver, copper = abs(money / 10000), abs(mod(money / 100, 100)), abs(mod(money, 100))
 		local cash = ''
-		cash = format('%.2d'..L.goldabbrev..' %.2d'..L.silverabbrev..' %.2d'..L.copperabbrev, gold, silver, copper)		
+		cash = format('%.2d'..'|cffffd700g|r'..' %.2d'..'|cffc7c7cfs|r'..' %.2d'..'|cffeda55fc|r', gold, silver, copper)		
 		return cash
 	end	
 
@@ -1280,26 +1481,28 @@ if datatext.gold and datatext.gold > 0 then
 			local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
 			GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 			GameTooltip:ClearLines()
-			GameTooltip:AddLine(L.datatext_session)
-			GameTooltip:AddDoubleLine(L.datatext_earned, formatMoney(Profit), 1, 1, 1, 1, 1, 1)
-			GameTooltip:AddDoubleLine(L.datatext_spent, formatMoney(Spent), 1, 1, 1, 1, 1, 1)
+			GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Gold")
+			GameTooltip:AddLine' '				
+			GameTooltip:AddLine('Session: ')
+			GameTooltip:AddDoubleLine('Earned:', formatMoney(Profit), 1, 1, 1, 1, 1, 1)
+			GameTooltip:AddDoubleLine('Spent:', formatMoney(Spent), 1, 1, 1, 1, 1, 1)
 			if Profit < Spent then
-				GameTooltip:AddDoubleLine(L.datatext_deficit, formatMoney(Profit-Spent), 1, 0, 0, 1, 1, 1)
+				GameTooltip:AddDoubleLine('Deficit:', formatMoney(Profit-Spent), 1, 0, 0, 1, 1, 1)
 			elseif (Profit-Spent)>0 then
-				GameTooltip:AddDoubleLine(L.datatext_profit, formatMoney(Profit-Spent), 0, 1, 0, 1, 1, 1)
+				GameTooltip:AddDoubleLine('Profit:', formatMoney(Profit-Spent), 0, 1, 0, 1, 1, 1)
 			end				
 			GameTooltip:AddLine' '								
 		
 			local totalGold = 0				
-			GameTooltip:AddLine(L.datatext_character)			
+			GameTooltip:AddLine('Character: ')			
 			local thisRealmList = nData.gold[myPlayerRealm];
 			for k,v in pairs(thisRealmList) do
 				GameTooltip:AddDoubleLine(k, FormatTooltipMoney(v), 1, 1, 1, 1, 1, 1)
 				totalGold=totalGold+v;
 			end 
 			GameTooltip:AddLine' '
-			GameTooltip:AddLine(L.datatext_server)
-			GameTooltip:AddDoubleLine(L.datatext_totalgold, FormatTooltipMoney(totalGold), 1, 1, 1, 1, 1, 1)
+			GameTooltip:AddLine('Server: ')
+			GameTooltip:AddDoubleLine('Total: ', FormatTooltipMoney(totalGold), 1, 1, 1, 1, 1, 1)
 
 			for i = 1, GetNumWatchedTokens() do
 				local name, count, extraCurrencyType, icon, itemID = GetBackpackCurrencyInfo(i)
@@ -1311,6 +1514,8 @@ if datatext.gold and datatext.gold > 0 then
 				if itemID then r, g, b = GetItemQualityColor(select(3, GetItemInfo(itemID))) end
 				if name and count then GameTooltip:AddDoubleLine(name, count, r, g, b, 1, 1, 1) end
 			end
+			GameTooltip:AddLine(" ")
+			GameTooltip:AddLine("|cffeda55fClick|r to Show Currency Panel")
 			GameTooltip:Show()
 		end
 	end)
@@ -1413,7 +1618,7 @@ if datatext.guild and datatext.guild > 0 then
 				Text:SetFormattedText(displayString, numOnline)
 				self:SetAllPoints(Text)
 			else
-				Text:SetText(hexa..L.datatext_noguild..hexb)
+				Text:SetText(hexa..'No Guild'..hexb)
 			end
 		end
 	end
@@ -1538,6 +1743,8 @@ if datatext.guild and datatext.guild > 0 then
 				GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 				GameTooltip:ClearAllPoints()
 				GameTooltip:ClearLines()
+				GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Guild")
+				GameTooltip:AddLine' '				
 				GameTooltip:AddDoubleLine(GetGuildInfo'player',format("%s: %d/%d",GUILD,online,total),tthead.r,tthead.g,tthead.b,tthead.r,tthead.g,tthead.b)
 				GameTooltip:AddLine(' ')
 				if gmotd ~= "" then GameTooltip:AddLine(format("  %s |cffaaaaaa- |cffffffff%s",GUILD_MOTD,gmotd),ttsubh.r,ttsubh.g,ttsubh.b,1) end
@@ -1626,7 +1833,9 @@ if datatext.guild and datatext.guild > 0 then
 						end
 					end
 				end
-				GameTooltip:Show()
+			GameTooltip:AddLine(" ")
+			GameTooltip:AddLine("|cffeda55fClick|r to Show Guild Panel")
+			GameTooltip:Show()
 			end
 		end
 	end)
@@ -1650,7 +1859,7 @@ if datatext.hps_text and datatext.hps_text > 0 then
  
 	local hText = PanelLeft:CreateFontString(nil, 'OVERLAY')
 	hText:SetFont(media.font, datatext.fontsize)
-	hText:SetText(L.datatext_hps, '0')
+	hText:SetText('HPS: ', '0')
  
 	PP(datatext.hps_text, hText)
  
@@ -1704,9 +1913,9 @@ if datatext.hps_text and datatext.hps_text > 0 then
 	
  	function get_hps()
 		if (actual_heals_total == 0) then
-			return (hexa..L.datatext_hps..hexb..'0')
+			return (hexa..'HPS: '..hexb..'0')
 		else
-			return string.format('%.1f '..hexa..L.datatext_hps..hexb, (actual_heals_total or 0) / (cmbt_time or 1))
+			return string.format('%.1f '..hexa..'HPS: '..hexb, (actual_heals_total or 0) / (cmbt_time or 1))
 		end
 	end
  
@@ -1749,7 +1958,7 @@ if datatext.micromenu and datatext.micromenu > 0 then
 	end
 
 	local function OpenMenu()
-		local menuFrame = CreateFrame("Frame", "TukuiDataTextMicroMenu", UIParent, "UIDropDownMenuTemplate")
+		local menuFrame = CreateFrame("Frame", "DataTextMicroMenu", UIParent, "UIDropDownMenuTemplate")
 		local menuList = {
 			{text = CHARACTER_BUTTON,
 			func = function() ToggleCharacter("PaperDollFrame") end},
@@ -1847,7 +2056,7 @@ if datatext.pro and datatext.pro > 0 then
 					CastSpellByName((GetProfessionInfo(prof1)))
 				end
 			else
-				print('|cff00B4FFBasic|rUI: |cffFF0000No Profession Found!|r')
+				print('nData: |cffFF0000No Profession Found!|r')
 			end
 		elseif btn == 'MiddleButton' then
 			ToggleFrame(SpellBookFrame)		
@@ -2060,11 +2269,16 @@ if datatext.spec and datatext.spec > 0 then
 		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 
 		GameTooltip:ClearLines()
+		GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Spec")
+		GameTooltip:AddLine' '		
 		for i = 1, GetNumTalentGroups() do
 			if GetPrimaryTalentTree(false, false, i) then
 				GameTooltip:AddLine(string.join(' ', string.format(talentStringTip, select(2, GetTalentTabInfo(GetPrimaryTalentTree(false, false, i))), talent[i][1], talent[i][2], talent[i][3]), (i == active and activeString or inactiveString)),1,1,1)
 			end
 		end
+		GameTooltip:AddLine' '
+		GameTooltip:AddLine("|cffeda55fLeft Click|r to Switch Spec's")		
+		GameTooltip:AddLine("|cffeda55fRight Click|r to Open Talent Tree")
 		GameTooltip:Show()
 	end)
 
@@ -2137,11 +2351,11 @@ if datatext.stat1 and datatext.stat1 > 0 then
 		
 		if Role == "Tank" then
 			if targetlv > 1 then
-				GameTooltip:AddDoubleLine(L.datatext_avoidancebreakdown, string.join("", " (", L.datatext_lvl, " ", targetlv, ")"))
+				GameTooltip:AddDoubleLine('Avoidance Breakdown', string.join("", " (", 'lvl', " ", targetlv, ")"))
 			elseif targetlv == -1 then
-				GameTooltip:AddDoubleLine(L.datatext_avoidancebreakdown, string.join("", " (", L.datatext_boss, ")"))
+				GameTooltip:AddDoubleLine('Avoidance Breakdown', string.join("", " (", 'Boss', ")"))
 			else
-				GameTooltip:AddDoubleLine(L.datatext_avoidancebreakdown, string.join("", " (", L.datatext_lvl, " ", playerlv, ")"))
+				GameTooltip:AddDoubleLine('Avoidance Breakdown', string.join("", " (", 'lvl', " ", playerlv, ")"))
 			end
 			GameTooltip:AddLine' '
 			GameTooltip:AddDoubleLine(DODGE_CHANCE, format(chanceString, dodge),1,1,1)
@@ -2247,7 +2461,7 @@ if datatext.stat1 and datatext.stat1 > 0 then
 		end
 		avoidance = (dodge+parry+block+basemisschance)
 		
-		Text:SetFormattedText(displayFloatString, hexa..L.datatext_playeravd..hexb, avoidance)
+		Text:SetFormattedText(displayFloatString, hexa..'AVD: '..hexb, avoidance)
 		--Setup Tooltip
 		self:SetAllPoints(Text)
 	end
@@ -2259,7 +2473,7 @@ if datatext.stat1 and datatext.stat1 > 0 then
 			spellpwr = GetSpellBonusDamage(7)
 		end
 		
-		Text:SetFormattedText(displayNumberString, hexa..L.datatext_playersp..hexb, spellpwr)
+		Text:SetFormattedText(displayNumberString, hexa..'SP: '..hexb, spellpwr)
 		--Setup Tooltip
 		self:SetAllPoints(Text)
 	end
@@ -2276,7 +2490,7 @@ if datatext.stat1 and datatext.stat1 > 0 then
 			pwr = effective
 		end
 		
-		Text:SetFormattedText(displayNumberString, hexa..L.datatext_playerap..hexb, pwr)      
+		Text:SetFormattedText(displayNumberString, hexa..'AP: '..hexb, pwr)      
 		--Setup Tooltip
 		self:SetAllPoints(Text)
 	end
@@ -2357,7 +2571,7 @@ if datatext.stat2 and datatext.stat2 > 0 then
 		GameTooltip:ClearLines()
 		
 		if Role == "Tank" then
-			AddTooltipHeader(L.datatext_mitigation)
+			AddTooltipHeader('Mitigation By Level: ')
 			local lv = level +3
 			for i = 1, 4 do
 				GameTooltip:AddDoubleLine(lv,format(chanceString, CalculateMitigation(lv, effectiveArmor) * 100),1,1,1)
@@ -2396,7 +2610,7 @@ if datatext.stat2 and datatext.stat2 > 0 then
 	local function UpdateCaster(self)
 		local spellcrit = GetSpellCritChance(1)
 
-		Text:SetFormattedText(displayFloatString, hexa..L.datatext_playercrit..hexb, spellcrit)
+		Text:SetFormattedText(displayFloatString, hexa..'Crit: '..hexb, spellcrit)
 		--Setup Tooltip
 		self:SetAllPoints(Text)
 	end
@@ -2412,7 +2626,7 @@ if datatext.stat2 and datatext.stat2 > 0 then
 			critChance = meleecrit
 		end
 		
-		Text:SetFormattedText(displayFloatString, hexa..L.datatext_playercrit..hexb, critChance)
+		Text:SetFormattedText(displayFloatString, hexa..'Crit: '..hexb, critChance)
 		--Setup Tooltip
 		self:SetAllPoints(Text)
 	end
@@ -2546,7 +2760,7 @@ if datatext.system and datatext.system > 0 then
 			elseif framerate >= 10 and framerate < 20 then
 				fpscolor = 3
 			end
-			local displayFormat = string.join("", hexa..L.datatext_fps..hexb, statusColors[fpscolor], "%d|r", hexa..L.datatext_ms..hexb, statusColors[latencycolor], "%d|r")
+			local displayFormat = string.join("", hexa..'FPS: '..hexb, statusColors[fpscolor], "%d|r", hexa..' MS: ', statusColors[latencycolor], "%d|r")
 			Text:SetFormattedText(displayFormat, framerate, latency)
 			int2 = 1
 		end
@@ -2558,23 +2772,25 @@ if datatext.system and datatext.system > 0 then
 		local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
 		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 		GameTooltip:ClearLines()
+		GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Latency")
+		GameTooltip:AddLine' '		
 		if datatext.fps.enable == true then 
 			if datatext.fps.home == true then
-				GameTooltip:AddDoubleLine(L.datatext_homelatency, string.format(homeLatencyString, latencyHome), 0.80, 0.31, 0.31,0.84, 0.75, 0.65)
+				GameTooltip:AddDoubleLine('Home Latency: ', string.format('Home Latency: ', latencyHome), 0.80, 0.31, 0.31,0.84, 0.75, 0.65)
 			elseif datatext.fps.world == true then
-				GameTooltip:AddDoubleLine(L.datatext_worldlatency, string.format(worldLatencyString, latencyWorld), 0.80, 0.31, 0.31,0.84, 0.75, 0.65)
+				GameTooltip:AddDoubleLine('World Latency: ', string.format('World Latency: ', latencyWorld), 0.80, 0.31, 0.31,0.84, 0.75, 0.65)
 			elseif datatext.fps.both == true then
-				GameTooltip:AddDoubleLine(L.datatext_homelatency, string.format(homeLatencyString, latencyHome), 0.80, 0.31, 0.31,0.84, 0.75, 0.65)
-				GameTooltip:AddDoubleLine(L.datatext_worldlatency, string.format(worldLatencyString, latencyWorld), 0.80, 0.31, 0.31,0.84, 0.75, 0.65)
+				GameTooltip:AddDoubleLine('Home Latency: ', string.format('Home Latency: ', latencyHome), 0.80, 0.31, 0.31,0.84, 0.75, 0.65)
+				GameTooltip:AddDoubleLine('World Latency: ', string.format('World Latency: ', latencyWorld), 0.80, 0.31, 0.31,0.84, 0.75, 0.65)
 			end
 		end
 		if bandwidth ~= 0 then
-			GameTooltip:AddDoubleLine(L.datatext_bandwidth , string.format(bandwidthString, bandwidth),0.69, 0.31, 0.31,0.84, 0.75, 0.65)
-			GameTooltip:AddDoubleLine(L.datatext_download , string.format(percentageString, GetDownloadedPercentage() *100),0.69, 0.31, 0.31, 0.84, 0.75, 0.65)
+			GameTooltip:AddDoubleLine('Bandwidth: ' , string.format(bandwidthString, bandwidth),0.69, 0.31, 0.31,0.84, 0.75, 0.65)
+			GameTooltip:AddDoubleLine('Download: ' , string.format(percentageString, GetDownloadedPercentage() *100),0.69, 0.31, 0.31, 0.84, 0.75, 0.65)
 			GameTooltip:AddLine(" ")
 		end
 		local totalMemory = UpdateMemory()
-		GameTooltip:AddDoubleLine(L.datatext_totalmemusage, formatMem(totalMemory), 0.69, 0.31, 0.31,0.84, 0.75, 0.65)
+		GameTooltip:AddDoubleLine('Total Memory Usage:', formatMem(totalMemory), 0.69, 0.31, 0.31,0.84, 0.75, 0.65)
 		GameTooltip:AddLine(" ")
 		for i = 1, #memoryTable do
 			if (memoryTable[i][4]) then
@@ -2729,7 +2945,8 @@ if datatext.wowtime and datatext.wowtime > 0 then
 		local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
 		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 		GameTooltip:ClearLines()
-
+		GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Time")
+		GameTooltip:AddLine' '	
 		local localizedName, isActive, canQueue, startTime, canEnter
 		for i = 1, GetNumWorldPVPAreas() do
 			_, localizedName, isActive, canQueue, startTime, canEnter = GetWorldPVPAreaInfo(i)
@@ -2754,9 +2971,9 @@ if datatext.wowtime and datatext.wowtime > 0 then
 		local Hr, Min, AmPm = CalculateTimeValues(true)
 
 		if datatext.localtime == true then
-			timeText = L.datatext_servertime
+			timeText = 'Server Time: '
 		else
-			timeText = L.datatext_localtime
+			timeText = 'Local Time: '
 		end
 		
 		if AmPm == -1 then
@@ -2772,7 +2989,7 @@ if datatext.wowtime and datatext.wowtime > 0 then
 				local tr,tg,tb,diff
 				if not oneraid then
 					GameTooltip:AddLine(" ")
-					GameTooltip:AddLine(L.datatext_savedraid)
+					GameTooltip:AddLine('Saved Raid(s)')
 					oneraid = true
 				end
 				if extended then lockoutColor = lockoutColorExtended else lockoutColor = lockoutColorNormal end
