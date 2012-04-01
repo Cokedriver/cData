@@ -15,7 +15,7 @@ if datatext.enable == true then
 	
 	
 	
-	if datatext.top == true then
+	if datatext.position == 'top' then
 		DataPanel:SetPoint('TOP', UIParent, 0, 0)
 		DataPanel:SetHeight(35)
 		DataPanel:SetWidth(getscreenwidth)
@@ -48,7 +48,8 @@ if datatext.enable == true then
 		BattleGroundPanel:SetAllPoints(PanelLeft)
 		BattleGroundPanel:SetFrameStrata('LOW')
 		BattleGroundPanel:SetFrameLevel(1)	
-	else
+		
+	elseif datatext.position == 'bottom' then
 		DataPanel:SetPoint('BOTTOM', UIParent, 0, 0)
 		DataPanel:SetHeight(35)
 		DataPanel:SetWidth(1200)
@@ -82,6 +83,33 @@ if datatext.enable == true then
 		BattleGroundPanel:SetFrameStrata('LOW')
 		BattleGroundPanel:SetFrameLevel(1)
 		
+	elseif datatext.position == 'shortbar' then
+		DataPanel:SetPoint('BOTTOM', UIParent, 0, 0)
+		DataPanel:SetHeight(35)
+		DataPanel:SetWidth(725)
+		DataPanel:SetFrameStrata('LOW')
+		DataPanel:SetFrameLevel(0)
+		DataPanel:SetBackdropColor(0, 0, 0, 1)
+		
+		-- Left Panel
+		PanelLeft:SetPoint('LEFT', DataPanel, 5, 0)
+		PanelLeft:SetHeight(35)
+		PanelLeft:SetWidth(725 / 2)
+		PanelLeft:SetFrameStrata('LOW')
+		PanelLeft:SetFrameLevel(1)				
+
+		-- Right panel
+		PanelRight:SetPoint('RIGHT', DataPanel, -5, 0)
+		PanelRight:SetHeight(35)
+		PanelRight:SetWidth(725 / 2)
+		PanelRight:SetFrameStrata('LOW')
+		PanelRight:SetFrameLevel(1)		
+
+		-- Battleground Panel
+		BattleGroundPanel:SetAllPoints(PanelLeft)
+		BattleGroundPanel:SetFrameStrata('LOW')
+		BattleGroundPanel:SetFrameLevel(1)		
+		
 	end
 	
 	if datatext.border == 'Tooltip' then
@@ -94,7 +122,7 @@ if datatext.enable == true then
 	elseif datatext.border == 'DialogBox' then
 		DataPanel:SetBackdrop({
 			bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
-			edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+			edgeFile = "Interface\\AddOns\\nData\\Media\\UI-DialogBox-Border",
 			edgeSize = 25,
 			insets = {left = 9, right = 9, top = 9, bottom = 8}
 		})
@@ -135,11 +163,17 @@ if datatext.enable == true then
 			VehicleMenuBar:ClearAllPoints() VehicleMenuBar:SetPoint("BOTTOM", DataPanel, "TOP", 0, 4) VehicleMenuBar.ClearAllPoints = bottom VehicleMenuBar.SetPoint = bottom
 			PetActionBarFrame:ClearAllPoints() PetActionBarFrame:SetPoint("BOTTOM", MainMenuBar, "TOP", 40, 47) PetActionBarFrame.ClearAllPoints = bottom PetActionBarFrame.SetPoint = bottom	
 		end
-		-- Move the tooltip above the Actionbar
-
-		hooksecurefunc('GameTooltip_SetDefaultAnchor', function(self)
-			self:SetPoint('BOTTOMRIGHT', UIParent, -100, 140)
-		end)
+		
+		-- Move the tooltip above the Actionbar	
+		if datatext.position == 'shortbar' then		
+			hooksecurefunc('GameTooltip_SetDefaultAnchor', function(self)
+				self:SetPoint('BOTTOMRIGHT', UIParent, 'BOTTOMRIGHT', -27.35, 27.35)
+			end)
+		else		
+			hooksecurefunc('GameTooltip_SetDefaultAnchor', function(self)
+				self:SetPoint('BOTTOMRIGHT', UIParent, -100, 140)
+			end)
+		end
 		
 		 -- Move the Bags above the Actionbar
 		CONTAINER_WIDTH = 192;
