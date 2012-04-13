@@ -140,7 +140,7 @@ if datatext.enable == true then
 	end
 
 		-- move some frames to make way for the datapanel
-	if datatext.top == true then
+	if datatext.position == 'top' then
 
 		local top = function() end
 		PlayerFrame:ClearAllPoints() PlayerFrame:SetPoint("TOPLEFT", -19, -32) PlayerFrame.ClearAllPoints = top PlayerFrame.SetPoint = top
@@ -149,7 +149,7 @@ if datatext.enable == true then
 		BuffFrame:ClearAllPoints() BuffFrame:SetPoint('TOP', MinimapCluster, -110, -5) BuffFrame.ClearAllPoints = top BuffFrame.SetPoint = top
 		WorldStateAlwaysUpFrame:ClearAllPoints() WorldStateAlwaysUpFrame:SetPoint('TOP', 0, -32) WorldStateAlwaysUpFrame.ClearAllpoints = top WorldStateAlwaysUpFrame.Setpoint = top
 
-	else
+	elseif datatext.position == 'bottom' then
 
 		-- Move some stuff for the panel on bottom.
 

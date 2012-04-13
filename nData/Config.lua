@@ -11,8 +11,8 @@ media = {
 datatext = {
 	['enable'] = true,
 
-	['position'] = 'shortbar',								-- choose either 'top' or 'bottom' or 'shortbar' (for NeavUi Shortbar) for your nData position.
-	['border'] = 'DialogBox',								-- choose either 'Tooltip' or 'DialogBox' or 'NeavUI' for your nData Border.
+	['position'] = 'top',								-- choose either 'top' or 'bottom' or 'shortbar' (for NeavUi Shortbar) for your nData position.
+	['border'] = 'Tooltip',								-- choose either 'Tooltip' or 'DialogBox' or 'NeavUI' for your nData Border.
 	['fontsize'] = 15,                                  	-- font size for panels.
 	['bags'] = 9,                                       	-- show space used in bags on panel.
 	['system'] = 0,                                     	-- show total memory and others systems info (FPS/MS) on panel.
