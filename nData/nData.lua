@@ -1,218 +1,69 @@
----------------------------------------------------
--- Code Source = TukUI
--- All Credit goes to programmers at www.tukui.org
----------------------------------------------------
 
-if datatext.enable == true then
+local LSM = LibStub("LibSharedMedia-3.0")
+local ccolor = RAID_CLASS_COLORS[select(2, UnitClass("player"))]
+local myclass = UnitClass("player")
+local myname, _ = UnitName("player")
+local myrealm = GetRealmName()
+local getscreenwidth = tonumber(string.match(({GetScreenResolutions()})[GetCurrentResolution()], "(%d+)x+%d"))
+local toc = select(4, GetBuildInfo())
+local locale = GetLocale()
+local currentFightDPS
 
-	local DataPanel = CreateFrame('Frame', 'DataPanel', UIParent)
-	local PanelLeft = CreateFrame('Frame', 'PanelLeft', UIParent)
-	local PanelCenter = CreateFrame('Frame', 'PanelCenter', UIParent)
-	local PanelRight = CreateFrame('Frame', 'PanelRight', UIParent)
-	local BattleGroundPanel = CreateFrame('Frame', 'BattleGroundPanel', UIParent)
-	local ccolor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[select(2,UnitClass("player"))]
-	local getscreenwidth = tonumber(string.match(({GetScreenResolutions()})[GetCurrentResolution()], "(%d+)x+%d"))
+
+cfg = {
+	["enable"] = true,
+
+	["datapanel"] = true,									-- panel turn off option								
+	["color"] = true,										-- classcolor Datatext
+	["battleground"] = true,                            	-- enable 3 stats in battleground only that replace stat1,stat2,stat3.
+	["bag"] = false,										-- True = Open Backpack; False = Open All bags			
+
+	-- nData Media
+	["border"] = "nData",									-- Shared Media Border for nData ( Choose either nData or Neav for border choice)
+	["background"] = "Blizzard Dialog Background",			-- Shared Media Background for nData
+	["font"] = "Expressfree",								-- Font Style for nData
+	["fontsize"] = 15,                                  	-- font size for panels.		
 	
+	-- Color Datatext
+	["color"] = { r = 1, g = 1, b = 1},						-- Color of Text for nData
+	["classcolor"] = true,									-- Enable Class Color for Text
 	
+	["panel"] = "bottom",									-- 3 Choices for panel placement = "top", "bottom", or "shortbar". Shortbar is to match nMainbar shortbar.
+	["armor"] = 0,                                     		-- show your armor value against the level mob you are currently targeting.
+	["avd"] = 0,                                        	-- show your current avoidance against the level of the mob your targeting	
+	["bags"] = 9,                                       	-- show space used in bags on panel.
+	["haste"] = 0,                                      	-- show your haste rating on panels.	
+	["system"] = 0,                                     	-- show total memory and others systems info (FPS/MS) on panel.	
+	["guild"] = 4,                                      	-- show number on guildmate connected on panel.
+	["dur"] = 8,                                        	-- show your equipment durability on panel.
+	["friends"] = 6,                                    	-- show number of friends connected.
+	["dps_text"] = 0,                                   	-- show a dps meter on panel.
+	["hps_text"] = 0,                                   	-- show a heal meter on panel.
+	["spec"] = 5,											-- show your current spec on panel.
+	["coords"] = 0,											-- show your current coords on panel.
+	["pro"] = 7,											-- shows your professions and tradeskills
+	["stat1"] = 1,											-- Stat Based on your Role (Avoidance-Tank, AP-Melee, SP/HP-Caster)
+	["stat2"] = 3,											-- Stat Based on your Role (Armor-Tank, Crit-Melee, Crit-Caster)
+	["recount"] = 2,										-- Stat Based on Recount"s DPS
+	["recountraiddps"] = false,								-- Enables tracking or Recounts Raid DPS
+	["calltoarms"] = 0,										-- Show Current Call to Arms.
 	
-	if datatext.position == 'top' then
-		DataPanel:SetPoint('TOP', UIParent, 0, 0)
-		DataPanel:SetHeight(35)
-		DataPanel:SetWidth(getscreenwidth)
-		DataPanel:SetFrameStrata('LOW')
-		DataPanel:SetFrameLevel(0)
-		DataPanel:SetBackdropBorderColor(ccolor.r, ccolor.g, ccolor.b, 1)
+}
 
-		-- Left Panel
-		PanelLeft:SetPoint('LEFT', DataPanel, 5, 0)
-		PanelLeft:SetHeight(35)
-		PanelLeft:SetWidth(getscreenwidth / 3)
-		PanelLeft:SetFrameStrata('LOW')
-		PanelLeft:SetFrameLevel(1)		
+--Register Media
+LSM:Register("border", "nData", [[Interface\AddOns\nData\Media\UI-DialogBox-Border.blp]])
+LSM:Register("border", "Neav", [[Interface\AddOns\nData\Media\NeavUI-Border.blp]])
+LSM:Register("font", "Expressway", [[Interface\AddOns\nData\Media\Expressway.ttf]])
 
-		-- Center Panel
-		PanelCenter:SetPoint('CENTER', DataPanel, 0, 0)
-		PanelCenter:SetHeight(35)
-		PanelCenter:SetWidth(getscreenwidth / 3)
-		PanelCenter:SetFrameStrata('LOW')
-		PanelCenter:SetFrameLevel(1)		
+-- Load All SharedMedia
 
-		-- Right Panel
-		PanelRight:SetPoint('RIGHT', DataPanel, -5, 0)
-		PanelRight:SetHeight(35)
-		PanelRight:SetWidth(getscreenwidth / 3)
-		PanelRight:SetFrameStrata('LOW')
-		PanelRight:SetFrameLevel(1)		
+-- Font Media
+cfg.font = LSM:Fetch("font", cfg.font)
 
-		-- Battleground Panel
-		BattleGroundPanel:SetAllPoints(PanelLeft)
-		BattleGroundPanel:SetFrameStrata('LOW')
-		BattleGroundPanel:SetFrameLevel(1)	
-		
-	elseif datatext.position == 'bottom' then
-		DataPanel:SetPoint('BOTTOM', UIParent, 0, 0)
-		DataPanel:SetHeight(35)
-		DataPanel:SetWidth(1200)
-		DataPanel:SetFrameStrata('LOW')
-		DataPanel:SetFrameLevel(0)
-		DataPanel:SetBackdropColor(0, 0, 0, 1)
-		
-		-- Left Panel
-		PanelLeft:SetPoint('LEFT', DataPanel, 5, 0)
-		PanelLeft:SetHeight(35)
-		PanelLeft:SetWidth(1200 / 3)
-		PanelLeft:SetFrameStrata('LOW')
-		PanelLeft:SetFrameLevel(1)		
+-- Datatext Media
+cfg.border = LSM:Fetch("border", cfg.border)
+cfg.background = LSM:Fetch("background", cfg.background)
 
-		-- Center Panel
-		PanelCenter:SetPoint('CENTER', DataPanel, 0, 0)
-		PanelCenter:SetHeight(35)
-		PanelCenter:SetWidth(1200 / 3)
-		PanelCenter:SetFrameStrata('LOW')
-		PanelCenter:SetFrameLevel(1)		
-
-		-- Right panel
-		PanelRight:SetPoint('RIGHT', DataPanel, -5, 0)
-		PanelRight:SetHeight(35)
-		PanelRight:SetWidth(1200 / 3)
-		PanelRight:SetFrameStrata('LOW')
-		PanelRight:SetFrameLevel(1)		
-
-		-- Battleground Panel
-		BattleGroundPanel:SetAllPoints(PanelLeft)
-		BattleGroundPanel:SetFrameStrata('LOW')
-		BattleGroundPanel:SetFrameLevel(1)
-		
-	elseif datatext.position == 'shortbar' then
-		DataPanel:SetPoint('BOTTOM', UIParent, 0, 0)
-		DataPanel:SetHeight(35)
-		DataPanel:SetWidth(725)
-		DataPanel:SetFrameStrata('LOW')
-		DataPanel:SetFrameLevel(0)
-		DataPanel:SetBackdropColor(0, 0, 0, 1)
-		
-		-- Left Panel
-		PanelLeft:SetPoint('LEFT', DataPanel, 5, 0)
-		PanelLeft:SetHeight(35)
-		PanelLeft:SetWidth(725 / 2)
-		PanelLeft:SetFrameStrata('LOW')
-		PanelLeft:SetFrameLevel(1)				
-
-		-- Right panel
-		PanelRight:SetPoint('RIGHT', DataPanel, -5, 0)
-		PanelRight:SetHeight(35)
-		PanelRight:SetWidth(725 / 2)
-		PanelRight:SetFrameStrata('LOW')
-		PanelRight:SetFrameLevel(1)		
-
-		-- Battleground Panel
-		BattleGroundPanel:SetAllPoints(PanelLeft)
-		BattleGroundPanel:SetFrameStrata('LOW')
-		BattleGroundPanel:SetFrameLevel(1)		
-		
-	end
-	
-	if datatext.border == 'Tooltip' then
-		DataPanel:SetBackdrop({
-			bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
-			edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",							
-			edgeSize = 20,
-			insets = {left = 3, right = 3, top = 3, bottom = 3},
-		})
-	elseif datatext.border == 'DialogBox' then
-		DataPanel:SetBackdrop({
-			bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
-			edgeFile = "Interface\\AddOns\\nData\\Media\\UI-DialogBox-Border",
-			edgeSize = 25,
-			insets = {left = 9, right = 9, top = 9, bottom = 8}
-		})
-	elseif datatext.border == 'NeavUI' then
-		DataPanel:SetHeight(30)
-		DataPanel:SetBackdrop({
-			bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
-			edgeSize = 25
-		})		
-		if (IsAddOnLoaded('!Beautycase')) then
-			DataPanel:CreateBorder(12)
-		else
-			print('|cff00B4FFn|rData: |cffFF0000!Beautycase needs to be installed for NeavUI Border. Get it at http://www.wowinterface.com/downloads/info19675-Beautycase.html|r')
-		end
-	end
-
-		-- move some frames to make way for the datapanel
-	if datatext.position == 'top' then
-
-		local top = function() end
-		PlayerFrame:ClearAllPoints() PlayerFrame:SetPoint("TOPLEFT", -19, -32) PlayerFrame.ClearAllPoints = top PlayerFrame.SetPoint = top
-		TargetFrame:ClearAllPoints() TargetFrame:SetPoint("TOPLEFT", 250, -32) TargetFrame.ClearAllPoints = top TargetFrame.SetPoint = top
-		MinimapCluster:ClearAllPoints() MinimapCluster:SetPoint('TOPRIGHT', 0, -32) MinimapCluster.ClearAllPoints = top MinimapCluster.SetPoint = top
-		BuffFrame:ClearAllPoints() BuffFrame:SetPoint('TOP', MinimapCluster, -110, -5) BuffFrame.ClearAllPoints = top BuffFrame.SetPoint = top
-		WorldStateAlwaysUpFrame:ClearAllPoints() WorldStateAlwaysUpFrame:SetPoint('TOP', 0, -32) WorldStateAlwaysUpFrame.ClearAllpoints = top WorldStateAlwaysUpFrame.Setpoint = top
-
-	elseif datatext.position == 'bottom' then
-
-		-- Move some stuff for the panel on bottom.
-
-		local bottom = function() end
-		if (IsAddOnLoaded('!Beautycase')) then
-			MainMenuBar:ClearAllPoints() MainMenuBar:SetPoint("BOTTOM", DataPanel, "TOP", 0, 0) MainMenuBar.ClearAllPoints = bottom MainMenuBar.SetPoint = bottom
-			VehicleMenuBar:ClearAllPoints() VehicleMenuBar:SetPoint("BOTTOM", DataPanel, "TOP", 0, 4) VehicleMenuBar.ClearAllPoints = bottom VehicleMenuBar.SetPoint = bottom
-			PetActionBarFrame:ClearAllPoints() PetActionBarFrame:SetPoint("BOTTOM", MainMenuBar, "TOP", 40, 47) PetActionBarFrame.ClearAllPoints = bottom PetActionBarFrame.SetPoint = bottom			
-		else
-			MainMenuBar:ClearAllPoints() MainMenuBar:SetPoint("BOTTOM", DataPanel, "TOP", 0, -3) MainMenuBar.ClearAllPoints = bottom MainMenuBar.SetPoint = bottom
-			VehicleMenuBar:ClearAllPoints() VehicleMenuBar:SetPoint("BOTTOM", DataPanel, "TOP", 0, 4) VehicleMenuBar.ClearAllPoints = bottom VehicleMenuBar.SetPoint = bottom
-			PetActionBarFrame:ClearAllPoints() PetActionBarFrame:SetPoint("BOTTOM", MainMenuBar, "TOP", 40, 47) PetActionBarFrame.ClearAllPoints = bottom PetActionBarFrame.SetPoint = bottom	
-		end
-		
-		-- Move the tooltip above the Actionbar	
-		if datatext.position == 'shortbar' then		
-			hooksecurefunc('GameTooltip_SetDefaultAnchor', function(self)
-				self:SetPoint('BOTTOMRIGHT', UIParent, 'BOTTOMRIGHT', -27.35, 27.35)
-			end)
-		else		
-			hooksecurefunc('GameTooltip_SetDefaultAnchor', function(self)
-				self:SetPoint('BOTTOMRIGHT', UIParent, -100, 140)
-			end)
-		end
-		
-		 -- Move the Bags above the Actionbar
-		CONTAINER_WIDTH = 192;
-		CONTAINER_SPACING = 5;
-		VISIBLE_CONTAINER_SPACING = 3;
-		CONTAINER_OFFSET_Y = 70;
-		CONTAINER_OFFSET_X = 0;
-
-		 
-		function updateContainerFrameAnchors()
-			local _, xOffset, yOffset, _, _, _, _;
-			local containerScale = 1;
-			screenHeight = GetScreenHeight() / containerScale;
-			-- Adjust the start anchor for bags depending on the multibars
-			xOffset = CONTAINER_OFFSET_X / containerScale;
-			yOffset = CONTAINER_OFFSET_Y / containerScale + 25;
-			-- freeScreenHeight determines when to start a new column of bags
-			freeScreenHeight = screenHeight - yOffset;
-			column = 0;
-			for index, frameName in ipairs(ContainerFrame1.bags) do
-				frame = _G[frameName];
-				frame:SetScale(containerScale);
-				if ( index == 1 ) then
-					-- First bag
-					frame:SetPoint('BOTTOMRIGHT', frame:GetParent(), 'BOTTOMRIGHT', -xOffset, yOffset );
-				elseif ( freeScreenHeight < frame:GetHeight() ) then
-					-- Start a new column
-					column = column + 1;
-					freeScreenHeight = screenHeight - yOffset;
-					frame:SetPoint('BOTTOMRIGHT', frame:GetParent(), 'BOTTOMRIGHT', -(column * CONTAINER_WIDTH) - xOffset, yOffset );
-				else
-					-- Anchor to the previous bag
-					frame:SetPoint('BOTTOMRIGHT', ContainerFrame1.bags[index - 1], 'TOPRIGHT', 0, CONTAINER_SPACING);   
-				end
-				freeScreenHeight = freeScreenHeight - frame:GetHeight() - VISIBLE_CONTAINER_SPACING;
-			end
-		end	 
-	end	
-end
 
 PP = function(p, obj)
 
@@ -280,6 +131,87 @@ PP = function(p, obj)
 
 end
 
+DataTextTooltipAnchor = function(self)
+	local panel = self:GetParent()
+	local anchor = 'GameTooltip'
+	local xoff = 1
+	local yoff = 3
+	
+	
+	for _, panel in pairs ({
+		PanelLeft,
+		PanelCenter,
+		PanelRight,
+	})	do
+		if cfg.top == true then
+			anchor = 'ANCHOR_BOTTOM'
+		else
+			anchor = 'ANCHOR_TOP'
+		end
+	end	
+	return anchor, panel, xoff, yoff
+end
+
+--Check Player's Role
+
+local classRoles = {
+	PALADIN = {
+		[1] = "Caster",
+		[2] = "Tank",
+		[3] = "Melee",
+	},
+	PRIEST = "Caster",
+	WARLOCK = "Caster",
+	WARRIOR = {
+		[1] = "Melee",
+		[2] = "Melee",
+		[3] = "Tank",	
+	},
+	HUNTER = "Melee",
+	SHAMAN = {
+		[1] = "Caster",
+		[2] = "Melee",
+		[3] = "Caster",	
+	},
+	ROGUE = "Melee",
+	MAGE = "Caster",
+	DEATHKNIGHT = {
+		[1] = "Tank",
+		[2] = "Melee",
+		[3] = "Melee",	
+	},
+	DRUID = {
+		[1] = "Caster",
+		[2] = "Melee",
+		[3] = "Tank",	
+		[4] = "Caster"
+	},
+	MONK = {
+		[1] = "Tank",
+		[2] = "Caster",
+		[3] = "Melee",	
+	},
+}
+
+local _, playerClass = UnitClass("player")
+local Role
+local function CheckRole()
+	local talentTree = GetSpecialization()
+
+	if(type(classRoles[playerClass]) == "string") then
+		Role = classRoles[playerClass]
+	elseif(talentTree) then
+		Role = classRoles[playerClass][talentTree]
+	end
+end
+
+local eventHandler = CreateFrame("Frame")
+eventHandler:RegisterEvent("PLAYER_ENTERING_WORLD")
+eventHandler:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
+eventHandler:RegisterEvent("PLAYER_TALENT_UPDATE")
+eventHandler:RegisterEvent("CHARACTER_POINTS_CHANGED")
+eventHandler:SetScript("OnEvent", CheckRole)
+
 SetFontString = function(parent, fontName, fontHeight, fontStyle)
 	local fs = parent:CreateFontString(nil, 'OVERLAY')
 	fs:SetFont(fontName, fontHeight, fontStyle)
@@ -289,212 +221,771 @@ SetFontString = function(parent, fontName, fontHeight, fontStyle)
 	return fs
 end
 
-DataTextTooltipAnchor = function(self)
-	local panel = self:GetParent()
-	local anchor = 'GameTooltip'
-	local xoff = 1
-	local yoff = 3
-	
-	for _, panel in pairs ({
-		PanelLeft,
-		PanelCenter,
-		PanelRight,
-	})	do
-		if datatext.top == true then
-			anchor = 'ANCHOR_BOTTOM'
-		else
-			anchor = 'ANCHOR_TOP'
-		end
-	end	
-	
-	return anchor, panel, xoff, yoff
+function RGBToHex(r, g, b)
+	r = r <= 1 and r >= 0 and r or 0
+	g = g <= 1 and g >= 0 and g or 0
+	b = b <= 1 and b >= 0 and b or 0
+	return string.format("|cff%02x%02x%02x", r*255, g*255, b*255)
 end
 
-SetUpAnimGroup = function(self)
-	self.anim = self:CreateAnimationGroup("Pulse")
-	self.anim.fadein = self.anim:CreateAnimation("ALPHA", "FadeIn")
-	self.anim.fadein:SetChange(1)
-	self.anim.fadein:SetOrder(2)
-
-	self.anim.fadeout = self.anim:CreateAnimation("ALPHA", "FadeOut")
-	self.anim.fadeout:SetChange(-1)
-	self.anim.fadeout:SetOrder(1)
-end
-
-Flash = function(self, duration)
-	if not self.anim then
-		SetUpAnimGroup(self)
-	end
-
-	self.anim.fadein:SetDuration(duration)
-	self.anim.fadeout:SetDuration(duration)
-	self.anim:SetLooping("REPEAT")
-	self.anim:Play()
-end
-
-StopFlash = function(self)
-	if self.anim then
-		self.anim:Finish()
-	end
-end
-
-Slots = {
-	[1] = {1, 'Head', 1000},
-	[2] = {3, 'Shoulder', 1000},
-	[3] = {5, 'Chest', 1000},
-	[4] = {6, 'Waist', 1000},
-	[5] = {9, 'Wrist', 1000},
-	[6] = {10, 'Hands', 1000},
-	[7] = {7, 'Legs', 1000},
-	[8] = {8, 'Feet', 1000},
-	[9] = {16, 'Main Hand', 1000},
-	[10] = {17, 'Off Hand', 1000},
-	[11] = {18, 'Ranged', 1000}
-}
-
-myclass = UnitClass("player")
-myname = select(1, UnitName("player"))
-toc = select(4, GetBuildInfo())
-myrealm = GetRealmName()
-
---Check Player's Role
-
-
-local RoleUpdater = CreateFrame("Frame")
-local function CheckRole(self, event, unit)
-	local tree = GetPrimaryTalentTree()
-	local resilience
-	local resilperc = GetCombatRatingBonus(COMBAT_RATING_RESILIENCE_PLAYER_DAMAGE_TAKEN)
-	if resilperc > GetDodgeChance() and resilperc > GetParryChance() then
-		resilience = true
+ShortValue = function(v)
+	if v >= 1e6 then
+		return ("%.1fm"):format(v / 1e6):gsub("%.?0+([km])$", "%1")
+	elseif v >= 1e3 or v <= -1e3 then
+		return ("%.1fk"):format(v / 1e3):gsub("%.?0+([km])$", "%1")
 	else
-		resilience = false
+		return v
 	end
-	if ((myclass == "PALADIN" and tree == 2) or 
-	(myclass == "WARRIOR" and tree == 3) or 
-	(myclass == "DEATHKNIGHT" and tree == 1)) and
-	resilience == false or
-	(myclass == "DRUID" and tree == 2 and GetBonusBarOffset() == 3) then
-		Role = "Tank"
-	else
-		local playerint = select(2, UnitStat("player", 4))
-		local playeragi	= select(2, UnitStat("player", 2))
-		local base, posBuff, negBuff = UnitAttackPower("player");
-		local playerap = base + posBuff + negBuff;
-
-		if (((playerap > playerint) or (playeragi > playerint)) and not (myclass == "SHAMAN" and tree ~= 1 and tree ~= 3) and not (UnitBuff("player", GetSpellInfo(24858)) or UnitBuff("player", GetSpellInfo(65139)))) or myclass == "ROGUE" or myclass == "HUNTER" or (myclass == "SHAMAN" and tree == 2) then
-			Role = "Melee"
-		else
-			Role = "Caster"
-		end
-	end
-end	
-RoleUpdater:RegisterEvent("PLAYER_ENTERING_WORLD")
-RoleUpdater:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
-RoleUpdater:RegisterEvent("PLAYER_TALENT_UPDATE")
-RoleUpdater:RegisterEvent("CHARACTER_POINTS_CHANGED")
-RoleUpdater:RegisterEvent("UNIT_INVENTORY_CHANGED")
-RoleUpdater:RegisterEvent("UPDATE_BONUS_ACTIONBAR")
-RoleUpdater:SetScript("OnEvent", CheckRole)
-CheckRole()
-
----------------------------------------------------
--- Color system for DataText Created by Hydra 
----------------------------------------------------
-
-local ccolor = RAID_CLASS_COLORS[select(2, UnitClass('player'))]
-hexa, hexb = datatext.colors.color, '|r'
-
-if datatext.colors.classcolor then
-	hexa = string.format('|c%02x%02x%02x%02x', 255, ccolor.r * 255, ccolor.g * 255, ccolor.b * 255)
 end
 
----------------
--- Threat Text
----------------
+function HexToRGB(hex)
+	local rhex, ghex, bhex = string.sub(hex, 1, 2), string.sub(hex, 3, 4), string.sub(hex, 5, 6)
+	return tonumber(rhex, 16), tonumber(ghex, 16), tonumber(bhex, 16)
+end
 
-if datatext.threatbar == true then
+SlashCmdList['RELOADUI'] = function()
+    ReloadUI()
+end
+SLASH_RELOADUI1 = '/rl'
 
-	local aggroColors = {
-		[1] = {1, 0, 0},
-		[2] = {1, 1, 0},
-		[3] = {0, 1, 0},
-	}
+if cfg.enable ~= true then return end
 
-	local nDataThreatBar = CreateFrame("StatusBar", "nDataThreatBar", UIParent)
-	nDataThreatBar:SetPoint("TOPLEFT", PanelCenter, 2, -2)
-	nDataThreatBar:SetPoint("BOTTOMRIGHT", PanelCenter, -2, 2)
-	nDataThreatBar:SetFrameLevel(1)
+--------------
+-- Data Panel
+--------------
+if cfg.datapanel then
 
-	nDataThreatBar.text = SetFontString(nDataThreatBar, media.font, 18)
-	nDataThreatBar.text:SetPoint("CENTER", nDataThreatBar, 0, 0)
+	--[[
+		All Credit for Datapanel.lua goes to Tuks.
+		Tukui = http://www.tukui.org/download.php.
+		Edited by Cokedriver.
+	]]
+
+	local DataPanel = CreateFrame('Frame', 'DataPanel', UIParent)
+	local PanelLeft = CreateFrame('Frame', 'PanelLeft', UIParent)
+	local PanelCenter = CreateFrame('Frame', 'PanelCenter', UIParent)
+	local PanelRight = CreateFrame('Frame', 'PanelRight', UIParent)
+	local BattleGroundPanel = CreateFrame('Frame', 'BattleGroundPanel', UIParent)
+
+	if cfg.panel == "top" then
+		DataPanel:SetPoint('TOP', UIParent, 0, 0)
+		DataPanel:SetHeight(35)
+		DataPanel:SetWidth(getscreenwidth)
+		DataPanel:SetFrameStrata('LOW')
+		DataPanel:SetFrameLevel(0)
+			DataPanel:SetBackdrop({
+			bgFile = cfg.background,
+			edgeFile = cfg.border,
+			edgeSize = 25,
+			insets = {left = 5, right = 5, top = 5, bottom = 5}
+		})
+		DataPanel:SetBackdropColor(0, 0, 0, 1)
+
+
+		-- Left Panel
+		PanelLeft:SetPoint('LEFT', DataPanel, 5, 0)
+		PanelLeft:SetHeight(35)
+		PanelLeft:SetWidth(getscreenwidth / 3)
+		PanelLeft:SetFrameStrata('LOW')
+		PanelLeft:SetFrameLevel(1)		
+
+		-- Center Panel
+		PanelCenter:SetPoint('CENTER', DataPanel, 0, 0)
+		PanelCenter:SetHeight(35)
+		PanelCenter:SetWidth(getscreenwidth / 3)
+		PanelCenter:SetFrameStrata('LOW')
+		PanelCenter:SetFrameLevel(1)		
+
+		-- Right Panel
+		PanelRight:SetPoint('RIGHT', DataPanel, -5, 0)
+		PanelRight:SetHeight(35)
+		PanelRight:SetWidth(getscreenwidth / 3)
+		PanelRight:SetFrameStrata('LOW')
+		PanelRight:SetFrameLevel(1)		
+
+		-- Battleground Panel
+		BattleGroundPanel:SetAllPoints(PanelLeft)
+		BattleGroundPanel:SetFrameStrata('LOW')
+		BattleGroundPanel:SetFrameLevel(1)
+		
+	elseif cfg.panel == "bottom" then
+		DataPanel:SetPoint('BOTTOM', UIParent, 0, 0)
+		DataPanel:SetHeight(35)
+		DataPanel:SetWidth(1200)
+		DataPanel:SetFrameStrata('LOW')
+		DataPanel:SetFrameLevel(0)
+		DataPanel:SetBackdrop({
+			bgFile = cfg.background,
+			edgeFile = cfg.border,
+			edgeSize = 25,
+			insets = {left = 5, right = 5, top = 5, bottom = 5}
+		})
+		DataPanel:SetBackdropColor(0, 0, 0, 1)
+
+		
+		-- Left Panel
+		PanelLeft:SetPoint('LEFT', DataPanel, 5, 0)
+		PanelLeft:SetHeight(35)
+		PanelLeft:SetWidth(1200 / 3)
+		PanelLeft:SetFrameStrata('LOW')
+		PanelLeft:SetFrameLevel(1)		
+
+		-- Center Panel
+		PanelCenter:SetPoint('CENTER', DataPanel, 0, 0)
+		PanelCenter:SetHeight(35)
+		PanelCenter:SetWidth(1200 / 3)
+		PanelCenter:SetFrameStrata('LOW')
+		PanelCenter:SetFrameLevel(1)		
+
+		-- Right panel
+		PanelRight:SetPoint('RIGHT', DataPanel, -5, 0)
+		PanelRight:SetHeight(35)
+		PanelRight:SetWidth(1200 / 3)
+		PanelRight:SetFrameStrata('LOW')
+		PanelRight:SetFrameLevel(1)		
+
+		-- Battleground Panel
+		BattleGroundPanel:SetAllPoints(PanelLeft)
+		BattleGroundPanel:SetFrameStrata('LOW')
+		BattleGroundPanel:SetFrameLevel(1)
+		
+	elseif cfg.panel == "shortbar" then	
+		DataPanel:SetPoint('BOTTOM', UIParent, 0, 0)
+		DataPanel:SetHeight(35)
+		DataPanel:SetWidth(725)
+		DataPanel:SetFrameStrata('LOW')
+		DataPanel:SetFrameLevel(0)
+		DataPanel:SetBackdrop({
+			bgFile = cfg.background,
+			edgeFile = cfg.border,							
+			edgeSize = 25,
+			insets = {left = 3, right = 3, top = 3, bottom = 3},
+		})
+		DataPanel:SetBackdropColor(0, 0, 0, 1)
+		
+		-- Left Panel
+		PanelLeft:SetPoint('LEFT', DataPanel, 5, 0)
+		PanelLeft:SetHeight(35)
+		PanelLeft:SetWidth(725 / 2)
+		PanelLeft:SetFrameStrata('LOW')
+		PanelLeft:SetFrameLevel(1)				
+
+		-- Right panel
+		PanelRight:SetPoint('RIGHT', DataPanel, -5, 0)
+		PanelRight:SetHeight(35)
+		PanelRight:SetWidth(725 / 2)
+		PanelRight:SetFrameStrata('LOW')
+		PanelRight:SetFrameLevel(1)		
+
+		-- Battleground Panel
+		BattleGroundPanel:SetAllPoints(PanelLeft)
+		BattleGroundPanel:SetFrameStrata('LOW')
+		BattleGroundPanel:SetFrameLevel(1)	
+		
+	end
+
+
+
+
+		-- move some frames to make way for the datapanel
+	if cfg.panel == "top" then
+
+		local top = function() end
+		
+		-- Player Frame
+		PlayerFrame:ClearAllPoints() 
+		PlayerFrame:SetPoint("TOPLEFT", -19, -20) 
+		PlayerFrame.ClearAllPoints = top 
+		PlayerFrame.SetPoint = top
+		
+		-- Target Frame
+		TargetFrame:ClearAllPoints() 
+		TargetFrame:SetPoint("TOPLEFT", 250, -20) 
+		TargetFrame.ClearAllPoints = top 
+		TargetFrame.SetPoint = top
+		
+		-- Minimap Frame
+		MinimapCluster:ClearAllPoints() 
+		MinimapCluster:SetPoint('TOPRIGHT', 0, -32) 
+		MinimapCluster.ClearAllPoints = top 
+		MinimapCluster.SetPoint = top
+		
+		-- Buff Frame
+		BuffFrame:ClearAllPoints() 
+		BuffFrame:SetPoint('TOP', MinimapCluster, -110, -2) 
+		BuffFrame.ClearAllPoints = top 
+		BuffFrame.SetPoint = top
+		
+		-- PvP Frame
+		WorldStateAlwaysUpFrame:ClearAllPoints() 
+		WorldStateAlwaysUpFrame:SetPoint('TOP', 0, -32) 
+		WorldStateAlwaysUpFrame.ClearAllpoints = top 
+		WorldStateAlwaysUpFrame.Setpoint = top
+		
+
+	else
+
+		-- Move some stuff for the panel on bottom.
+		
+		local bottom = function() end
+		
+		-- Main Menu Bar
+		MainMenuBar:ClearAllPoints() 
+		MainMenuBar:SetPoint("BOTTOM", DataPanel, "TOP", 0, -3) 
+		MainMenuBar.ClearAllPoints = bottom 
+		MainMenuBar.SetPoint = bottom
+		
+		-- Vehicle Bar
+		OverrideActionBar:ClearAllPoints() 
+		OverrideActionBar:SetPoint("BOTTOM", DataPanel, "TOP", 0, -3) 
+		OverrideActionBar.ClearAllPoints = bottom 
+		OverrideActionBar.SetPoint = bottom
+		
+		-- Pet Battle Bar
+		PetBattleFrame.BottomFrame:ClearAllPoints() 
+		PetBattleFrame.BottomFrame:SetPoint("BOTTOM", DataPanel, "TOP", 0, -3) 
+		PetBattleFrame.BottomFrame.ClearAllPoints = bottom 
+		PetBattleFrame.BottomFrame.SetPoint = bottom
+		
+		-- Pet Action Bar
+		PetActionBarFrame:ClearAllPoints() 
+		PetActionBarFrame:SetPoint("BOTTOM", MainMenuBar, "TOP", 40, 58) 
+		PetActionBarFrame.ClearAllPoints = bottom 
+		PetActionBarFrame.SetPoint = bottom
+		
+		-- World Status
+		WorldStateAlwaysUpFrame:ClearAllPoints() 
+		WorldStateAlwaysUpFrame:SetPoint('TOP', -20, -40) 
+		WorldStateAlwaysUpFrame.ClearAllpoints = bottom 
+		WorldStateAlwaysUpFrame.Setpoint = bottom
+		
+		-- Buff Frame
+		BuffFrame:ClearAllPoints() 
+		BuffFrame:SetPoint('TOP', MinimapCluster, -110, -15) 
+		BuffFrame.ClearAllPoints = bottom 
+		BuffFrame.SetPoint = bottom	
+
+		
+		-- Move the tooltip above the Actionbar
+		hooksecurefunc('GameTooltip_SetDefaultAnchor', function(self)
+			self:SetPoint('BOTTOMRIGHT', UIParent, -95, 135)
+		end)
+
+		
+		 -- Move the Bags above the Actionbar
+		CONTAINER_WIDTH = 192;
+		CONTAINER_SPACING = 5;
+		VISIBLE_CONTAINER_SPACING = 3;
+		CONTAINER_OFFSET_Y = 70;
+		CONTAINER_OFFSET_X = 0;
+
 		 
-
-	local function OnEvent(self, event, ...)
-		local party = GetNumPartyMembers()
-		local raid = GetNumRaidMembers()
-		local pet = select(1, HasPetUI())
-		if event == "PLAYER_ENTERING_WORLD" then
-			self:Hide()
-			self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-		elseif event == "PLAYER_REGEN_ENABLED" then
-			self:Hide()
-		elseif event == "PLAYER_REGEN_DISABLED" then
-			if party > 0 or raid > 0 or pet == 1 then
-				self:Show()
-			else
-				self:Hide()
+		function UpdateContainerFrameAnchors()
+			local _, xOffset, yOffset, _, _, _, _;
+			local containerScale = 1;
+			screenHeight = GetScreenHeight() / containerScale;
+			-- Adjust the start anchor for bags depending on the multibars
+			xOffset = CONTAINER_OFFSET_X / containerScale;
+			yOffset = CONTAINER_OFFSET_Y / containerScale + 25;
+			-- freeScreenHeight determines when to start a new column of bags
+			freeScreenHeight = screenHeight - yOffset;
+			column = 0;
+			for index, frameName in ipairs(ContainerFrame1.bags) do
+				frame = _G[frameName];
+				frame:SetScale(containerScale);
+				if ( index == 1 ) then
+					-- First bag
+					frame:SetPoint('BOTTOMRIGHT', frame:GetParent(), 'BOTTOMRIGHT', -xOffset, yOffset );
+				elseif ( freeScreenHeight < frame:GetHeight() ) then
+					-- Start a new column
+					column = column + 1;
+					freeScreenHeight = screenHeight - yOffset;
+					frame:SetPoint('BOTTOMRIGHT', frame:GetParent(), 'BOTTOMRIGHT', -(column * CONTAINER_WIDTH) - xOffset, yOffset );
+				else
+					-- Anchor to the previous bag
+					frame:SetPoint('BOTTOMRIGHT', ContainerFrame1.bags[index - 1], 'TOPRIGHT', 0, CONTAINER_SPACING);   
+				end
+				freeScreenHeight = freeScreenHeight - frame:GetHeight() - VISIBLE_CONTAINER_SPACING;
 			end
-		else
-			if (InCombatLockdown()) and (party > 0 or raid > 0 or pet == 1) then
-				self:Show()
-			else
-				self:Hide()
-			end
-		end
-	end
-
-	local function OnUpdate(self, event, unit)
-		if UnitAffectingCombat(self.unit) then
-			local _, _, threatpct, rawthreatpct, _ = UnitDetailedThreatSituation(self.unit, self.tar)
-			local threatval = threatpct or 0
-			
-			self:SetValue(threatval)
-			self.text:SetFormattedText("%s ".."%3.1f%%|r", 'Threat on current target:', threatval)
-			
-			if( threatval < 30 ) then
-				self.text:SetTextColor(unpack(self.Colors[3]))
-			elseif( threatval >= 30 and threatval < 70 ) then
-				self.text:SetTextColor(unpack(self.Colors[2]))
-			else
-				self.text:SetTextColor(unpack(self.Colors[1]))
-			end	
-					
-			if threatval > 0 then
-				self:SetAlpha(1)
-				PanelCenter:SetAlpha(0)
-			else
-				self:SetAlpha(0)
-				PanelCenter:SetAlpha(1)
-			end		
-		end
-	end
-
-	nDataThreatBar:RegisterEvent("PLAYER_ENTERING_WORLD")
-	nDataThreatBar:RegisterEvent("PLAYER_REGEN_ENABLED")
-	nDataThreatBar:RegisterEvent("PLAYER_REGEN_DISABLED")
-	nDataThreatBar:SetScript("OnEvent", OnEvent)
-	nDataThreatBar:SetScript("OnUpdate", OnUpdate)
-	nDataThreatBar.unit = "player"
-	nDataThreatBar.tar = nDataThreatBar.unit.."target"
-	nDataThreatBar.Colors = aggroColors
-	nDataThreatBar:SetAlpha(0)
+		end	 
+	end	
 end
-----------------------------------
--- Datatext for Battleground Data
-----------------------------------
 
-if datatext.battleground == true then 
+----------------
+-- Color System
+----------------
+if cfg.color then
+
+	--[[
+
+		All Credit for Colors.lua goes to Tuks.
+		Tukui = http://www.tukui.org/download.php.
+		Edited by Cokedriver.
+		
+	]]
+
+	if cfg.classcolor ~= true then
+		local r, g, b = cfg.color.r, cfg.color.g, cfg.color.b
+		hexa = ("|cff%.2x%.2x%.2x"):format(r * 255, g * 255, b * 255)
+		hexb = "|r"
+	else
+		hexa = ("|cff%.2x%.2x%.2x"):format(ccolor.r * 255, ccolor.g * 255, ccolor.b * 255)
+		hexb = "|r"
+	end
+end
+
+----------------
+-- Player Armor
+----------------
+if cfg.armor and cfg.armor > 0 then
+	local effectiveArmor
+	
+	local Stat = CreateFrame('Frame')
+	Stat:EnableMouse(true)
+	Stat:SetFrameStrata('BACKGROUND')
+	Stat:SetFrameLevel(3)
+
+	local Text  = DataPanel:CreateFontString(nil, 'OVERLAY')
+	Text:SetFont(cfg.font, cfg.fontsize,'THINOUTLINE')
+	PP(cfg.armor, Text)
+
+	local function Update(self)
+		effectiveArmor = select(2, UnitArmor("player"))
+		Text:SetText(hexa.."Armor: "..hexb..(effectiveArmor))
+		--Setup Armor Tooltip
+		self:SetAllPoints(Text)
+	end
+
+	Stat:RegisterEvent("UNIT_INVENTORY_CHANGED")
+	Stat:RegisterEvent("UNIT_AURA")
+	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
+	Stat:SetScript("OnMouseDown", function() ToggleCharacter("PaperDollFrame") end)
+	Stat:SetScript("OnEvent", Update)
+	Stat:SetScript("OnEnter", function(self)
+		if not InCombatLockdown() then
+			local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)	
+			GameTooltip:SetOwner(panel, anchor, xoff, yoff)
+			GameTooltip:ClearLines()
+			GameTooltip:AddLine("Mitigation By Level: ")
+			local lv = 83
+			local mitigation = (effectiveArmor/(effectiveArmor+(467.5*lv-22167.5)))
+			for i = 1, 4 do
+				local format = string.format
+				if mitigation > .75 then
+					mitigation = .75
+				end
+				GameTooltip:AddDoubleLine(lv,format("%.2f", mitigation*100) .. "%",1,1,1)
+				lv = lv - 1
+			end
+			if UnitLevel("target") > 0 and UnitLevel("target") < UnitLevel("player") then
+				if mitigation > .75 then
+					mitigation = .75
+				end
+				GameTooltip:AddDoubleLine(UnitLevel("target"),format("%.2f", mitigation*100) .. "%",1,1,1)
+			end
+			GameTooltip:Show()
+		end
+	end)
+	Stat:SetScript("OnLeave", function() GameTooltip:Hide() end)
+end
+
+--------------------
+-- Player Avoidance
+--------------------
+if cfg.avd and cfg.avd > 0 then
+	local dodge, parry, block, avoidance, targetlv, playerlv, basemisschance, leveldifference
+	local Stat = CreateFrame('Frame')
+	Stat:EnableMouse(true)
+	Stat:SetFrameStrata('BACKGROUND')
+	Stat:SetFrameLevel(3)
+
+	local Text  = DataPanel:CreateFontString(nil, 'OVERLAY')
+	Text:SetFont(cfg.font, cfg.fontsize,'THINOUTLINE')
+	PP(cfg.avd, Text)
+	
+	local targetlv, playerlv
+
+	local function Update(self)
+		local format = string.format
+		targetlv, playerlv = UnitLevel("target"), UnitLevel("player")
+		local basemisschance, leveldifference, avoidance
+		
+		if targetlv == -1 then
+			basemisschance = (5 - (3*.2))  --Boss Value
+			leveldifference = 3
+		elseif targetlv > playerlv then
+			basemisschance = (5 - ((targetlv - playerlv)*.2)) --Mobs above player level
+			leveldifference = (targetlv - playerlv)
+		elseif targetlv < playerlv and targetlv > 0 then
+			basemisschance = (5 + ((playerlv - targetlv)*.2)) --Mobs below player level
+			leveldifference = (targetlv - playerlv)
+		else
+			basemisschance = 5 --Sets miss chance of attacker level if no target exists, lv80=5, 81=4.2, 82=3.4, 83=2.6
+			leveldifference = 0
+		end
+		
+		if myrace == "NightElf" then
+			basemisschance = basemisschance + 2
+		end
+
+		if leveldifference >= 0 then
+			dodge = (GetDodgeChance()-leveldifference*.2)
+			parry = (GetParryChance()-leveldifference*.2)
+			block = (GetBlockChance()-leveldifference*.2)
+			avoidance = (dodge+parry+block)
+			Text:SetText(hexa.."Avd: "..hexb..format("%.2f", avoidance).."|r")
+		else
+			dodge = (GetDodgeChance()+abs(leveldifference*.2))
+			parry = (GetParryChance()+abs(leveldifference*.2))
+			block = (GetBlockChance()+abs(leveldifference*.2))
+			avoidance = (dodge+parry+block)
+			Text:SetText(hexa.."Avd: "..hexb..format("%.2f", avoidance).."|r")
+		end
+
+		--Setup Avoidance Tooltip
+		self:SetAllPoints(Text)
+	end
+
+
+	Stat:RegisterEvent("UNIT_AURA")
+	Stat:RegisterEvent("UNIT_INVENTORY_CHANGED")
+	Stat:RegisterEvent("PLAYER_TARGET_CHANGED")
+	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
+	Stat:SetScript("OnEvent", Update)
+	Stat:SetScript("OnEnter", function(self)
+		if not InCombatLockdown() then
+			local anchor, yoff = DataTextTooltipAnchor(Text)
+			GameTooltip:SetOwner(self, anchor, 0, yoff)
+			GameTooltip:ClearAllPoints()
+			GameTooltip:ClearLines()
+			if targetlv > 1 then
+				GameTooltip:AddDoubleLine("Avoidance Breakdown".." (".."lvl".." "..targetlv..")")
+			elseif targetlv == -1 then
+				GameTooltip:AddDoubleLine("Avoidance Breakdown".." (".."Boss"..")")
+			else
+				GameTooltip:AddDoubleLine("Avoidance Breakdown".." (".."lvl".." "..targetlv..")")
+			end
+			GameTooltip:AddDoubleLine("Dodge",format("%.2f",dodge) .. "%",1,1,1,  1,1,1)
+			GameTooltip:AddDoubleLine("Parry",format("%.2f",parry) .. "%",1,1,1,  1,1,1)
+			GameTooltip:AddDoubleLine("Block",format("%.2f",block) .. "%",1,1,1,  1,1,1)
+			GameTooltip:Show()
+		end
+	end)
+	Stat:SetScript("OnLeave", function() GameTooltip:Hide() end)
+end
+
+--------
+-- Bags
+--------
+
+if cfg.bags and cfg.bags > 0 then
+	local Stat = CreateFrame('Frame')
+	Stat:EnableMouse(true)
+	Stat:SetFrameStrata('BACKGROUND')
+	Stat:SetFrameLevel(3)
+
+	local Text  = DataPanel:CreateFontString(nil, 'OVERLAY')
+	Text:SetFont(cfg.font, cfg.fontsize,'THINOUTLINE')
+	PP(cfg.bags, Text)
+--[[local Profit	= 0
+	local Spent		= 0
+	local OldMoney	= 0
+	local myPlayerRealm = GetRealmName()
+
+	local function formatMoney(money)
+		local gold = floor(math.abs(money) / 10000)
+		local silver = mod(floor(math.abs(money) / 100), 100)
+		local copper = mod(floor(math.abs(money)), 100)
+		if gold ~= 0 then
+			return format(Stat.Color2.."%s|r"..L.goldabbrev..Stat.Color2.." %s|r"..L.silverabbrev..Stat.Color2.." %s|r"..L.copperabbrev, gold, silver, copper)
+		elseif silver ~= 0 then
+			return format(Stat.Color2.."%s|r"..L.silverabbrev..Stat.Color2.." %s|r"..L.copperabbrev, silver, copper)
+		else
+			return format(Stat.Color2.."%s|r"..L.copperabbrev, copper)
+		end
+	end
+
+	local function FormatTooltipMoney(money)
+		local gold, silver, copper = abs(money / 10000), abs(mod(money / 100, 100)), abs(mod(money, 100))
+		local cash = ""
+		cash = format("%.2d"..L.goldabbrev.." %.2d"..L.silverabbrev.." %.2d"..L.copperabbrev, gold, silver, copper)		
+		return cash
+	end	
+
+	local function OnEvent(self, event)
+		if event == "PLAYER_ENTERING_WORLD" then
+			OldMoney = GetMoney()
+		end
+		
+		local NewMoney	= GetMoney()
+		local Change = NewMoney-OldMoney -- Positive if we gain money
+		
+		if OldMoney>NewMoney then		-- Lost Money
+			Spent = Spent - Change
+		else							-- Gained Moeny
+			Profit = Profit + Change
+		end
+		
+		Text:SetText(formatMoney(NewMoney))
+		-- Setup Money Tooltip
+		self:SetAllPoints(Text)
+
+		local myPlayerName  = UnitName("player")				
+		if not TukuiData then TukuiData = {} end
+		if not TukuiData.gold then TukuiData.gold = {} end
+		if not TukuiData.gold[myPlayerRealm] then TukuiData.gold[myPlayerRealm]={} end
+		TukuiData.gold[myPlayerRealm][myPlayerName] = GetMoney()
+				
+		OldMoney = NewMoney
+	end
+
+	Stat:RegisterEvent("PLAYER_MONEY")
+	Stat:RegisterEvent("SEND_MAIL_MONEY_CHANGED")
+	Stat:RegisterEvent("SEND_MAIL_COD_CHANGED")
+	Stat:RegisterEvent("PLAYER_TRADE_MONEY")
+	Stat:RegisterEvent("TRADE_MONEY_CHANGED")
+	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
+	Stat:SetScript("OnMouseDown", function() ToggleAllBags() end)
+	Stat:SetScript("OnEvent", OnEvent)
+	Stat:SetScript("OnEnter", function(self)
+		if not InCombatLockdown() then
+			local anchor, panel, xoff, yoff = T.DataTextTooltipAnchor(Text)
+			GameTooltip:SetOwner(panel, anchor, xoff, yoff)
+			GameTooltip:ClearLines()
+			GameTooltip:AddLine(L.datatext_session)
+			GameTooltip:AddDoubleLine(L.datatext_earned, formatMoney(Profit), 1, 1, 1, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L.datatext_spent, formatMoney(Spent), 1, 1, 1, 1, 1, 1)
+			if Profit < Spent then
+				GameTooltip:AddDoubleLine(L.datatext_deficit, formatMoney(Profit-Spent), 1, 0, 0, 1, 1, 1)
+			elseif (Profit-Spent)>0 then
+				GameTooltip:AddDoubleLine(L.datatext_profit, formatMoney(Profit-Spent), 0, 1, 0, 1, 1, 1)
+			end				
+			GameTooltip:AddLine' '								
+		
+			local totalGold = 0				
+			GameTooltip:AddLine(L.datatext_character)			
+			local thisRealmList = TukuiData.gold[myPlayerRealm];
+			for k,v in pairs(thisRealmList) do
+				GameTooltip:AddDoubleLine(k, FormatTooltipMoney(v), 1, 1, 1, 1, 1, 1)
+				totalGold=totalGold+v;
+			end 
+			GameTooltip:AddLine' '
+			GameTooltip:AddLine(L.datatext_server)
+			GameTooltip:AddDoubleLine(L.datatext_totalgold, FormatTooltipMoney(totalGold), 1, 1, 1, 1, 1, 1)
+
+			for i = 1, GetNumWatchedTokens() do
+				local name, count, extraCurrencyType, icon, itemID = GetBackpackCurrencyInfo(i)
+				if name and i == 1 then
+					GameTooltip:AddLine(" ")
+					GameTooltip:AddLine(CURRENCY)
+				end
+				local r, g, b = 1,1,1
+				if itemID then r, g, b = GetItemQualityColor(select(3, GetItemInfo(itemID))) end
+				if name and count then GameTooltip:AddDoubleLine(name, count, r, g, b, 1, 1, 1) end
+			end
+			GameTooltip:Show()
+		end
+	end)
+	Stat:SetScript("OnLeave", function() GameTooltip:Hide() end)	
+	-- reset gold data
+	local function RESETGOLD()
+		local myPlayerRealm = GetRealmName()
+		local myPlayerName  = UnitName("player")
+		
+		TukuiData.gold = {}
+		TukuiData.gold[myPlayerRealm]={}
+		TukuiData.gold[myPlayerRealm][myPlayerName] = GetMoney()
+	end
+	SLASH_RESETGOLD1 = "/resetgold"
+	SlashCmdList["RESETGOLD"] = RESETGOLD
+]]
+	local Profit	= 0
+	local Spent		= 0
+	local OldMoney	= 0
+	local myPlayerRealm = GetRealmName();
+	
+	
+	local function formatMoney(c)
+		local str = ""
+		if not c or c < 0 then 
+			return str 
+		end
+		
+		if c >= 10000 then
+			local g = math.floor(c/10000)
+			c = c - g*10000
+			str = str..g.."|cFFFFD800g|r "
+		end
+		if c >= 100 then
+			local s = math.floor(c/100)
+			c = c - s*100
+			str = str..s.."|cFFC7C7C7s|r "
+		end
+		if c >= 0 then
+			str = str..c.."|cFFEEA55Fc|r"
+		end
+		
+		return str
+	end
+	
+	local function FormatTooltipMoney(c)
+		if not c then return end
+		local str = ""
+		if not c or c < 0 then 
+			return str 
+		end
+		
+		if c >= 10000 then
+			local g = math.floor(c/10000)
+			c = c - g*10000
+			str = str..g.."|cFFFFD800g|r "
+		end
+		if c >= 100 then
+			local s = math.floor(c/100)
+			c = c - s*100
+			str = str..s.."|cFFC7C7C7s|r "
+		end
+		if c >= 0 then
+			str = str..c.."|cFFEEA55Fc|r"
+		end
+		
+		return str
+	end	
+	local function OnEvent(self, event)
+		--[[local totalSlots, freeSlots = 0, 0
+		local itemLink, subtype, isBag
+		for i = 0,NUM_BAG_SLOTS do
+			isBag = true
+			if i > 0 then
+				itemLink = GetInventoryItemLink('player', ContainerIDToInventoryID(i))
+				if itemLink then
+					subtype = select(7, GetItemInfo(itemLink))
+					if (subtype == 'Mining Bag') or (subtype == 'Gem Bag') or (subtype == 'Engineering Bag') or (subtype == 'Enchanting Bag') or (subtype == 'Herb Bag') or (subtype == 'Inscription Bag') or (subtype == 'Leatherworking Bag') or (subtype == 'Fishing Bag')then
+						isBag = false
+					end
+				end
+			end
+			if isBag then
+				totalSlots = totalSlots + GetContainerNumSlots(i)
+				freeSlots = freeSlots + GetContainerNumFreeSlots(i)
+			end
+			Text:SetText(hexa.."Bags: "..hexb.. freeSlots.. '/' ..totalSlots)
+				if freeSlots < 6 then
+					Text:SetTextColor(1,0,0)
+				elseif freeSlots < 10 then
+					Text:SetTextColor(1,0,0)
+				elseif freeSlots > 10 then
+					Text:SetTextColor(1,1,1)
+				end
+			self:SetAllPoints(Text)
+			
+		end	]]
+		if event == "PLAYER_ENTERING_WORLD" then
+			OldMoney = GetMoney()
+		end
+		
+		local NewMoney	= GetMoney()
+		local Change = NewMoney-OldMoney -- Positive if we gain money
+		
+		if OldMoney>NewMoney then		-- Lost Money
+			Spent = Spent - Change
+		else							-- Gained Moeny
+			Profit = Profit + Change
+		end
+		
+		Text:SetText(formatMoney(NewMoney))
+		-- Setup Money Tooltip
+		self:SetAllPoints(Text)
+
+		local myPlayerName  = UnitName("player")				
+		if not nDataDB then nDataDB = {} end
+		if not nDataDB.gold then nDataDB.gold = {} end
+		if not nDataDB.gold[myPlayerRealm] then nDataDB.gold[myPlayerRealm]={} end
+		nDataDB.gold[myPlayerRealm][myPlayerName] = GetMoney()		
+			
+		OldMoney = NewMoney	
+			
+	end
+
+	Stat:RegisterEvent("PLAYER_MONEY")
+	Stat:RegisterEvent("SEND_MAIL_MONEY_CHANGED")
+	Stat:RegisterEvent("SEND_MAIL_COD_CHANGED")
+	Stat:RegisterEvent("PLAYER_TRADE_MONEY")
+	Stat:RegisterEvent("TRADE_MONEY_CHANGED")
+	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
+	Stat:SetScript('OnMouseDown', 
+		function()
+			if cfg.bag ~= true then
+				ToggleAllBags()
+			else
+				ToggleBag(0)
+			end
+		end
+	)
+	Stat:SetScript('OnEvent', OnEvent)	
+	Stat:SetScript("OnEnter", function(self)
+		if not InCombatLockdown() then
+			local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
+			GameTooltip:SetOwner(panel, anchor, xoff, yoff)
+			GameTooltip:ClearLines()
+			GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Gold")
+			GameTooltip:AddLine' '			
+			GameTooltip:AddLine("Session: ")
+			GameTooltip:AddDoubleLine("Earned:", formatMoney(Profit), 1, 1, 1, 1, 1, 1)
+			GameTooltip:AddDoubleLine("Spent:", formatMoney(Spent), 1, 1, 1, 1, 1, 1)
+			if Profit < Spent then
+				GameTooltip:AddDoubleLine("Deficit:", formatMoney(Profit-Spent), 1, 0, 0, 1, 1, 1)
+			elseif (Profit-Spent)>0 then
+				GameTooltip:AddDoubleLine("Profit:", formatMoney(Profit-Spent), 0, 1, 0, 1, 1, 1)
+			end				
+			GameTooltip:AddLine' '								
+		
+			local totalGold = 0				
+			GameTooltip:AddLine("Character: ")			
+			local thisRealmList = nDataDB.gold[myPlayerRealm];
+			for k,v in pairs(thisRealmList) do
+				GameTooltip:AddDoubleLine(k, FormatTooltipMoney(v), 1, 1, 1, 1, 1, 1)
+				totalGold=totalGold+v;
+			end  
+			GameTooltip:AddLine' '
+			GameTooltip:AddLine("Server: ")
+			GameTooltip:AddDoubleLine("Total: ", FormatTooltipMoney(totalGold), 1, 1, 1, 1, 1, 1)
+
+			for i = 1, GetNumWatchedTokens() do
+				local name, count, extraCurrencyType, icon, itemID = GetBackpackCurrencyInfo(i)
+				if name and i == 1 then
+					GameTooltip:AddLine(" ")
+					GameTooltip:AddLine(CURRENCY)
+				end
+				local r, g, b = 1,1,1
+				if itemID then r, g, b = GetItemQualityColor(select(3, GetItemInfo(itemID))) end
+				if name and count then GameTooltip:AddDoubleLine(name, count, r, g, b, 1, 1, 1) end
+			end
+			GameTooltip:AddLine' '
+			GameTooltip:AddLine("|cffeda55fClick|r to Open Bags")			
+			GameTooltip:Show()
+		end
+	end)
+	
+	Stat:SetScript("OnLeave", function() GameTooltip:Hide() end)			
+	-- reset gold data
+	local function RESETGOLD()
+		local myPlayerRealm = GetRealmName();
+		local myPlayerName  = UnitName("player");
+		
+		nDataDB.gold = {}
+		nDataDB.gold[myPlayerRealm]={}
+		nDataDB.gold[myPlayerRealm][myPlayerName] = GetMoney();
+	end
+	SLASH_RESETGOLD1 = "/resetgold"
+	SlashCmdList["RESETGOLD"] = RESETGOLD	
+
+end
+
+----------------
+-- Battleground
+----------------
+if cfg.battleground == true then 
 
 	--Map IDs
 	local WSG = 443
@@ -517,31 +1008,31 @@ if datatext.battleground == true then
 					GameTooltip:ClearLines()
 					GameTooltip:SetPoint('BOTTOM', self, 'TOP', 0, 1)
 					GameTooltip:ClearLines()
-					GameTooltip:AddLine('Stats for '..hexa..name..hexb)
+					GameTooltip:AddLine("Stats for : "..hexa..name..hexb)
 					GameTooltip:AddLine' '
-					GameTooltip:AddDoubleLine('Killing Blows : ', killingBlows,1,1,1)
-					GameTooltip:AddDoubleLine('Honorable Kills:', honorableKills,1,1,1)
-					GameTooltip:AddDoubleLine('Deaths:', deaths,1,1,1)
-					GameTooltip:AddDoubleLine('Honor Gained:', format('%d', honorGained),1,1,1)
-					GameTooltip:AddDoubleLine('Damage Done:', damageDone,1,1,1)
-					GameTooltip:AddDoubleLine('Healing Done:', healingDone,1,1,1)
+					GameTooltip:AddDoubleLine("Killing Blows:", killingBlows,1,1,1)
+					GameTooltip:AddDoubleLine("Honorable Kills:", honorableKills,1,1,1)
+					GameTooltip:AddDoubleLine("Deaths:", deaths,1,1,1)
+					GameTooltip:AddDoubleLine("Honor Gained:", format('%d', honorGained),1,1,1)
+					GameTooltip:AddDoubleLine("Damage Done:", damageDone,1,1,1)
+					GameTooltip:AddDoubleLine("Healing Done:", healingDone,1,1,1)
 					--Add extra statistics to watch based on what BG you are in.
 					if curmapid == WSG or curmapid == TP then 
-						GameTooltip:AddDoubleLine('Flags Captured:',GetBattlefieldStatData(i, 1),1,1,1)
-						GameTooltip:AddDoubleLine('Flags Returned:',GetBattlefieldStatData(i, 2),1,1,1)
+						GameTooltip:AddDoubleLine("Flags Captured:",GetBattlefieldStatData(i, 1),1,1,1)
+						GameTooltip:AddDoubleLine("Flags Returned:",GetBattlefieldStatData(i, 2),1,1,1)
 					elseif curmapid == EOTS then
-						GameTooltip:AddDoubleLine('Flags Captured:',GetBattlefieldStatData(i, 1),1,1,1)
+						GameTooltip:AddDoubleLine("Flags Captured:",GetBattlefieldStatData(i, 1),1,1,1)
 					elseif curmapid == AV then
-						GameTooltip:AddDoubleLine('Graveyards Assaulted:',GetBattlefieldStatData(i, 1),1,1,1)
-						GameTooltip:AddDoubleLine('Graveyards Defended:',GetBattlefieldStatData(i, 2),1,1,1)
-						GameTooltip:AddDoubleLine('Towers Assaulted:',GetBattlefieldStatData(i, 3),1,1,1)
-						GameTooltip:AddDoubleLine('Towers Defended:',GetBattlefieldStatData(i, 4),1,1,1)
+						GameTooltip:AddDoubleLine("Graveyards Assaulted:",GetBattlefieldStatData(i, 1),1,1,1)
+						GameTooltip:AddDoubleLine("Graveyards Defended:",GetBattlefieldStatData(i, 2),1,1,1)
+						GameTooltip:AddDoubleLine("Towers Assaulted:",GetBattlefieldStatData(i, 3),1,1,1)
+						GameTooltip:AddDoubleLine("Towers Defended:",GetBattlefieldStatData(i, 4),1,1,1)
 					elseif curmapid == SOTA then
-						GameTooltip:AddDoubleLine('Demolishers Destroyed:',GetBattlefieldStatData(i, 1),1,1,1)
-						GameTooltip:AddDoubleLine('Gates Destroyed:',GetBattlefieldStatData(i, 2),1,1,1)
+						GameTooltip:AddDoubleLine("Demolishers Destroyed:",GetBattlefieldStatData(i, 1),1,1,1)
+						GameTooltip:AddDoubleLine("Gates Destroyed:",GetBattlefieldStatData(i, 2),1,1,1)
 					elseif curmapid == IOC or curmapid == TBFG or curmapid == AB then
-						GameTooltip:AddDoubleLine('Bases Assaulted:',GetBattlefieldStatData(i, 1),1,1,1)
-						GameTooltip:AddDoubleLine('Bases Defended:',GetBattlefieldStatData(i, 2),1,1,1)
+						GameTooltip:AddDoubleLine("Bases Assaulted:",GetBattlefieldStatData(i, 1),1,1,1)
+						GameTooltip:AddDoubleLine("Bases Defended:",GetBattlefieldStatData(i, 2),1,1,1)
 					end					
 					GameTooltip:Show()
 				end
@@ -554,19 +1045,19 @@ if datatext.battleground == true then
 	Stat:EnableMouse(true)
 
 	local Text1  = BattleGroundPanel:CreateFontString(nil, 'OVERLAY')
-	Text1:SetFont(media.font, datatext.fontsize)
+	Text1:SetFont(cfg.font, cfg.fontsize,'THINOUTLINE')
 	Text1:SetPoint('LEFT', BattleGroundPanel, 30, 0)
-	Text1:SetHeight(PanelLeft:GetHeight())
+	Text1:SetHeight(DataPanel:GetHeight())
 
 	local Text2  = BattleGroundPanel:CreateFontString(nil, 'OVERLAY')
-	Text2:SetFont(media.font, datatext.fontsize)
+	Text2:SetFont(cfg.font, cfg.fontsize,'THINOUTLINE')
 	Text2:SetPoint('CENTER', BattleGroundPanel, 0, 0)
-	Text2:SetHeight(PanelLeft:GetHeight())
+	Text2:SetHeight(DataPanel:GetHeight())
 
 	local Text3  = BattleGroundPanel:CreateFontString(nil, 'OVERLAY')
-	Text3:SetFont(media.font, datatext.fontsize)
+	Text3:SetFont(cfg.font, cfg.fontsize,'THINOUTLINE')
 	Text3:SetPoint('RIGHT', BattleGroundPanel, -30, 0)
-	Text3:SetHeight(PanelLeft:GetHeight())
+	Text3:SetHeight(DataPanel:GetHeight())
 
 	local int = 2
 	local function Update(self, t)
@@ -578,15 +1069,15 @@ if datatext.battleground == true then
 			for i=1, numScores do
 				local name, killingBlows, honorableKills, deaths, honorGained, faction, race, class, classToken, damageDone, healingDone, bgRating, ratingChange = GetBattlefieldScore(i)
 				if healingDone > damageDone then
-					dmgtxt = ('Healing : '..hexa..healingDone..hexb)
+					dmgtxt = ("Healing : "..hexa..healingDone..hexb)
 				else
-					dmgtxt = ('Damage : '..hexa..damageDone..hexb)
+					dmgtxt = ("Damage : "..hexa..damageDone..hexb)
 				end
 				if ( name ) then
 					if ( name == myname ) then
-						Text2:SetText('Honor : '..hexa..format('%d', honorGained)..hexb)
+						Text2:SetText("Honor : "..hexa..format('%d', honorGained)..hexb)
 						Text1:SetText(dmgtxt)
-						Text3:SetText('Killing Blows : '..hexa..killingBlows..hexb)
+						Text3:SetText("Killing Blows : "..hexa..killingBlows..hexb)
 					end   
 				end
 			end 
@@ -617,221 +1108,18 @@ if datatext.battleground == true then
 	Update(Stat, 10)
 end
 
----------------------
--- Datatext for Bags
----------------------
-
-if datatext.bags and datatext.bags > 0 then
-	local Stat = CreateFrame('Frame')
-	Stat:EnableMouse(true)
-	Stat:SetFrameStrata('BACKGROUND')
-	Stat:SetFrameLevel(3)
-
-	local Text  = DataPanel:CreateFontString(nil, 'OVERLAY')
-	Text:SetFont(media.font, datatext.fontsize,'THINOUTLINE')
-	PP(datatext.bags, Text)
-
-	local defaultColor = { 1, 1, 1 }
-	local Profit	= 0
-	local Spent		= 0
-	local OldMoney	= 0	
-	
-	local function formatMoney(c)
-		local str = ""
-		if not c or c < 0 then 
-			return str 
-		end
-		
-		if c >= 10000 then
-			local g = math.floor(c/10000)
-			c = c - g*10000
-			str = str.."|cFFFFD800"..g.."|r|TInterface\\MoneyFrame\\UI-GoldIcon.blp:0:0:0:0|t"
-		end
-		if c >= 100 then
-			local s = math.floor(c/100)
-			c = c - s*100
-			str = str.."|cFFC7C7C7"..s.."|r|TInterface\\MoneyFrame\\UI-SilverIcon.blp:0:0:0:0|t"
-		end
-		if c >= 0 then
-			str = str.."|cFFEEA55F"..c.."|r|TInterface\\MoneyFrame\\UI-CopperIcon.blp:0:0:0:0|t"
-		end
-		
-		return str
-	end
-	
-	local function FormatTooltipMoney(c)
-		if not c then return end
-		local str = ""
-		if not c or c < 0 then 
-			return str 
-		end
-		
-		if c >= 10000 then
-			local g = math.floor(c/10000)
-			c = c - g*10000
-			str = str.."|cFFFFD800"..g.."|r|TInterface\\MoneyFrame\\UI-GoldIcon.blp:0:0:0:0|t"
-		end
-		if c >= 100 then
-			local s = math.floor(c/100)
-			c = c - s*100
-			str = str.."|cFFC7C7C7"..s.."|r|TInterface\\MoneyFrame\\UI-SilverIcon.blp:0:0:0:0|t"
-		end
-		if c >= 0 then
-			str = str.."|cFFEEA55F"..c.."|r|TInterface\\MoneyFrame\\UI-CopperIcon.blp:0:0:0:0|t"
-		end
-		
-		return str
-	end	
-	Stat:SetScript("OnEnter", function(self)
-		if InCombatLockdown() then return end
-		
-		local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
-		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
-		GameTooltip:ClearLines()
-		GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Gold")
-		GameTooltip:AddLine' '			
-		GameTooltip:AddLine("Session: ")
-		GameTooltip:AddDoubleLine("Earned:", formatMoney(Profit), 1, 1, 1, 1, 1, 1)
-		GameTooltip:AddDoubleLine("Spent:", formatMoney(Spent), 1, 1, 1, 1, 1, 1)
-		if Profit < Spent then
-			GameTooltip:AddDoubleLine("Deficit:", formatMoney(Profit-Spent), 1, 0, 0, 1, 1, 1)
-		elseif (Profit-Spent)>0 then
-			GameTooltip:AddDoubleLine("Profit:", formatMoney(Profit-Spent), 0, 1, 0, 1, 1, 1)
-		end				
-		GameTooltip:AddLine' '								
-	
-		local totalGold = 0				
-		GameTooltip:AddLine("Character: ")			
-		for k,_ in pairs(nData[myrealm]) do
-			if nData[myrealm][k]["gold"] then 
-				GameTooltip:AddDoubleLine(k, FormatTooltipMoney(nData[myrealm][k]["gold"]), 1, 1, 1, 1, 1, 1)
-				totalGold=totalGold+nData[myrealm][k]["gold"]
-			end
-		end 
-		GameTooltip:AddLine' '
-		GameTooltip:AddLine("Server: ")
-		GameTooltip:AddDoubleLine("Total: ", FormatTooltipMoney(totalGold), 1, 1, 1, 1, 1, 1)
-
-		for i = 1, MAX_WATCHED_TOKENS do
-			local name, count, extraCurrencyType, icon, itemID = GetBackpackCurrencyInfo(i)
-			if name and i == 1 then
-				GameTooltip:AddLine(" ")
-				GameTooltip:AddLine(CURRENCY)
-			end
-			if name and count then GameTooltip:AddDoubleLine(name, count, 1, 1, 1) end
-		end
-		GameTooltip:AddLine' '
-		GameTooltip:AddLine("|cffeda55fClick|r to Open Bags")			
-		GameTooltip:Show()
-		
-	end)
-	
-	Stat:SetScript("OnLeave", function() GameTooltip:Hide() end)		
-	
-	local function OnEvent(self, event)
-		local totalSlots, freeSlots = 0, 0
-		local itemLink, subtype, isBag
-		for i = 0,NUM_BAG_SLOTS do
-			isBag = true
-			if i > 0 then
-				itemLink = GetInventoryItemLink('player', ContainerIDToInventoryID(i))
-				if itemLink then
-					subtype = select(7, GetItemInfo(itemLink))
-					if (subtype == 'Soul Bag') or (subtype == 'Ammo Pouch') or (subtype == 'Quiver') or (subtype == 'Mining Bag') or (subtype == 'Gem Bag') or (subtype == 'Engineering Bag') or (subtype == 'Enchanting Bag') or (subtype == 'Herb Bag') or (subtype == 'Inscription Bag') or (subtype == 'Leatherworking Bag')then
-						isBag = false
-					end
-				end
-			end
-			if isBag then
-				totalSlots = totalSlots + GetContainerNumSlots(i)
-				freeSlots = freeSlots + GetContainerNumFreeSlots(i)
-			end
-			Text:SetText(hexa.."Bags: "..hexb.. freeSlots.. '/' ..totalSlots)
-				if freeSlots < 6 then
-					Text:SetTextColor(1,0,0)
-					Flash(Text, .5)
-				elseif freeSlots < 10 then
-					Text:SetTextColor(1,0,0)
-					Flash(Text, 1)
-				elseif freeSlots > 10 then
-					Text:SetTextColor(1,1,1)
-					StopFlash(Text)
-				end
-			self:SetAllPoints(Text)
-			
-		end	
-		if event == "PLAYER_LOGIN" then
-			OldMoney = GetMoney()
-		end
-		
-		local NewMoney	= GetMoney()
-		local Change = NewMoney-OldMoney -- Positive if we gain money
-		
-		if OldMoney>NewMoney then		-- Lost Money
-			Spent = Spent - Change
-		else							-- Gained Moeny
-			Profit = Profit + Change
-		end
-		
-		-- Setup Money Tooltip
-		self:SetAllPoints(Text)
-
-		if (nData == nil) then nData = {}; end
-		if (nData[myrealm] == nil) then nData[myrealm] = {} end
-		if (nData[myrealm][myname] == nil) then nData[myrealm][myname] = {} end
-		nData[myrealm][myname]["gold"] = GetMoney()
-		nData.gold = nil -- old
-			
-		OldMoney = NewMoney			
-	end
-	
-	Stat:RegisterEvent("PLAYER_MONEY")
-	Stat:RegisterEvent("SEND_MAIL_MONEY_CHANGED")
-	Stat:RegisterEvent("SEND_MAIL_COD_CHANGED")
-	Stat:RegisterEvent("PLAYER_TRADE_MONEY")
-	Stat:RegisterEvent("TRADE_MONEY_CHANGED")         
-	Stat:RegisterEvent('PLAYER_LOGIN')
-	Stat:RegisterEvent('BAG_UPDATE')
-	Stat:SetScript('OnMouseDown', 
-		function()
-			if datatext.bag == true then
-				ToggleBag(0)
-			elseif datatext.bag == false then
-				ToggleAllBags()
-			end
-		end
-	)	
-
-
-		-- reset gold data
-	local function RESETGOLD()		
-		for k,_ in pairs(nData[myrealm]) do
-			nData[myrealm][k].gold = nil
-		end 
-		if (nData == nil) then nData = {}; end
-		if (nData[myrealm] == nil) then nData[myrealm] = {} end
-		if (nData[myrealm][myname] == nil) then nData[myrealm][myname] = {} end
-		nData[myrealm][myname]["gold"] = GetMoney()		
-	end
-	SLASH_RESETGOLD1 = "/resetgold"
-	SlashCmdList["RESETGOLD"] = RESETGOLD	
-	Stat:SetScript('OnEvent', OnEvent)
-end
-
-
-----------------------------------
--- Datatext for Call To Arms Data
-----------------------------------
-
-if datatext.calltoarms and datatext.calltoarms > 0 then
+----------------
+-- Call To Arms
+----------------
+if cfg.calltoarms and cfg.calltoarms > 0 then
 	local Stat = CreateFrame("Frame")
 	Stat:EnableMouse(true)
 	Stat:SetFrameStrata("MEDIUM")
 	Stat:SetFrameLevel(3)
 
-	local Text  = PanelLeft:CreateFontString(nil, "OVERLAY")
-	Text:SetFont(media.font, datatext.fontsize)
-	PP(datatext.calltoarms, Text)
+	local Text  = DataPanel:CreateFontString(nil, "OVERLAY")
+	Text:SetFont(cfg.font, cfg.fontsize,'THINOUTLINE')
+	PP(cfg.calltoarms, Text)
 	
 	local function MakeIconString(tank, healer, damage)
 		local str = ""
@@ -882,18 +1170,20 @@ if datatext.calltoarms and datatext.calltoarms > 0 then
 		if unavailable then
 			Text:SetText(QUEUE_TIME_UNAVAILABLE)
 		else
-			Text:SetText(hexa..BATTLEGROUND_HOLIDAY..hexb.." : "..MakeIconString(tankReward, healerReward, dpsReward).." ")
+			Text:SetText(hexa..'C to A'..hexb.." : "..MakeIconString(tankReward, healerReward, dpsReward).." ")
 		end
 		
 		self:SetAllPoints(Text)
 	end
 
 	local function OnEnter(self)
+		if InCombatLockdown() then return end
+	
 		local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
 		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 		GameTooltip:ClearLines()
 		GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Call to Arms")
-		GameTooltip:AddLine(' ')		
+		GameTooltip:AddLine(' ')
 		
 		local allUnavailable = true
 		local numCTA = 0
@@ -921,94 +1211,56 @@ if datatext.calltoarms and datatext.calltoarms > 0 then
 		end
 		
 		if allUnavailable then 
-			GameTooltip:AddLine('Could not get Call To Arms information.')
+			GameTooltip:AddLine("Could not get Call To Arms information.")
 		elseif numCTA == 0 then 
-			GameTooltip:AddLine('No dungeons are currently offering a Call To Arms.') 
+			GameTooltip:AddLine("Could not get Call To Arms information.") 
 		end
 		GameTooltip:AddLine' '
-		GameTooltip:AddLine("|cffeda55fClick|r to Open Dungeon Finder")		
-		GameTooltip:Show()		
+		GameTooltip:AddLine("|cffeda55fLeft Click|r to Open Dungeon Finder")	
+		GameTooltip:AddLine("|cffeda55fRight Click|r to Open PvP Finder")			
+		GameTooltip:Show()	
 	end
     
 	Stat:RegisterEvent("LFG_UPDATE_RANDOM_INFO")
 	Stat:RegisterEvent("PLAYER_LOGIN")
 	Stat:SetScript("OnEvent", OnEvent)
-	Stat:SetScript("OnMouseDown", function() ToggleFrame(LFDParentFrame) end)
+	Stat:SetScript("OnMouseDown", function(self, btn)
+		if btn == "LeftButton" then
+			ToggleLFDParentFrame(1)
+		elseif btn == "RightButton" then
+			TogglePVPUI(1)
+		end
+	end)		
 	Stat:SetScript("OnEnter", OnEnter)
 	Stat:SetScript("OnLeave", function() GameTooltip:Hide() end)
 end
 
-------------------------------
--- Datatext for Player Coords
-------------------------------
-
-if datatext.coords and datatext.coords > 0 then
+---------------
+-- Coordinates
+---------------
+if cfg.coords and cfg.coords > 0 then
 	local Stat = CreateFrame("Frame")
 	Stat:EnableMouse(true)
 	Stat:SetFrameStrata('BACKGROUND')
 	Stat:SetFrameLevel(3)
 
-	local Text = PanelLeft:CreateFontString(nil, "OVERLAY")
-	Text:SetFont(media.font, datatext.fontsize)
-	PP(datatext.coords, Text)
+	local Text = DataPanel:CreateFontString(nil, "OVERLAY")
+	Text:SetFont(cfg.font, cfg.fontsize,'THINOUTLINE')
+	PP(cfg.coords, Text)
 
 	local function Update(self)
 	local px,py=GetPlayerMapPosition("player")
-		Text:SetText(format("%i , %i",px*100,py*100))
+		Text:SetText(format(hexa.."Loc: "..hexb.."%i , %i",px*100,py*100))
 	end
 
 	Stat:SetScript("OnUpdate", Update)
 	Update(Stat, 10)
 end
 
--------------------------
--- Datatext for CURRENCY
--------------------------
-
-if datatext.currency and datatext.currency > 0 then
-	local Stat = CreateFrame('Frame')
-	Stat:EnableMouse(true)
-	Stat:SetFrameStrata('BACKGROUND')
-	Stat:SetFrameLevel(3)
-
-	local Text  = PanelLeft:CreateFontString(nil, 'OVERLAY')
-	Text:SetFont(media.font, datatext.fontsize)
-	PP(datatext.currency, Text)
-	
-	local function update()
-		local _text = '---'
-		for i = 1, MAX_WATCHED_TOKENS do
-			local name, count, _, _, _ = GetBackpackCurrencyInfo(i)
-			if name and count then
-				if(i ~= 1) then _text = _text .. ' ' else _text = '' end
-				words = { strsplit(' ', name) }
-				for _, word in ipairs(words) do
-					_text = _text .. string.sub(word,1,1)
-				end
-				_text = _text .. ': ' .. count
-			end
-		end
-		
-		Text:SetText(_text)
-	end
-	
-	local function OnEvent(self, event, ...)
-		update()
-		self:SetAllPoints(Text)
-		Stat:UnregisterEvent('PLAYER_LOGIN')	
-	end
-
-	Stat:RegisterEvent('PLAYER_LOGIN')	
-	hooksecurefunc('BackpackTokenFrame_Update', update)
-	Stat:SetScript('OnEvent', OnEvent)
-	Stat:SetScript('OnMouseDown', function() ToggleCharacter('TokenFrame') end)
-end
-
-----------------------------
--- Datatext for DPS Feed... 
-----------------------------
-
-if datatext.dps_text and datatext.dps_text > 0 then
+---------------------
+-- Damage Per Second
+---------------------
+if cfg.dps_text and cfg.dps_text > 0 then
 	local events = {SWING_DAMAGE = true, RANGE_DAMAGE = true, SPELL_DAMAGE = true, SPELL_PERIODIC_DAMAGE = true, DAMAGE_SHIELD = true, DAMAGE_SPLIT = true, SPELL_EXTRA_ATTACKS = true}
 	local DPS_FEED = CreateFrame('Frame')
 	local player_id = UnitGUID('player')
@@ -1017,11 +1269,11 @@ if datatext.dps_text and datatext.dps_text > 0 then
 
 	local pet_id = UnitGUID('pet')
      
-	local dText = PanelLeft:CreateFontString(nil, 'OVERLAY')
-	dText:SetFont(media.font, datatext.fontsize)
-	dText:SetText('DPS: ', '0')
+	local dText = DataPanel:CreateFontString(nil, 'OVERLAY')
+	dText:SetFont(cfg.font, cfg.fontsize,'THINOUTLINE')
+	dText:SetText("DPS: ", '0')
 
-	PP(datatext.dps_text, dText)
+	PP(cfg.dps_text, dText)
 
 	DPS_FEED:EnableMouse(true)
 	DPS_FEED:SetFrameStrata('BACKGROUND')
@@ -1084,9 +1336,9 @@ if datatext.dps_text and datatext.dps_text > 0 then
      
 	function getDPS()
 		if (dmg_total == 0) then
-			return (hexa..'DPS: '..hexb..'0')
+			return (hexa.."DPS"..hexb..' 0')
 		else
-			return string.format('%.1f ' ..hexa..'DPS: '..hexb, (dmg_total or 0) / (cmbt_time or 1))
+			return string.format(hexa.."DPS: "..hexb..'%.1f ', (dmg_total or 0) / (cmbt_time or 1))
 		end
 	end
 
@@ -1107,24 +1359,39 @@ if datatext.dps_text and datatext.dps_text > 0 then
 	end)
 end
 
----------------------------
--- Datatext for DURABILITY
----------------------------
-	
-if datatext.dur and datatext.dur > 0 then
+--------------
+-- Durability
+--------------
+if cfg.dur and cfg.dur > 0 then
+
+	Slots = {
+		[1] = {1, "Head", 1000},
+		[2] = {3, "Shoulder", 1000},
+		[3] = {5, "Chest", 1000},
+		[4] = {6, "Waist", 1000},
+		[5] = {9, "Wrist", 1000},
+		[6] = {10, "Hands", 1000},
+		[7] = {7, "Legs", 1000},
+		[8] = {8, "Feet", 1000},
+		[9] = {16, "Main Hand", 1000},
+		[10] = {17, "Off Hand", 1000},
+		[11] = {18, "Ranged", 1000}
+	}
+
+
 	local Stat = CreateFrame("Frame")
 	Stat:EnableMouse(true)
-	Stat:SetFrameStrata("BACKGROUND")
+	Stat:SetFrameStrata("MEDIUM")
 	Stat:SetFrameLevel(3)
 
-	local Text  = PanelLeft:CreateFontString(nil, "OVERLAY")
-	Text:SetFont(media.font, datatext.fontsize)
-	PP(datatext.dur, Text)
-
-	local Total = 0
-	local current, max
+	local Text  = DataPanel:CreateFontString(nil, "OVERLAY")
+	Text:SetFont(cfg.font, cfg.fontsize,'THINOUTLINE')
+	PP(cfg.dur, Text)
 
 	local function OnEvent(self)
+		local Total = 0
+		local current, max
+		
 		for i = 1, 11 do
 			if GetInventoryItemLink("player", Slots[i][1]) ~= nil then
 				current, max = GetInventoryItemDurability(Slots[i][1])
@@ -1137,9 +1404,9 @@ if datatext.dur and datatext.dur > 0 then
 		table.sort(Slots, function(a, b) return a[3] < b[3] end)
 		
 		if Total > 0 then
-			Text:SetText(hexa..'Armor: '..hexb..floor(Slots[1][3]*100).."%")
+			Text:SetText(hexa.."Armor: "..hexb..floor(Slots[1][3]*100).."% |r")
 		else
-			Text:SetText(hexa..'Armor: '..hexb.."100%")
+			Text:SetText(hexa.."Armor: "..hexb.."100% |r")
 		end
 		-- Setup Durability Tooltip
 		self:SetAllPoints(Text)
@@ -1156,29 +1423,32 @@ if datatext.dur and datatext.dur > 0 then
 			local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
 			GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 			GameTooltip:ClearLines()
-			GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Armor")			
+			GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Durability")
+			GameTooltip:AddLine' '			
 			for i = 1, 11 do
 				if Slots[i][3] ~= 1000 then
+					local green, red
 					green = Slots[i][3]*2
 					red = 1 - green
 					GameTooltip:AddDoubleLine(Slots[i][2], floor(Slots[i][3]*100).."%",1 ,1 , 1, red + 1, green, 0)
 				end
 			end
-			GameTooltip:AddLine(" ")
-			GameTooltip:AddLine("|cffeda55fClick|r to Open Character Panel")
-			GameTooltip:Show()
+		GameTooltip:AddLine(" ")
+		GameTooltip:AddLine("|cffeda55fClick|r to Show Character Panel")
+		GameTooltip:Show()
 		end
 	end)
 	Stat:SetScript("OnLeave", function() GameTooltip:Hide() end)
+
 end
 
------------------------------
--- Datatext for Friends List
------------------------------
+------------
+-- Friends
+------------
+if cfg.friends and cfg.friends > 0 then
 
-if datatext.friends and datatext.friends > 0 then
-
-	StaticPopupDialogs.SET_BN_BROADCAST = {
+	-- create a popup
+	StaticPopupDialogs["SET_BN_BROADCAST"] = {
 		text = BN_BROADCAST_TOOLTIP,
 		button1 = ACCEPT,
 		button2 = CANCEL,
@@ -1196,26 +1466,33 @@ if datatext.friends and datatext.friends > 0 then
 		hideOnEscape = 1
 	}
 
-	-- localized references for global functions (about 50% faster)
+	--[[ localized references for global functions (about 50% faster)
 	local join 			= string.join
 	local find			= string.find
 	local format		= string.format
+	local split			= string.split
 	local sort			= table.sort
+	local insert		= table.insert
+	local sizeof		= table.getn
+
+	-- for datatext display
+	local displayString = join("", hexa.."%s: "..hexb, "|cffffffff", "%d|r")]]
 
 	local Stat = CreateFrame("Frame")
 	Stat:EnableMouse(true)
-	Stat:SetFrameStrata("BACKGROUND")
+	Stat:SetFrameStrata("MEDIUM")
 	Stat:SetFrameLevel(3)
 
-	local Text  = PanelLeft:CreateFontString(nil, "OVERLAY")
-	Text:SetFont(media.font, datatext.fontsize)
-	PP(datatext.friends, Text)
+	local Text  = DataPanel:CreateFontString(nil, "OVERLAY")
+	Text:SetFont(cfg.font, cfg.fontsize,'THINOUTLINE')
+	PP(cfg.friends, Text)
 
-	local menuFrame = CreateFrame("Frame", "ElvuiFriendRightClickMenu", UIParent, "UIDropDownMenuTemplate")
+
+	local menuFrame = CreateFrame("Frame", "TukuiFriendRightClickMenu", UIParent, "UIDropDownMenuTemplate")
 	local menuList = {
 		{ text = OPTIONS_MENU, isTitle = true,notCheckable=true},
 		{ text = INVITE, hasArrow = true,notCheckable=true, },
-		{ text = CHAT_MSG_WHISPER_INFORM, hasArrow = true,notCheckable=true, },
+		{ text = CHAT_MSG_WHISPER_INFORM, hasArrow = true,notCheckable=true, },			
 		{ text = PLAYER_STATUS, hasArrow = true, notCheckable=true,
 			menuList = {
 				{ text = "|cff2BC226"..AVAILABLE.."|r", notCheckable=true, func = function() if IsChatAFK() then SendChatMessage("", "AFK") elseif IsChatDND() then SendChatMessage("", "DND") end end },
@@ -1223,92 +1500,149 @@ if datatext.friends and datatext.friends > 0 then
 				{ text = "|cffFF0000"..AFK.."|r", notCheckable=true, func = function() if not IsChatAFK() then SendChatMessage("", "AFK") end end },
 			},
 		},
-		{ text = BN_BROADCAST_TOOLTIP, notCheckable=true, func = function() StaticPopup_Show("SET_BN_BROADCAST") end },
+		{ text = BN_BROADCAST_TOOLTIP, notCheckable=true, func = function() T.ShowPopup("TUKUI_SET_BN_BROADCAST") end },
 	}
+
+	local function GetTableIndex(table, fieldIndex, value)
+		for k,v in ipairs(table) do
+			if v[fieldIndex] == value then return k end
+		end
+		return -1
+	end
 
 	local function inviteClick(self, arg1, arg2, checked)
 		menuFrame:Hide()
-		InviteUnit(arg1)
+		if type(arg1) ~= 'number' then
+			InviteUnit(arg1)
+		else
+			BNInviteFriend(arg1);
+		end
 	end
 
-	local function whisperClick(self,arg1,arg2,checked)
-		menuFrame:Hide() 
-		SetItemRef( "player:"..arg1, ("|Hplayer:%1$s|h[%1$s]|h"):format(arg1), "LeftButton" )		 
+	local function whisperClick(self,name,bnet)
+		menuFrame:Hide()
+		if bnet then
+			ChatFrame_SendSmartTell(name)
+		else
+			SetItemRef( "player:"..name, ("|Hplayer:%1$s|h[%1$s]|h"):format(name), "LeftButton" )
+		end
 	end
 
 	local levelNameString = "|cff%02x%02x%02x%d|r |cff%02x%02x%02x%s|r"
-	local clientLevelNameString = "%s |cff%02x%02x%02x(%d|r |cff%02x%02x%02x%s|r%s) |cff%02x%02x%02x%s|r"
+	local clientLevelNameString = "%s (|cff%02x%02x%02x%d|r |cff%02x%02x%02x%s|r%s) |cff%02x%02x%02x%s|r"
 	local levelNameClassString = "|cff%02x%02x%02x%d|r %s%s%s"
 	local worldOfWarcraftString = "World of Warcraft"
 	local battleNetString = "Battle.NET"
 	local wowString = "WoW"
-	local otherGameInfoString = "%s (%s)"
-	local otherGameInfoString2 = "%s %s"
-	local totalOnlineString = join("", FRIENDS_LIST_ONLINE, ": %s/%s")
+	local totalOnlineString = "Online: " .. "%s/%s"
 	local tthead, ttsubh, ttoff = {r=0.4, g=0.78, b=1}, {r=0.75, g=0.9, b=1}, {r=.3,g=1,b=.3}
 	local activezone, inactivezone = {r=0.3, g=1.0, b=0.3}, {r=0.65, g=0.65, b=0.65}
-	local displayString = join("", "%s: ", "%d|r")
-	local statusTable = { 'AFK', 'DND', "" }
+	local displayString = string.join("", hexa.."%s: "..hexb, "|cffffffff", "%d|r")
+	local statusTable = { "|cffff0000[AFK]|r", "|cffff0000[DND]|r", "" }
 	local groupedTable = { "|cffaaaaaa*|r", "" } 
 	local friendTable, BNTable = {}, {}
-	local friendOnline, friendOffline = gsub(ERR_FRIEND_ONLINE_SS,"\124Hplayer:%%s\124h%[%%s%]\124h",""), gsub(ERR_FRIEND_OFFLINE_S,"%%s","")
-	local dataValid = false
+	local totalOnline, BNTotalOnline = 0, 0
 
 	local function BuildFriendTable(total)
+		totalOnline = 0
 		wipe(friendTable)
 		local name, level, class, area, connected, status, note
 		for i = 1, total do
 			name, level, class, area, connected, status, note = GetFriendInfo(i)
+			for k,v in pairs(LOCALIZED_CLASS_NAMES_MALE) do if class == v then class = k end end
 			
-			if connected then 
-				for k,v in pairs(LOCALIZED_CLASS_NAMES_MALE) do if class == v then class = k end end
-				friendTable[i] = { name, level, class, area, connected, status, note }
+			if status == "<"..AFK..">" then
+				status = "|cffff0000[AFK]|r"
+			elseif status == "<"..DND..">" then
+				status = "|cffff0000[DND]|r"
+			end
+			
+			friendTable[i] = { name, level, class, area, connected, status, note }
+			if connected then totalOnline = totalOnline + 1 end
+		end
+	end
+
+	local function UpdateFriendTable(total)
+		totalOnline = 0
+		local name, level, class, area, connected, status, note
+		for i = 1, #friendTable do
+			name, level, class, area, connected, status, note = GetFriendInfo(i)
+			for k,v in pairs(LOCALIZED_CLASS_NAMES_MALE) do if class == v then class = k end end
+			
+			-- get the correct index in our table		
+			local index = GetTableIndex(friendTable, 1, name)
+			-- we cannot find a friend in our table, so rebuild it
+			if index == -1 then
+				BuildFriendTable(total)
+				break
+			end
+			-- update on-line status for all members
+			friendTable[index][5] = connected
+			-- update information only for on-line members
+			if connected then
+				friendTable[index][2] = level
+				friendTable[index][3] = class
+				friendTable[index][4] = area
+				friendTable[index][6] = status
+				friendTable[index][7] = note
+				totalOnline = totalOnline + 1
 			end
 		end
-		sort(friendTable, function(a, b)
-			if a[1] and b[1] then
-				return a[1] < b[1]
-			end
-		end)
 	end
 
 	local function BuildBNTable(total)
+		BNTotalOnline = 0
 		wipe(BNTable)
-		local presenceID, givenName, surname, toonName, toonID, client, isOnline, isAFK, isDND, noteText, realmName, faction, race, class, zoneName, level
+		
 		for i = 1, total do
-			presenceID, givenName, surname, toonName, toonID, client, isOnline, _, isAFK, isDND, _, noteText = BNGetFriendInfo(i)
+			local presenceID, presenceName, battleTag, isBattleTagPresence, toonName, toonID, client, isOnline, lastOnline, isAFK, isDND, messageText, noteText, isRIDFriend, messageTime, canSoR = BNGetFriendInfo(i)
+			local hasFocus, _, _, realmName, realmID, faction, race, class, guild, zoneName, level, gameText = BNGetToonInfo(presenceID)
+
+			for k,v in pairs(LOCALIZED_CLASS_NAMES_MALE) do if class == v then class = k end end
 			
-			if isOnline then 
-				_, _, _, realmName, faction, _, race, class, _, zoneName, level = BNGetToonInfo(presenceID)
-				for k,v in pairs(LOCALIZED_CLASS_NAMES_MALE) do if class == v then class = k end end
-				BNTable[i] = { presenceID, givenName, surname, toonName, toonID, client, isOnline, isAFK, isDND, noteText, realmName, faction, race, class, zoneName, level }
-			end
+			BNTable[i] = { presenceID, presenceName, battleTag, toonName, toonID, client, isOnline, isAFK, isDND, noteText, realmName, faction, race, class, zoneName, level }
+			if isOnline then BNTotalOnline = BNTotalOnline + 1 end
 		end
-		sort(BNTable, function(a, b)
-			if a[2] and b[2] then
-				if a[2] == b[2] then return a[3] < b[3] end
-				return a[2] < b[2]
-			end
-		end)
 	end
 
-	local function Update(self, event, ...)
-		local _, onlineFriends = GetNumFriends()
-		local _, numBNetOnline = BNGetNumFriends()
-
-		-- special handler to detect friend coming online or going offline
-		-- when this is the case, we invalidate our buffered table and update the 
-		-- datatext information
-		if event == "CHAT_MSG_SYSTEM" then
-			local message = select(1, ...)
-			if not (find(message, friendOnline) or find(message, friendOffline)) then return end
+	local function UpdateBNTable(total)
+		BNTotalOnline = 0
+		for i = 1, #BNTable do
+			-- get guild roster information
+			local presenceID, presenceName, battleTag, isBattleTagPresence, toonName, toonID, client, isOnline, lastOnline, isAFK, isDND, messageText, noteText, isRIDFriend, messageTime, canSoR = BNGetFriendInfo(i)
+			local hasFocus, _, _, realmName, realmID, faction, race, class, guild, zoneName, level, gameText = BNGetToonInfo(presenceID)
+			
+			for k,v in pairs(LOCALIZED_CLASS_NAMES_MALE) do if class == v then class = k end end
+			
+			-- get the correct index in our table		
+			local index = GetTableIndex(BNTable, 1, presenceID)
+			-- we cannot find a BN member in our table, so rebuild it
+			if index == -1 then
+				BuildBNTable(total)
+				return
+			end
+			-- update on-line status for all members
+			BNTable[index][7] = isOnline
+			-- update information only for on-line members
+			if isOnline then
+				BNTable[index][2] = presenceName
+				BNTable[index][3] = battleTag
+				BNTable[index][4] = toonName
+				BNTable[index][5] = toonID
+				BNTable[index][6] = client
+				BNTable[index][8] = isAFK
+				BNTable[index][9] = isDND
+				BNTable[index][10] = noteText
+				BNTable[index][11] = realmName
+				BNTable[index][12] = faction
+				BNTable[index][13] = race
+				BNTable[index][14] = class
+				BNTable[index][15] = zoneName
+				BNTable[index][16] = level
+				
+				BNTotalOnline = BNTotalOnline + 1
+			end
 		end
-
-		-- force update when showing tooltip
-		dataValid = false
-
-		Text:SetFormattedText(displayString, hexa..'Friends'..hexb, onlineFriends + numBNetOnline)
-		self:SetAllPoints(Text)
 	end
 
 	Stat:SetScript("OnMouseUp", function(self, btn)
@@ -1318,43 +1652,41 @@ if datatext.friends and datatext.friends > 0 then
 		
 		local menuCountWhispers = 0
 		local menuCountInvites = 0
-		local classc, levelc, info
+		local classc, levelc
 		
 		menuList[2].menuList = {}
 		menuList[3].menuList = {}
 		
-		if #friendTable > 0 then
+		if totalOnline > 0 then
 			for i = 1, #friendTable do
-				info = friendTable[i]
-				if (info[5]) then
+				if (friendTable[i][5]) then
 					menuCountInvites = menuCountInvites + 1
 					menuCountWhispers = menuCountWhispers + 1
-		
-					classc, levelc = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[3]], GetQuestDifficultyColor(info[2])
-					if classc == nil then classc = GetQuestDifficultyColor(info[2]) end
-		
-					menuList[2].menuList[menuCountInvites] = {text = format(levelNameString,levelc.r*255,levelc.g*255,levelc.b*255,info[2],classc.r*255,classc.g*255,classc.b*255,info[1]), arg1 = info[1],notCheckable=true, func = inviteClick}
-					menuList[3].menuList[menuCountWhispers] = {text = format(levelNameString,levelc.r*255,levelc.g*255,levelc.b*255,info[2],classc.r*255,classc.g*255,classc.b*255,info[1]), arg1 = info[1],notCheckable=true, func = whisperClick}
+
+					classc, levelc = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[friendTable[i][3]], GetQuestDifficultyColor(friendTable[i][2])
+					if classc == nil then classc = GetQuestDifficultyColor(friendTable[i][2]) end
+
+					menuList[2].menuList[menuCountInvites] = {text = format(levelNameString,levelc.r*255,levelc.g*255,levelc.b*255,friendTable[i][2],classc.r*255,classc.g*255,classc.b*255,friendTable[i][1]), arg1 = friendTable[i][1],notCheckable=true, func = inviteClick}
+					menuList[3].menuList[menuCountWhispers] = {text = format(levelNameString,levelc.r*255,levelc.g*255,levelc.b*255,friendTable[i][2],classc.r*255,classc.g*255,classc.b*255,friendTable[i][1]), arg1 = friendTable[i][1],notCheckable=true, func = whisperClick}
 				end
 			end
 		end
-		if #BNTable > 0 then
-			local realID, playerFaction, grouped
+		
+		if BNTotalOnline > 0 then
+			local realID, grouped
 			for i = 1, #BNTable do
-				info = BNTable[i]
-				if (info[7]) then
-					realID = (BATTLENET_NAME_FORMAT):format(info[2], info[3])
+				if (BNTable[i][7]) then
+					realID = BNTable[i][2]
 					menuCountWhispers = menuCountWhispers + 1
-					menuList[3].menuList[menuCountWhispers] = {text = realID, arg1 = realID,notCheckable=true, func = whisperClick}
+					menuList[3].menuList[menuCountWhispers] = {text = realID, arg1 = realID, arg2 = true, notCheckable=true, func = whisperClick}
 
-					if select(1, UnitFactionGroup("player")) == "Horde" then playerFaction = 0 else playerFaction = 1 end
-					if info[6] == wowString and info[11] == myrealm and playerFaction == info[12] then
-						classc, levelc = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[14]], GetQuestDifficultyColor(info[16])
-						if classc == nil then classc = GetQuestDifficultyColor(info[16]) end
+					if BNTable[i][6] == wowString and UnitFactionGroup("player") == BNTable[i][12] then
+						classc, levelc = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[BNTable[i][14]], GetQuestDifficultyColor(BNTable[i][16])
+						if classc == nil then classc = GetQuestDifficultyColor(BNTable[i][16]) end
 
-						if UnitInParty(info[4]) or UnitInRaid(info[4]) then grouped = 1 else grouped = 2 end
+						if UnitInParty(BNTable[i][4]) or UnitInRaid(BNTable[i][4]) then grouped = 1 else grouped = 2 end
 						menuCountInvites = menuCountInvites + 1
-						menuList[2].menuList[menuCountInvites] = {text = format(levelNameString,levelc.r*255,levelc.g*255,levelc.b*255,info[16],classc.r*255,classc.g*255,classc.b*255,info[4]), arg1 = info[4],notCheckable=true, func = inviteClick}
+						menuList[2].menuList[menuCountInvites] = {text = format(levelNameString,levelc.r*255,levelc.g*255,levelc.b*255,BNTable[i][16],classc.r*255,classc.g*255,classc.b*255,BNTable[i][4]), arg1 = BNTable[i][5],notCheckable=true, func = inviteClick}
 					end
 				end
 			end
@@ -1362,80 +1694,94 @@ if datatext.friends and datatext.friends > 0 then
 
 		EasyMenu(menuList, menuFrame, "cursor", 0, 0, "MENU", 2)
 	end)
-		
-	Stat:SetScript("OnMouseDown", function(self, btn) if btn == "LeftButton" then ToggleFriendsFrame(1) end end)
 
-	Stat:SetScript("OnEnter", function(self)
-		if InCombatLockdown() then return end
-
-		local numberOfFriends, onlineFriends = GetNumFriends()
-		local totalBNet, numBNetOnline = BNGetNumFriends()
-			
-		local totalonline = onlineFriends + numBNetOnline
-		
-		-- no friends online, quick exit
-		if totalonline == 0 then return end
-
-		if not dataValid then
-			-- only retrieve information for all on-line members when we actually view the tooltip
-			if numberOfFriends > 0 then BuildFriendTable(numberOfFriends) end
-			if totalBNet > 0 then BuildBNTable(totalBNet) end
-			dataValid = true
+	local function Update(self, event)
+		if event == "BN_FRIEND_INFO_CHANGED" or "BN_FRIEND_ACCOUNT_ONLINE" or "BN_FRIEND_ACCOUNT_OFFLINE" or "BN_TOON_NAME_UPDATED"
+				or "BN_FRIEND_TOON_ONLINE" or "BN_FRIEND_TOON_OFFLINE" or "PLAYER_ENTERING_WORLD" then
+			local BNTotal = BNGetNumFriends()
+			if BNTotal == #BNTable then
+				UpdateBNTable(BNTotal)
+			else
+				BuildBNTable(BNTotal)
+			end
 		end
-
-		local totalfriends = numberOfFriends + totalBNet
-		local zonec, classc, levelc, realmc, info
-
-		local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
-		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
-		GameTooltip:ClearLines()
-		GameTooltip:AddDoubleLine('Friends list:', format(totalOnlineString, totalonline, totalfriends),tthead.r,tthead.g,tthead.b,tthead.r,tthead.g,tthead.b)
-		if onlineFriends > 0 then
-			GameTooltip:AddLine(' ')
-			GameTooltip:AddLine(worldOfWarcraftString)
-			for i = 1, #friendTable do
-				info = friendTable[i]
-				if info[5] then
-					if GetRealZoneText() == info[4] then zonec = activezone else zonec = inactivezone end
-					classc, levelc = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[3]], GetQuestDifficultyColor(info[2])
-					if classc == nil then classc = GetQuestDifficultyColor(info[2]) end
-					
-					if UnitInParty(info[1]) or UnitInRaid(info[1]) then grouped = 1 else grouped = 2 end
-					GameTooltip:AddDoubleLine(format(levelNameClassString,levelc.r*255,levelc.g*255,levelc.b*255,info[2],info[1],groupedTable[grouped]," "..info[6]),info[4],classc.r,classc.g,classc.b,zonec.r,zonec.g,zonec.b)
-				end
+		
+		if event == "FRIENDLIST_UPDATE" or "PLAYER_ENTERING_WORLD" then
+			local total = GetNumFriends()
+			if total == #friendTable then
+				UpdateFriendTable(total)
+			else
+				BuildFriendTable(total)
 			end
 		end
 
-		if numBNetOnline > 0 then
-			GameTooltip:AddLine(' ')
-			GameTooltip:AddLine(battleNetString)
+		Text:SetFormattedText(displayString, "Friends", totalOnline + BNTotalOnline)
+		self:SetAllPoints(Text)
+	end
 
-			local status = 0
-			for i = 1, #BNTable do
-				info = BNTable[i]
-				if info[7] then
-					if info[6] == wowString then
-						if (info[8] == true) then status = 1 elseif (info[9] == true) then status = 2 else status = 3 end
-						classc, levelc = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[14]], GetQuestDifficultyColor(info[16])
+	Stat:SetScript("OnMouseDown", function(self, btn) if btn == "LeftButton" then ToggleFriendsFrame() end end)
+	Stat:SetScript("OnEnter", function(self)
+		if InCombatLockdown() then return end
+			
+		local totalonline = totalOnline + BNTotalOnline
+		local totalfriends = #friendTable + #BNTable
+		local zonec, classc, levelc, realmc, grouped
+		if totalonline > 0 then
+			local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
+			GameTooltip:SetOwner(panel, anchor, xoff, yoff)
+			GameTooltip:ClearLines()
+			GameTooltip:AddDoubleLine("Friends list:", format(totalOnlineString, totalonline, totalfriends),tthead.r,tthead.g,tthead.b,tthead.r,tthead.g,tthead.b)
+			if totalOnline > 0 then
+				GameTooltip:AddLine(' ')
+				GameTooltip:AddLine(worldOfWarcraftString)
+				for i = 1, #friendTable do
+					if friendTable[i][5] then
+						if GetRealZoneText() == friendTable[i][4] then zonec = activezone else zonec = inactivezone end
+						classc = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[friendTable[i][3]]
+						if classc == nil then classc = GetQuestDifficultyColor(friendTable[i][2]) end
 						
-						if classc == nil then classc = GetQuestDifficultyColor(info[16]) end
-						
-						if UnitInParty(info[4]) or UnitInRaid(info[4]) then grouped = 1 else grouped = 2 end
-						GameTooltip:AddDoubleLine(format(clientLevelNameString, info[6],levelc.r*255,levelc.g*255,levelc.b*255,info[16],classc.r*255,classc.g*255,classc.b*255,info[4],groupedTable[grouped], 255, 0, 0, statusTable[status]),info[2].." "..info[3],238,238,238,238,238,238)
-						if IsShiftKeyDown() then
-							if GetRealZoneText() == info[15] then zonec = activezone else zonec = inactivezone end
-							if GetRealmName() == info[11] then realmc = activezone else realmc = inactivezone end
-							GameTooltip:AddDoubleLine(info[15], info[11], zonec.r, zonec.g, zonec.b, realmc.r, realmc.g, realmc.b)
+						if friendTable[i][2] ~= '' then
+							levelc = GetQuestDifficultyColor(friendTable[i][2])
+						else
+							levelc = RAID_CLASS_COLORS["PRIEST"]
+							classc = RAID_CLASS_COLORS["PRIEST"]
 						end
-					else
-						GameTooltip:AddDoubleLine(format(otherGameInfoString, info[6], info[4]), format(otherGameInfoString2, info[2], info[3]), .9, .9, .9, .9, .9, .9)
+						
+						if UnitInParty(friendTable[i][1]) or UnitInRaid(friendTable[i][1]) then grouped = 1 else grouped = 2 end
+						GameTooltip:AddDoubleLine(format(levelNameClassString,levelc.r*255,levelc.g*255,levelc.b*255,friendTable[i][2],friendTable[i][1],groupedTable[grouped]," "..friendTable[i][6]),friendTable[i][4],classc.r,classc.g,classc.b,zonec.r,zonec.g,zonec.b)
 					end
 				end
 			end
+			if BNTotalOnline > 0 then
+				GameTooltip:AddLine(' ')
+				GameTooltip:AddLine(battleNetString)
+
+				local status = 0
+				for i = 1, #BNTable do
+					if BNTable[i][7] then
+						if BNTable[i][6] == wowString then
+							if (BNTable[i][8] == true) then status = 1 elseif (BNTable[i][9] == true) then status = 2 else status = 3 end
+		
+							classc, levelc = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[BNTable[i][14]], GetQuestDifficultyColor(BNTable[i][16])
+							if classc == nil then classc = GetQuestDifficultyColor(BNTable[i][16]) end
+							
+							if UnitInParty(BNTable[i][4]) or UnitInRaid(BNTable[i][4]) then grouped = 1 else grouped = 2 end
+							GameTooltip:AddDoubleLine(format(clientLevelNameString, BNTable[i][6],levelc.r*255,levelc.g*255,levelc.b*255,BNTable[i][16],classc.r*255,classc.g*255,classc.b*255,BNTable[i][4],groupedTable[grouped], 255, 0, 0, statusTable[status]),BNTable[i][2],238,238,238,238,238,238)
+							if IsShiftKeyDown() then
+								if GetRealZoneText() == BNTable[i][15] then zonec = activezone else zonec = inactivezone end
+								if GetRealmName() == BNTable[i][11] then realmc = activezone else realmc = inactivezone end
+								GameTooltip:AddDoubleLine("  "..BNTable[i][15], BNTable[i][11], zonec.r, zonec.g, zonec.b, realmc.r, realmc.g, realmc.b)
+							end
+						else
+							GameTooltip:AddDoubleLine("|cffeeeeee"..BNTable[i][6].." ("..BNTable[i][4]..")|r", "|cffeeeeee"..BNTable[i][2].."|r")
+						end
+					end
+				end
+			end
+			GameTooltip:Show()
+		else 
+			GameTooltip:Hide() 
 		end
-		GameTooltip:AddLine' '
-		GameTooltip:AddLine("|cffeda55fClick|r to Open Friend's List")		
-		GameTooltip:Show()	
 	end)
 
 	Stat:RegisterEvent("BN_FRIEND_ACCOUNT_ONLINE")
@@ -1446,341 +1792,313 @@ if datatext.friends and datatext.friends > 0 then
 	Stat:RegisterEvent("BN_TOON_NAME_UPDATED")
 	Stat:RegisterEvent("FRIENDLIST_UPDATE")
 	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
-	Stat:RegisterEvent("CHAT_MSG_SYSTEM")
 
 	Stat:SetScript("OnLeave", function() GameTooltip:Hide() end)
 	Stat:SetScript("OnEvent", Update)
 end
 
------------------------------
--- Datatext for Guild Roster
------------------------------
-
-local USE_EPGP = true
-
-if datatext.guild and datatext.guild > 0 then	
-
-	function sortGuildByRank(a,b)
-
-		texta = string.format("%02d",a.rankIndex)..a.name
-		textb = string.format("%02d",b.rankIndex)..b.name
-
-		return texta<textb
-	end
-
-	function sortGuildByName(a,b)
-		texta = a.name
-		textb = b.name
-
-		return texta<textb
-	end
-
-	function sortGuildByZone(a,b)
-
-		texta = a.zone..a.name
-		textb = b.zone..b.name
-
-		return texta<textb
-	end
-
-	sortGuildFunc = sortGuildByName
+---------
+-- Guild
+---------
+if cfg.guild and cfg.guild > 0 then
 
 	local Stat = CreateFrame("Frame")
 	Stat:EnableMouse(true)
-	Stat:SetFrameStrata("BACKGROUND")
+	Stat:SetFrameStrata("MEDIUM")
 	Stat:SetFrameLevel(3)
 
-	local tthead = {r=0.4,g=0.78,b=1}
-	local ttsubh = {r=0.75,g=0.9,b=1}
+	local Text  = DataPanel:CreateFontString(nil, "OVERLAY")
+	Text:SetFont(cfg.font, cfg.fontsize,'THINOUTLINE')
+	PP(cfg.guild, Text)
 
-	local Text  = PanelLeft:CreateFontString(nil, "OVERLAY")
-	Text:SetFont(media.font, datatext.fontsize)
-	PP(datatext.guild, Text)
+	local tthead, ttsubh, ttoff = {r=0.4, g=0.78, b=1}, {r=0.75, g=0.9, b=1}, {r=.3,g=1,b=.3}
+	local activezone, inactivezone = {r=0.3, g=1.0, b=0.3}, {r=0.65, g=0.65, b=0.65}
+	local displayString = string.join("", hexa.."%s: "..hexb, "|cffffffff", "%d|r")
+	local guildInfoString0 = "%s"
+	local guildInfoString1 = "%s [%d]"
+	local guildInfoString2 = "%s: %d/%d"
+	local guildMotDString = "%s |cffaaaaaa- |cffffffff%s"
+	local levelNameString = "|cff%02x%02x%02x%d|r |cff%02x%02x%02x%s|r %s"
+	local levelNameStatusString = "|cff%02x%02x%02x%d|r %s %s"
+	local nameRankString = "%s |cff999999-|cffffffff %s"
+	local noteString = "  '%s'"
+	local officerNoteString = "  o: '%s'"
 
-	local BASE_GP = 1
-	local function ParseGuildInfo(info)
-		BASE_GP = 1
-		local v
-		local lines = {string.split("\n", info)}
-		for _,line in pairs(lines) do
-			v = string.match(line,"@BASE_GP:(%d+)")
-			if(v) then
-				BASE_GP = v
-				break
-			end
-		end
-	end
+	local guildTable, guildXP, guildMotD = {}, {}, ""
+	local totalOnline = 0
 
-	local displayString = string.join("", hexa..GUILD..hexb, ": ", "%d|r")
 
-	local function Update(self, event, ...)	
-
-		if (event=="ADDON_LOADED") then
-
-			if USE_EPGP then
-				ParseGuildInfo(GetGuildInfoText())
-			end
-
-		else
-			if IsInGuild() then
-				GuildRoster()
-				local numOnline = (GetNumGuildMembers())
-				local total = (GetNumGuildMembers())
-				local numOnline = 0
-				for i = 1, total do
-					local _, _, _, _, _, _, _, _, online, _, _ = GetGuildRosterInfo(i)
-					if online then
-						numOnline = numOnline + 1
-					end
-				end 			
-
-				Text:SetFormattedText(displayString, numOnline)
-				self:SetAllPoints(Text)
+	local function BuildGuildTable()
+		totalOnline = 0
+		wipe(guildTable)
+		local _, name, rank, level, zone, note, officernote, connected, status, class, isMobile
+		for i = 1, GetNumGuildMembers() do
+			name, rank, _, level, _, zone, note, officernote, connected, status, class, _, _, isMobile = GetGuildRosterInfo(i)
+			
+			if status == 1 then
+				status = "|cffff0000["..AFK.."]|r"
+			elseif status == 2 then
+				status = "|cffff0000["..DND.."]|r" 
 			else
-				Text:SetText(hexa..'No Guild'..hexb)
+				status = ""
 			end
+			
+			guildTable[i] = { name, rank, level, zone, note, officernote, connected, status, class, isMobile }
+			if connected then totalOnline = totalOnline + 1 end
 		end
+		table.sort(guildTable, function(a, b)
+			if a and b then
+				return a[1] < b[1]
+			end
+		end)
 	end
 
-	local guildMenuFrame = nil
+	local function UpdateGuildXP()
+		local currentXP, remainingXP = UnitGetGuildXP("player")
+		local nextLevelXP = currentXP + remainingXP
+		
+		-- prevent 4.3 division / 0
+		if nextLevelXP == 0 or maxDailyXP == 0 then return end
+		
+		local percentTotal = tostring(math.ceil((currentXP / nextLevelXP) * 100))
+		
+		guildXP[0] = { currentXP, nextLevelXP, percentTotal }
+	end
 
-	function setGuildSort(self,fun)
+	local function UpdateGuildMessage()
+		guildMotD = GetGuildRosterMOTD()
+	end
 
-		guildMenuFrame:Hide()
-		sortGuildFunc = fun
-	end	
-
-	local guildMenuList = {
-		{ text = "Select an Option", isTitle = true,notCheckable=true},
-		{ text = "Invite", hasArrow = true,notCheckable=true,
-			menuList = {
-				{ text = "Option 3", func = function() print("You've chosen option 3"); end }
-			}
-		},
-		{ text = "Whisper", hasArrow = true,notCheckable=true,
-			menuList = {
-				{ text = "Option 4", func = function() print("You've chosen option 4"); end }
-			}
-		},
-		{ text = "Sort", hasArrow = true,notCheckable=true,
-			menuList = {
-				{ notCheckable=true,text = "Name", func = setGuildSort, arg1=sortGuildByName},
-				{ notCheckable=true,text = "Zone", func = setGuildSort, arg1=sortGuildByZone},
-				{ notCheckable=true,text = "Rank", func = setGuildSort, arg1=sortGuildByRank},
-			}
-		}
+	local function Update(self, event, ...)
+		if event == "PLAYER_ENTERING_WORLD" then
+			self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+			if IsInGuild() and not GuildFrame then LoadAddOn("Blizzard_GuildUI") end
+		end
+		
+		if IsInGuild() then
+			totalOnline = 0
+			local name, rank, level, zone, note, officernote, connected, status, class
+			for i = 1, GetNumGuildMembers() do
+				local connected = select(9, GetGuildRosterInfo(i))
+				if connected then totalOnline = totalOnline + 1 end
+			end	
+			Text:SetFormattedText(displayString, "Guild", totalOnline)
+		else
+			Text:SetText("No Guild")
+		end
+		
+		self:SetAllPoints(Text)
+	end
+		
+	local menuFrame = CreateFrame("Frame", "GuildRightClickMenu", UIParent, "UIDropDownMenuTemplate")
+	local menuList = {
+		{ text = OPTIONS_MENU, isTitle = true,notCheckable=true},
+		{ text = INVITE, hasArrow = true,notCheckable=true,},
+		{ text = CHAT_MSG_WHISPER_INFORM, hasArrow = true,notCheckable=true,}
 	}
 
-	if USE_EPGP then
-
-		function sortEPGP(a,b)
-			if a.PR == b.PR then
-				return a.name < b.name
-			else
-				return a.PR>b.PR
-			end
-		end
-
-		guildMenuList[4].menuList[4] = { notCheckable=true,text = "EPGP (PR)", func = setGuildSort, arg1=sortEPGP}
-	end
-
-	function inviteFriendClick(self, arg1, arg2, checked)
-		guildMenuFrame:Hide()
+	local function inviteClick(self, arg1, arg2, checked)
+		menuFrame:Hide()
 		InviteUnit(arg1)
 	end
 
-	function whisperFriendClick(self,arg1,arg2,checked)
-		guildMenuFrame:Hide()
+	local function whisperClick(self,arg1,arg2,checked)
+		menuFrame:Hide()
 		SetItemRef( "player:"..arg1, ("|Hplayer:%1$s|h[%1$s]|h"):format(arg1), "LeftButton" )
 	end
 
-	local menuCountWhispers = 0
-	local menuCountInvites = 0
+	local function ToggleGuildFrame()
+		if IsInGuild() then 
+			if not GuildFrame then LoadAddOn("Blizzard_GuildUI") end 
+			GuildFrame_Toggle()
+			GuildFrame_TabClicked(GuildFrameTab2)
+		else 
+			if not LookingForGuildFrame then LoadAddOn("Blizzard_LookingForGuildUI") end 
+			LookingForGuildFrame_Toggle() 
+		end
+	end
 
 	Stat:SetScript("OnMouseUp", function(self, btn)
-		if btn == "RightButton" then
-			GameTooltip:Hide()
+		if btn ~= "RightButton" or not IsInGuild() then return end
+		
+		GameTooltip:Hide()
 
-			if(guildMenuFrame==nil) then
-				guildMenuFrame = CreateFrame("Frame", "guildMenuFrame", nil, "UIDropDownMenuTemplate")
-				guildMenuFrame.relativeTo = self
-			else
-				guildMenuFrame:Show()
-			end			
+		local classc, levelc, grouped
+		local menuCountWhispers = 0
+		local menuCountInvites = 0
 
-			EasyMenu(guildMenuList, guildMenuFrame, "cursor", 0, 0, "MENU", 2)
-		end
-	end)	
+		menuList[2].menuList = {}
+		menuList[3].menuList = {}
 
-	local function EPGPDecodeNote(note)
-	  if note then
-		if note == "" then
-		  return 0, 0
-		else
-		  local ep, gp = string.match(note, "^(%d+),(%d+)$")
-		  if ep then
-			return tonumber(ep), tonumber(gp)
-		  end
-		end
-	  end
-	end	
+		for i = 1, #guildTable do
+			if (guildTable[i][7] and guildTable[i][1] ~= nDatamyname) then
+				local classc, levelc = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[guildTable[i][9]], GetQuestDifficultyColor(guildTable[i][3])
 
-	Stat:RegisterEvent("ADDON_LOADED")
-	Stat:RegisterEvent("GUILD_ROSTER_UPDATE")
-	Stat:RegisterEvent("PLAYER_GUILD_UPDATE")
-	Stat:RegisterEvent("GUILD_PERK_UPDATE")
-	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
-	Stat:RegisterEvent("CHAT_MSG_SYSTEM")
-	Stat:SetScript("OnEnter", function(self)
-		if not InCombatLockdown() or self.altdow then					
-
-			if IsInGuild() then			
-
-				menuCountWhispers = 0
-				menuCountInvites = 0
-
-				guildMenuList[2].menuList = {}
-				guildMenuList[3].menuList = {}
-
-				colors = {
-					note = { .14, .76, .15 },
-					officerNote = { 1, .56, .25 }
-				}	
-
-				local r,g,b = unpack(colors.officerNote)
-				local officerColor = ("\124cff%.2x%.2x%.2x"):format( r*255, g*255, b*255 )
-				r,g,b = unpack(colors.note)
-				local noteColor = ("\124cff%.2x%.2x%.2x"):format( r*255, g*255, b*255 )
-
-				self.hovered = true
-				GuildRoster()
-				local name, rank,rankIndex, level, zone, note, officernote, EP,GP,PR, connected, status, class, zone_r, zone_g, zone_b, classc, levelc,grouped
-				local online, total, gmotd = 0, GetNumGuildMembers(true), GetGuildRosterMOTD()
-				for i = 0, total do if select(9, GetGuildRosterInfo(i)) then online = online + 1 end end
-				
-				local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
-				GameTooltip:SetOwner(panel, anchor, xoff, yoff)
-				GameTooltip:ClearAllPoints()
-				GameTooltip:ClearLines()
-				GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Guild")
-				GameTooltip:AddLine' '				
-				GameTooltip:AddDoubleLine(GetGuildInfo'player',format("%s: %d/%d",GUILD,online,total),tthead.r,tthead.g,tthead.b,tthead.r,tthead.g,tthead.b)
-				GameTooltip:AddLine(' ')
-				if gmotd ~= "" then GameTooltip:AddLine(format("  %s |cffaaaaaa- |cffffffff%s",GUILD_MOTD,gmotd),ttsubh.r,ttsubh.g,ttsubh.b,1) end
-				if online > 1 then
-					GameTooltip:AddLine' '
-					sortable = {}
-					for i = 1, total do
-						tabletemp = {}
-						tabletemp.index=i
-						tabletemp.name, tabletemp.rank, tabletemp.rankIndex , tabletemp.level, _, tabletemp.zone, tabletemp.note, tabletemp.officernote, tabletemp.connected, tabletemp.status, tabletemp.class = GetGuildRosterInfo(i)
-
-						if tabletemp.zone==nil then
-							tabletemp.zone = "Unknow Zone"
-						end
-
-						if USE_EPGP then
-							if tabletemp.officernote then
-								tabletemp.EP,tabletemp.GP = EPGPDecodeNote(tabletemp.officernote)
-								if(tabletemp.EP) then
-
-									tabletemp.GP = tabletemp.GP + BASE_GP
-									tabletemp.PR = tabletemp.EP / tabletemp.GP
-									tabletemp.officernote = format("EP: %d GP: %d PR:%.2f",tabletemp.EP,tabletemp.GP,tabletemp.PR)
-								else
-									tabletemp.EP = 0
-									tabletemp.GP = 0
-									tabletemp.PR = -1
-								end
-							end
-						end
-
-						if tabletemp.connected~=nil and tabletemp.connected==1 then
-							table.insert(sortable,tabletemp)
-						end
-
-					end
-
-					table.sort(sortable,sortGuildFunc)
-
-					for i,v in ipairs(sortable) do
-						if online <= 1 then
-							if online > 1 then GameTooltip:AddLine(format("+ %d More...", online - modules.Guild.maxguild),ttsubh.r,ttsubh.g,ttsubh.b) end
-							break
-						end						
-
-						name = v.name
-						rank = v.rank
-						rankIndex = v.rankIndex
-						level = v.level
-						zone = v.zone
-						note = v.note
-						officernote = v.officernote
-						connected = v.connected
-						status = v.status
-						class = v.class
-
-						if connected then
-
-							if GetRealZoneText() == zone then zone_r, zone_g, zone_b = 0.3, 1.0, 0.3 else zone_r, zone_g, zone_b = 0.65, 0.65, 0.65 end
-							classc, levelc = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class], GetQuestDifficultyColor(level)
-
-							notes = format(" %s%s",noteColor,note)
-							if officernote ~= "" then
-								notes = notes .. format(" %s%s",officerColor,officernote)
-							end
-							rank = noteColor..rank
-
-							if (UnitInParty(name) or UnitInRaid(name)) and (name ~= UnitName'player') then
-								grouped = "|cffaaaaaa*|r"
-							else
-								grouped = ""
-								if name ~= UnitName'player' then
-									menuCountInvites = menuCountInvites +1
-									guildMenuList[2].menuList[menuCountInvites] = {text = format("|cff%02x%02x%02x%d|r |cff%02x%02x%02x%s|r",levelc.r*255,levelc.g*255,levelc.b*255,level,classc.r*255,classc.g*255,classc.b*255,name), arg1 = name,notCheckable=true, func = inviteFriendClick}
-								end
-							end
-
-							GameTooltip:AddDoubleLine(format("|cff%02x%02x%02x%d|r %s%s%s%s",levelc.r*255,levelc.g*255,levelc.b*255,level,name,grouped,notes,' '..status),zone.." "..rank,classc.r,classc.g,classc.b,zone_r,zone_g,zone_b)
-
-							if name ~= UnitName'player' then
-								menuCountWhispers = menuCountWhispers + 1
-
-								guildMenuList[3].menuList[menuCountWhispers] = {text = format("|cff%02x%02x%02x%d|r |cff%02x%02x%02x%s|r",levelc.r*255,levelc.g*255,levelc.b*255,level,classc.r*255,classc.g*255,classc.b*255,name), arg1 = name,notCheckable=true, func = whisperFriendClick}
-							end
-
-						end
+				if UnitInParty(guildTable[i][1]) or UnitInRaid(guildTable[i][1]) then
+					grouped = "|cffaaaaaa*|r"
+				else
+					grouped = ""
+					if not guildTable[i][10] then
+						menuCountInvites = menuCountInvites + 1
+						menuList[2].menuList[menuCountInvites] = {text = string.format(levelNameString, levelc.r*255,levelc.g*255,levelc.b*255, guildTable[i][3], classc.r*255,classc.g*255,classc.b*255, guildTable[i][1], ""), arg1 = guildTable[i][1],notCheckable=true, func = inviteClick}
 					end
 				end
-			GameTooltip:AddLine(" ")
-			GameTooltip:AddLine("|cffeda55fClick|r to Open Guild Panel")
-			GameTooltip:Show()
+				menuCountWhispers = menuCountWhispers + 1
+				menuList[3].menuList[menuCountWhispers] = {text = string.format(levelNameString, levelc.r*255,levelc.g*255,levelc.b*255, guildTable[i][3], classc.r*255,classc.g*255,classc.b*255, guildTable[i][1], grouped), arg1 = guildTable[i][1],notCheckable=true, func = whisperClick}
 			end
 		end
+
+		EasyMenu(menuList, menuFrame, "cursor", 0, 0, "MENU", 2)
 	end)
+
+	Stat:SetScript("OnEnter", function(self)
+		if InCombatLockdown() or not IsInGuild() then return end
+		
+		GuildRoster()
+		UpdateGuildMessage()
+		BuildGuildTable()
+			
+		local name, rank, level, zone, note, officernote, connected, status, class, isMobile
+		local zonec, classc, levelc
+		local online = totalOnline
+		local guildName, guildRankName, guildRankIndex = GetGuildInfo("player");
+		local GuildInfo = GetGuildInfo('player')
+		local GuildLevel = GetGuildLevel()
+			
+		local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
+		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
+		GameTooltip:ClearLines()
+		GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Guild")		
+		if GuildInfo then
+			GameTooltip:AddDoubleLine(string.format(guildInfoString0, GuildInfo), string.format(guildInfoString1, "Guild Level:", GuildLevel),tthead.r,tthead.g,tthead.b,tthead.r,tthead.g,tthead.b)		
+		end
+		GameTooltip:AddLine' '
+		if GuildLevel then
+			GameTooltip:AddLine( string.format(guildInfoString2, "Member's Online", online, #guildTable),tthead.r,tthead.g,tthead.b)		
+		end
+		
+		if guildMotD ~= "" then GameTooltip:AddLine(' ') 
+			GameTooltip:AddLine(string.format(guildMotDString, GUILD_MOTD, guildMotD), ttsubh.r, ttsubh.g, ttsubh.b, 1) 
+		end
+		
+		local col = RGBToHex(ttsubh.r, ttsubh.g, ttsubh.b)
+		GameTooltip:AddLine' '
+		if GuildLevel and GuildLevel ~= 25 then
+			--UpdateGuildXP()
+			
+			if guildXP[0] then
+				local currentXP, nextLevelXP, percentTotal = unpack(guildXP[0])
+				
+				GameTooltip:AddLine(string.format(col..GUILD_EXPERIENCE_CURRENT, "|r |cFFFFFFFF"..ShortValue(currentXP), ShortValue(nextLevelXP), percentTotal))
+			end
+		end
+		
+		local _, _, standingID, barMin, barMax, barValue = GetGuildFactionInfo()
+		if standingID ~= 8 then -- Not Max Rep
+			barMax = barMax - barMin
+			barValue = barValue - barMin
+			barMin = 0
+			GameTooltip:AddLine(string.format("%s:|r |cFFFFFFFF%s/%s (%s%%)",col..COMBAT_FACTION_CHANGE, ShortValue(barValue), ShortValue(barMax), math.ceil((barValue / barMax) * 100)))
+		end
+		
+		if online > 1 then
+			GameTooltip:AddLine(' ')
+			for i = 1, #guildTable do
+				if online <= 1 then
+					if online > 1 then GameTooltip:AddLine(format("+ %d More...", online - modules.Guild.maxguild),ttsubh.r,ttsubh.g,ttsubh.b) end
+					break
+				end
+
+				name, rank, level, zone, note, officernote, connected, status, class, isMobile = unpack(guildTable[i])
+				if connected and name ~= nDatamyname then
+					if GetRealZoneText() == zone then zonec = activezone else zonec = inactivezone end
+					classc, levelc = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class], GetQuestDifficultyColor(level)
+					
+					if isMobile then zone = "" end
+					
+					if IsShiftKeyDown() then
+						GameTooltip:AddDoubleLine(string.format(nameRankString, name, rank), zone, classc.r, classc.g, classc.b, zonec.r, zonec.g, zonec.b)
+						if note ~= "" then GameTooltip:AddLine(string.format(noteString, note), ttsubh.r, ttsubh.g, ttsubh.b, 1) end
+						if officernote ~= "" then GameTooltip:AddLine(string.format(officerNoteString, officernote), ttoff.r, ttoff.g, ttoff.b ,1) end
+					else
+						GameTooltip:AddDoubleLine(string.format(levelNameStatusString, levelc.r*255, levelc.g*255, levelc.b*255, level, name, status), zone, classc.r,classc.g,classc.b, zonec.r,zonec.g,zonec.b)
+					end
+				end
+			end
+		end
+		GameTooltip:AddLine' '
+		GameTooltip:AddLine("|cffeda55fLeft Click|r to Open Guild Roster")
+		GameTooltip:AddLine("|cffeda55fHold Shift & Mouseover|r to See Guild and Officer Note's")
+		GameTooltip:AddLine("|cffeda55fRight Click|r to open Options Menu")		
+		GameTooltip:Show()
+	end)
+
 	Stat:SetScript("OnLeave", function() GameTooltip:Hide() end)
 	Stat:SetScript("OnMouseDown", function(self, btn)
-		if btn == "LeftButton" then
-			if not GuildFrame and IsInGuild() then LoadAddOn("Blizzard_GuildUI") end GuildFrame_Toggle() end
-		end)
+		if btn ~= "LeftButton" then return end
+		ToggleGuildFrame()
+	end)
+
+	Stat:RegisterEvent("GUILD_ROSTER_SHOW")
+	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
+	Stat:RegisterEvent("GUILD_ROSTER_UPDATE")
+	Stat:RegisterEvent("PLAYER_GUILD_UPDATE")
 	Stat:SetScript("OnEvent", Update)
 end
 
-----------------------------
--- Datatext for HPS Feed... 
-----------------------------
+----------------
+-- Player Haste
+----------------
+if cfg.haste and cfg.haste > 0 then
+	local Stat = CreateFrame('Frame')
+	Stat:EnableMouse(true)
+	Stat:SetFrameStrata('BACKGROUND')
+	Stat:SetFrameLevel(3)
 
-if datatext.hps_text and datatext.hps_text > 0 then
+	local Text  = DataPanel:CreateFontString(nil, 'OVERLAY')
+	Text:SetFont(cfg.font, cfg.fontsize,'THINOUTLINE')
+	PP(cfg.haste, Text)
+
+	local int = 1
+
+	local function Update(self, t)
+		local spellhaste = GetCombatRating(CR_HASTE_SPELL)
+		local rangedhaste = GetCombatRating(CR_HASTE_RANGED)
+		local attackhaste = GetCombatRating(CR_HASTE_MELEE)
+		
+		if attackhaste > spellhaste and select(2, UnitClass("Player")) ~= "HUNTER" then
+			haste = attackhaste
+		elseif select(2, UnitClass("Player")) == "HUNTER" then
+			haste = rangedhaste
+		else
+			haste = spellhaste
+		end
+		
+		int = int - t
+		if int < 0 then
+			Text:SetText(hexa.."Haste: "..hexb..haste)
+			int = 1
+		end     
+	end
+
+	Stat:SetScript("OnUpdate", Update)
+	Update(Stat, 10)
+end
+
+--------------------
+-- Heals Per Second
+--------------------
+if cfg.hps_text and cfg.hps_text > 0 then
 	local events = {SPELL_HEAL = true, SPELL_PERIODIC_HEAL = true}
 	local HPS_FEED = CreateFrame('Frame')
 	local player_id = UnitGUID('player')
 	local actual_heals_total, cmbt_time = 0
  
-	local hText = PanelLeft:CreateFontString(nil, 'OVERLAY')
-	hText:SetFont(media.font, datatext.fontsize)
-	hText:SetText('HPS: ', '0')
+	local hText = DataPanel:CreateFontString(nil, 'OVERLAY')
+	hText:SetFont(cfg.font, cfg.fontsize,'THINOUTLINE')
+	hText:SetText("HPS: ", '0')
  
-	PP(datatext.hps_text, hText)
+	PP(cfg.hps_text, hText)
  
 	HPS_FEED:EnableMouse(true)
 	HPS_FEED:SetFrameStrata('BACKGROUND')
@@ -1832,9 +2150,9 @@ if datatext.hps_text and datatext.hps_text > 0 then
 	
  	function get_hps()
 		if (actual_heals_total == 0) then
-			return (hexa..'HPS: '..hexb..'0')
+			return (hexa.."HPS: "..hexb..'0' )
 		else
-			return string.format('%.1f '..hexa..'HPS: '..hexb, (actual_heals_total or 0) / (cmbt_time or 1))
+			return string.format('%.1f '..hexa.."HPS"..hexb, (actual_heals_total or 0) / (cmbt_time or 1))
 		end
 	end
  
@@ -1852,74 +2170,12 @@ if datatext.hps_text and datatext.hps_text > 0 then
 		actual_heals_total = 0
 	end)
  
-
-
 end
 
-
----------------------------
--- Datatext for Micro Menu
----------------------------
-
-if datatext.micromenu and datatext.micromenu > 0 then
-	local Stat = CreateFrame("Frame")
-	Stat:EnableMouse(true)
-	Stat:SetFrameStrata("BACKGROUND")
-	Stat:SetFrameLevel(3)
-
-	local Text  = PanelLeft:CreateFontString(nil, "OVERLAY")
-	Text:SetFont(media.font, datatext.fontsize)
-	PP(datatext.micromenu, Text)
-
-	local function OnEvent(self, event, ...)
-		Text:SetText(hexa..MAINMENU_BUTTON..hexb)
-		self:SetAllPoints(Text)
-	end
-
-	local function OpenMenu()
-		local menuFrame = CreateFrame("Frame", "DataTextMicroMenu", UIParent, "UIDropDownMenuTemplate")
-		local menuList = {
-			{text = CHARACTER_BUTTON,
-			func = function() ToggleCharacter("PaperDollFrame") end},
-			{text = SPELLBOOK_ABILITIES_BUTTON,
-			func = function() ToggleFrame(SpellBookFrame) end},
-			{text = TALENTS_BUTTON,
-			func = function() if not PlayerTalentFrame then LoadAddOn("Blizzard_TalentUI") end if not GlyphFrame then LoadAddOn("Blizzard_GlyphUI") end PlayerTalentFrame_Toggle() end},
-			{text = ACHIEVEMENT_BUTTON,
-			func = function() ToggleAchievementFrame() end},
-			{text = QUESTLOG_BUTTON,
-			func = function() ToggleFrame(QuestLogFrame) end},
-			{text = SOCIAL_BUTTON,
-			func = function() ToggleFriendsFrame(1) end},
-			{text = PLAYER_V_PLAYER,
-			func = function() ToggleFrame(PVPFrame) end},
-			{text = ACHIEVEMENTS_GUILD_TAB,
-			func = function() if IsInGuild() then if not GuildFrame then LoadAddOn("Blizzard_GuildUI") end GuildFrame_Toggle() end end},
-			{text = LFG_TITLE,
-			func = function() ToggleFrame(LFDParentFrame) end},
-			{text = L_LFRAID,
-			func = function() ToggleFrame(LFRParentFrame) end},
-			{text = HELP_BUTTON,
-			func = function() ToggleHelpFrame() end},
-			{text = L_CALENDAR,
-			func = function()
-			if(not CalendarFrame) then LoadAddOn("Blizzard_Calendar") end
-				Calendar_Toggle()
-			end},
-		}
-
-		EasyMenu(menuList, menuFrame, "cursor", 0, 0, "MENU", 2)
-	end
-
-	Stat:RegisterEvent("PLAYER_LOGIN")
-	Stat:SetScript("OnEvent", OnEvent)
-	Stat:SetScript("OnMouseDown", function() OpenMenu() end)
-end
-
----------------------------
---Datatext for Professions
----------------------------
-if datatext.pro and datatext.pro > 0 then
+---------------
+-- Professions
+---------------
+if cfg.pro and cfg.pro > 0 then
 
 	local Stat = CreateFrame('Button')
 	Stat:RegisterEvent('PLAYER_ENTERING_WORLD')
@@ -1928,26 +2184,30 @@ if datatext.pro and datatext.pro > 0 then
 	Stat:EnableMouse(true)
 	Stat.tooltip = false
 
-	local Text  = PanelLeft:CreateFontString(nil, 'OVERLAY')
-	Text:SetFont(media.font, datatext.fontsize)
-	PP(datatext.pro, Text)
+	local Text = DataPanel:CreateFontString(nil, 'OVERLAY')
+	Text:SetFont(cfg.font, cfg.fontsize,'THINOUTLINE')
+	PP(cfg.pro, Text)
 
 	local function Update(self)
-		for _, v in pairs({GetProfessions()}) do
+		for i = 1, select("#", GetProfessions()) do
+			local v = select(i, GetProfessions());
 			if v ~= nil then
 				local name, texture, rank, maxRank = GetProfessionInfo(v)
-				Text:SetFormattedText(hexa..'Professions'..hexb)
+				Text:SetFormattedText(hexa.."Professions"..hexb)
 			end
 		end
 		self:SetAllPoints(Text)
 	end
 
 	Stat:SetScript('OnEnter', function()
+		if InCombatLockdown() then return end
 		local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
 		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 		GameTooltip:ClearLines()
-		GameTooltip:AddLine(hexa..myname.."'s"..hexb..' Professions', .4,.78,1)
-		for _, v in pairs({GetProfessions()}) do
+		GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Professions")
+		GameTooltip:AddLine' '		
+		for i = 1, select("#", GetProfessions()) do
+			local v = select(i, GetProfessions());
 			if v ~= nil then
 				local name, texture, rank, maxRank = GetProfessionInfo(v)
 				GameTooltip:AddDoubleLine(name, rank..' / '..maxRank,.75,.9,1,.3,1,.3)
@@ -1956,7 +2216,8 @@ if datatext.pro and datatext.pro > 0 then
 		GameTooltip:AddLine' '
 		GameTooltip:AddLine("|cffeda55fLeft Click|r to Open Profession #1")
 		GameTooltip:AddLine("|cffeda55fMiddle Click|r to Open Spell Book")
-		GameTooltip:AddLine("|cffeda55fRight Click|r to Open Profession #2")		
+		GameTooltip:AddLine("|cffeda55fRight Click|r to Open Profession #2")
+		
 		GameTooltip:Show()
 	end)
 
@@ -1965,57 +2226,65 @@ if datatext.pro and datatext.pro > 0 then
 		local prof1, prof2 = GetProfessions()
 		if btn == "LeftButton" then
 			if prof1 then
-				if (GetProfessionInfo(prof1) == 'Herbalism')then
-						print('|cff00B4FFn|rData: |cffFF0000Herbalism has no options!|r')
-				elseif(GetProfessionInfo(prof1) == 'Skinning') then
-						print('|cff00B4FFn|rData: |cffFF0000Skinning has no options!|r')
-				elseif(GetProfessionInfo(prof1) == 'Mining') then
-						CastSpellByName("Smelting")							
+				if (GetProfessionInfo(prof1) == (locale == "deDE" and "Kr\195\164uterkunde" or'Herbalism')) then
+						print('|cffCC3333 n|rData: |cffFF0000Herbalism has no options!|r')
+				elseif(GetProfessionInfo(prof1) == (locale == "deDE" and "K\195\188rschnerei" or 'Skinning')) then
+						print('|cffCC3333 n|rData: |cffFF0000Skinning has no options!|r')
+				elseif(GetProfessionInfo(prof1) == (locale == "deDE" and "Bergbau" or 'Mining')) then
+					if(locale == "deDE") then
+						CastSpellByName("Verh\195\188ttung")
+					else
+						CastSpellByName("Smelting")
+					end
 				else	
 					CastSpellByName((GetProfessionInfo(prof1)))
 				end
 			else
-				print('|cff00B4FFn|rData: |cffFF0000No Profession Found!|r')
+				print('|cffCC3333 n|rData: |cffFF0000No Profession Found!|r')
 			end
 		elseif btn == 'MiddleButton' then
-			ToggleFrame(SpellBookFrame)		
+			ToggleFrame(SpellBookFrame)--ToggleSpellBook("professions");		
 		elseif btn == "RightButton" then
 			if prof2 then
-				if (GetProfessionInfo(prof2) == 'Herbalism')then
-						print('|cff00B4FFn|rData: |cffFF0000Herbalism has no options!|r')
-				elseif(GetProfessionInfo(prof2) == 'Skinning') then
-						print('|cff00B4FFn|rData: |cffFF0000Skinning has no options!|r')
-				elseif(GetProfessionInfo(prof2) == 'Mining') then
-						CastSpellByName("Smelting")						
-				else	
+				if (GetProfessionInfo(prof2) == (locale == "deDE" and "Kräuterkunde" or'Herbalism')) then
+						print('|cffCC3333 n|rData: |cffFF0000Herbalism has no options!|r')
+				elseif(GetProfessionInfo(prof2) == (locale == "deDE" and "K\195\188rschnerei" or 'Skinning')) then
+						print('|cffCC3333 n|rData: |cffFF0000Skinning has no options!|r')
+				elseif(GetProfessionInfo(prof2) == (locale == "deDE" and "Bergbau" or 'Mining')) then
+					if(locale == "deDE") then
+						CastSpellByName("Verh\195\188ttung")
+					else
+						CastSpellByName("Smelting")
+					end
+				else
 					CastSpellByName((GetProfessionInfo(prof2)))
 				end
 			else
-				print('|cff00B4FFn|rData: |cffFF0000No Profession Found!|r')
+				print('|cffCC3333 n|rData: |cffFF0000No Profession Found!|r')
 			end
 		end
 	end)
+
 
 	Stat:RegisterForClicks("AnyUp")
 	Stat:SetScript('OnUpdate', Update)
 	Stat:SetScript('OnLeave', function() GameTooltip:Hide() end)
 end
 
-------------------------
--- Datatext for Recount 
-------------------------
-local currentFightDPS
 
-if datatext.recount and datatext.recount > 0 then 
+-----------
+-- Recount
+-----------
+if cfg.recount and cfg.recount > 0 then 
 
 	local RecountDPS = CreateFrame("Frame")
 	RecountDPS:EnableMouse(true)
 	RecountDPS:SetFrameStrata("MEDIUM")
 	RecountDPS:SetFrameLevel(3)
 
-	local Text  = PanelLeft:CreateFontString(nil, "OVERLAY")
-	Text:SetFont(media.font, datatext.fontsize)
-	PP(datatext.recount, Text)
+	local Text  = DataPanel:CreateFontString(nil, "OVERLAY")
+	Text:SetFont(cfg.font, cfg.fontsize,'THINOUTLINE')
+	PP(cfg.recount, Text)
 	RecountDPS:SetAllPoints(Text)
 
 	function OnEvent(self, event, ...)
@@ -2045,7 +2314,7 @@ if datatext.recount and datatext.recount > 0 then
 
 	function RecountDPS:getDPS()
 		if not IsAddOnLoaded("Recount") then return "N/A" end
-		if datatext.recountraiddps == true then
+		if cfg.recountraiddps == true then
 			-- show raid dps
 			_, dps = RecountDPS:getRaidValuePerSecond(Recount.db.profile.CurDataSet)
 			return dps
@@ -2085,6 +2354,8 @@ if datatext.recount and datatext.recount > 0 then
 		local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
 		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 		GameTooltip:ClearLines()
+		GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Damage")
+		GameTooltip:AddLine' '		
 		if IsAddOnLoaded("Recount") then
 			local damage, dps = Recount:MergedPetDamageDPS(Recount.db2.combatants[myname], Recount.db.profile.CurDataSet)
 			local raid_damage, raid_dps = RecountDPS:getRaidValuePerSecond(Recount.db.profile.CurDataSet)
@@ -2097,9 +2368,9 @@ if datatext.recount and datatext.recount > 0 then
 			GameTooltip:AddDoubleLine("Raid Damage:", raid_damage, 1, 1, 1, 0.8, 0.8, 0.8)
 			GameTooltip:AddDoubleLine("Raid DPS:", raid_dps, 1, 1, 1, 0.8, 0.8, 0.8)
 			GameTooltip:AddLine(" ")
-			GameTooltip:AddLine("|cffeda55fLeft Click|r to Open Recount")
-			GameTooltip:AddLine("|cffeda55fRight Click|r to Reset Data")
-			GameTooltip:AddLine("|cffeda55fShift + Right Click|r to Open Config")
+			GameTooltip:AddLine("|cffeda55fLeft Click|r to toggle Recount")
+			GameTooltip:AddLine("|cffeda55fRight Click|r to reset data")
+			GameTooltip:AddLine("|cffeda55fShift + Right Click|r to open config")
 		else
 			GameTooltip:AddLine("Recount is not loaded.", 255, 0, 0)
 			GameTooltip:AddLine("Enable Recount and reload your UI.")
@@ -2134,35 +2405,33 @@ if datatext.recount and datatext.recount > 0 then
 	end)
 end
 
---------------------------
--- Datatext for Spec Swap
---------------------------
-
-if datatext.spec and datatext.spec > 0 then
+--------------------
+-- Talent Spec Swap
+--------------------
+if cfg.spec and cfg.spec > 0 then
 
 	local Stat = CreateFrame('Frame')
 	Stat:EnableMouse(true)
 	Stat:SetFrameStrata('BACKGROUND')
 	Stat:SetFrameLevel(3)
 
-	local Text  = PanelLeft:CreateFontString(nil, 'OVERLAY')
-	Text:SetFont(media.font, datatext.fontsize)
-	PP(datatext.spec, Text)
+	local Text  = DataPanel:CreateFontString(nil, 'OVERLAY')
+	Text:SetFont(cfg.font, cfg.fontsize,'THINOUTLINE')
+	PP(cfg.spec, Text)
 
 	local talent = {}
 	local active
 	local talentString = string.join('', '|cffFFFFFF%s|r ')
-	local talentStringTip = string.join('', '|cffFFFFFF%s:|r ', '%d|r/',  '%d|r/',  '%d|r')
 	local activeString = string.join('', '|cff00FF00' , ACTIVE_PETS, '|r')
 	local inactiveString = string.join('', '|cffFF0000', FACTION_INACTIVE, '|r')
 
 
 
 	local function LoadTalentTrees()
-		for i = 1, GetNumTalentGroups(false, false) do
+		for i = 1, GetNumSpecGroups(false, false) do
 			talent[i] = {} -- init talent group table
-			for j = 1, GetNumTalentTabs(false, false) do
-				talent[i][j] = select(5, GetTalentTabInfo(j, false, false, i))
+			for j = 1, GetNumSpecializations(false, false) do
+				talent[i][j] = select(5, GetSpecializationInfo(j, false, false, i))
 			end
 		end
 	end
@@ -2170,10 +2439,10 @@ if datatext.spec and datatext.spec > 0 then
 	local int = 1
 	local function Update(self, t)
 		int = int - t
-		if int > 0 or not GetPrimaryTalentTree() then return end
+		if int > 0 or not GetSpecialization() then return end
 
-		active = GetActiveTalentGroup(false, false)
-		Text:SetFormattedText(talentString, hexa..select(2, GetTalentTabInfo(GetPrimaryTalentTree(false, false, active)))..hexb)
+		active = GetActiveSpecGroup(false, false)
+		Text:SetFormattedText(talentString, hexa..select(2, GetSpecializationInfo(GetSpecialization(false, false, active)))..hexb)
 		int = 1
 
 		-- disable script	
@@ -2190,11 +2459,12 @@ if datatext.spec and datatext.spec > 0 then
 		GameTooltip:ClearLines()
 		GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Spec")
 		GameTooltip:AddLine' '		
-		for i = 1, GetNumTalentGroups() do
-			if GetPrimaryTalentTree(false, false, i) then
-				GameTooltip:AddLine(string.join(' ', string.format(talentStringTip, select(2, GetTalentTabInfo(GetPrimaryTalentTree(false, false, i))), talent[i][1], talent[i][2], talent[i][3]), (i == active and activeString or inactiveString)),1,1,1)
+		for i = 1, GetNumSpecGroups() do
+			if GetSpecialization(false, false, i) then
+				GameTooltip:AddLine(string.join('- ', string.format(talentString, select(2, GetSpecializationInfo(GetSpecialization(false, false, i)))), (i == active and activeString or inactiveString)),1,1,1)
 			end
 		end
+		
 		GameTooltip:AddLine' '
 		GameTooltip:AddLine("|cffeda55fLeft Click|r to Switch Spec's")		
 		GameTooltip:AddLine("|cffeda55fRight Click|r to Open Talent Tree")
@@ -2232,18 +2502,17 @@ if datatext.spec and datatext.spec > 0 then
 
 	Stat:SetScript("OnMouseDown", function(self, button)
 		if button == "LeftButton" then
-			SetActiveTalentGroup(active == 1 and 2 or 1)
+			SetActiveSpecGroup (active == 1 and 2 or 1)
 		elseif button == "RightButton" then
 			ToggleTalentFrame()
 		end
 	end)
 end
 
------------------------
--- Datatext for Stat 1 
------------------------
-
-if datatext.stat1 and datatext.stat1 > 0 then
+-----------------
+-- Statistics #1
+-----------------
+if cfg.stat1 and cfg.stat1 > 0 then
 
 	local Stat = CreateFrame("Frame")
 	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -2251,9 +2520,9 @@ if datatext.stat1 and datatext.stat1 > 0 then
 	Stat:SetFrameLevel(3)
 	Stat:EnableMouse(true)
 
-	local Text  = PanelLeft:CreateFontString(nil, "OVERLAY")
-	Text:SetFont(media.font, datatext.fontsize)
-	PP(datatext.stat1, Text)
+	local Text  = DataPanel:CreateFontString(nil, "OVERLAY")
+	Text:SetFont(cfg.font, cfg.fontsize,'THINOUTLINE')
+	PP(cfg.stat1, Text)
 
 	local format = string.format
 	local targetlv, playerlv = UnitLevel("target"), UnitLevel("player")
@@ -2268,17 +2537,21 @@ if datatext.stat1 and datatext.stat1 > 0 then
 	local level = UnitLevel("player")
 
 	local function ShowTooltip(self)
+		if InCombatLockdown() then return end
+	
 		local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
 		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 		GameTooltip:ClearLines()
+		GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Statistics")
+		GameTooltip:AddLine' '		
 		
 		if Role == "Tank" then
 			if targetlv > 1 then
-				GameTooltip:AddDoubleLine('Avoidance Breakdown', string.join("", " (", 'lvl', " ", targetlv, ")"))
+				GameTooltip:AddDoubleLine("Avoidance Breakdown", string.join("", " (", "lvl", " ", targetlv, ")"))
 			elseif targetlv == -1 then
-				GameTooltip:AddDoubleLine('Avoidance Breakdown', string.join("", " (", 'Boss', ")"))
+				GameTooltip:AddDoubleLine("Avoidance Breakdown", string.join("", " (", "Boss", ")"))
 			else
-				GameTooltip:AddDoubleLine('Avoidance Breakdown', string.join("", " (", 'lvl', " ", playerlv, ")"))
+				GameTooltip:AddDoubleLine("Avoidance Breakdown", string.join("", " (", "lvl", " ", playerlv, ")"))
 			end
 			GameTooltip:AddLine' '
 			GameTooltip:AddDoubleLine(DODGE_CHANCE, format(chanceString, dodge),1,1,1)
@@ -2296,21 +2569,6 @@ if datatext.stat1 and datatext.stat1 > 0 then
 		
 			GameTooltip:AddDoubleLine(STAT_HIT_CHANCE, format(modifierString, hit, hitBonus), 1, 1, 1)
 			
-			--Hunters don't use expertise
-			if myclass ~= "HUNTER" then
-				local expertisePercent, offhandExpertisePercent = GetExpertisePercent()
-				expertisePercent = format("%.2f", expertisePercent)
-				offhandExpertisePercent = format("%.2f", offhandExpertisePercent)
-				
-				local expertisePercentDisplay
-				if IsDualWielding() then
-					expertisePercentDisplay = expertisePercent.."% / "..offhandExpertisePercent.."%"
-				else
-					expertisePercentDisplay = expertisePercent.."%"
-				end
-				GameTooltip:AddDoubleLine(COMBAT_RATING_NAME24, format('%d (+%s)', GetCombatRating(CR_EXPERTISE), expertisePercentDisplay), 1, 1, 1)
-			end
-			
 			local haste = myclass == "HUNTER" and GetCombatRating(CR_HASTE_RANGED) or GetCombatRating(CR_HASTE_MELEE)
 			local hasteBonus = myclass == "HUNTER" and GetCombatRatingBonus(CR_HASTE_RANGED) or GetCombatRatingBonus(CR_HASTE_MELEE)
 			
@@ -2318,17 +2576,17 @@ if datatext.stat1 and datatext.stat1 > 0 then
 		end
 		
 		local masteryspell
-		if GetCombatRating(CR_MASTERY) ~= 0 and GetPrimaryTalentTree() then
+		if GetCombatRating(CR_MASTERY) ~= 0 and GetSpecialization() then
 			if myclass == "DRUID" then
 				if Role == "Melee" then
-					masteryspell = select(2, GetTalentTreeMasterySpells(GetPrimaryTalentTree()))
+					masteryspell = select(2, GetSpecializationMasterySpells(GetSpecialization()))
 				elseif Role == "Tank" then
-					masteryspell = select(1, GetTalentTreeMasterySpells(GetPrimaryTalentTree()))
+					masteryspell = select(1, GetSpecializationMasterySpells(GetSpecialization()))
 				else
-					masteryspell = GetTalentTreeMasterySpells(GetPrimaryTalentTree())
+					masteryspell = GetSpecializationMasterySpells(GetSpecialization())
 				end
 			else
-				masteryspell = GetTalentTreeMasterySpells(GetPrimaryTalentTree())
+				masteryspell = GetSpecializationMasterySpells(GetSpecialization())
 			end
 			
 
@@ -2384,7 +2642,7 @@ if datatext.stat1 and datatext.stat1 > 0 then
 		end
 		avoidance = (dodge+parry+block+basemisschance)
 		
-		Text:SetFormattedText(displayFloatString, hexa..'AVD: '..hexb, avoidance)
+		Text:SetFormattedText(displayFloatString, hexa.."AVD: "..hexb, avoidance)
 		--Setup Tooltip
 		self:SetAllPoints(Text)
 	end
@@ -2396,7 +2654,7 @@ if datatext.stat1 and datatext.stat1 > 0 then
 			spellpwr = GetSpellBonusDamage(7)
 		end
 		
-		Text:SetFormattedText(displayNumberString, hexa..'SP: '..hexb, spellpwr)
+		Text:SetFormattedText(displayNumberString, hexa.."SP: "..hexb, spellpwr)
 		--Setup Tooltip
 		self:SetAllPoints(Text)
 	end
@@ -2413,7 +2671,7 @@ if datatext.stat1 and datatext.stat1 > 0 then
 			pwr = effective
 		end
 		
-		Text:SetFormattedText(displayNumberString, hexa..'AP: '..hexb, pwr)      
+		Text:SetFormattedText(displayNumberString, hexa.."AP: "..hexb, pwr)      
 		--Setup Tooltip
 		self:SetAllPoints(Text)
 	end
@@ -2439,11 +2697,10 @@ if datatext.stat1 and datatext.stat1 > 0 then
 	Update(Stat, 10)
 end
 
------------------------
--- Datatext for Stat 2
------------------------
-
-if datatext.stat2 and datatext.stat2 > 0 then
+-----------------
+-- Statistics #2
+-----------------
+if cfg.stat2 and cfg.stat2 > 0 then
 
 	local Stat = CreateFrame("Frame")
 	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -2451,9 +2708,9 @@ if datatext.stat2 and datatext.stat2 > 0 then
 	Stat:SetFrameLevel(3)
 	Stat:EnableMouse(true)
 
-	local Text  = PanelLeft:CreateFontString(nil, "OVERLAY")
-	Text:SetFont(media.font, datatext.fontsize)
-	PP(datatext.stat2, Text)
+	local Text  = DataPanel:CreateFontString(nil, "OVERLAY")
+	Text:SetFont(cfg.font, cfg.fontsize,'THINOUTLINE')
+	PP(cfg.stat2, Text)
 
 	local _G = getfenv(0)
 	local format = string.format
@@ -2464,6 +2721,7 @@ if datatext.stat2 and datatext.stat2 > 0 then
 	local displayNumberString = string.join("", "%s", "%d|r")
 	local displayFloatString = string.join("", "%s", "%.2f%%|r")
 	local level = UnitLevel("player")
+
 
 	local function CalculateMitigation(level, effective)
 		local mitigation
@@ -2489,12 +2747,16 @@ if datatext.stat2 and datatext.stat2 > 0 then
 	end
 
 	local function ShowTooltip(self)
+		if InCombatLockdown() then return end
+	
 		local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
 		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 		GameTooltip:ClearLines()
+		GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Statistics")
+		GameTooltip:AddLine' '	
 		
 		if Role == "Tank" then
-			AddTooltipHeader('Mitigation By Level: ')
+			AddTooltipHeader("Mitigation By Level: ")
 			local lv = level +3
 			for i = 1, 4 do
 				GameTooltip:AddDoubleLine(lv,format(chanceString, CalculateMitigation(lv, effectiveArmor) * 100),1,1,1)
@@ -2533,7 +2795,7 @@ if datatext.stat2 and datatext.stat2 > 0 then
 	local function UpdateCaster(self)
 		local spellcrit = GetSpellCritChance(1)
 
-		Text:SetFormattedText(displayFloatString, hexa..'Crit: '..hexb, spellcrit)
+		Text:SetFormattedText(displayFloatString, hexa.."Crit: "..hexb, spellcrit)
 		--Setup Tooltip
 		self:SetAllPoints(Text)
 	end
@@ -2549,7 +2811,7 @@ if datatext.stat2 and datatext.stat2 > 0 then
 			critChance = meleecrit
 		end
 		
-		Text:SetFormattedText(displayFloatString, hexa..'Crit: '..hexb, critChance)
+		Text:SetFormattedText(displayFloatString, hexa.."Crit: "..hexb, critChance)
 		--Setup Tooltip
 		self:SetAllPoints(Text)
 	end
@@ -2576,11 +2838,10 @@ if datatext.stat2 and datatext.stat2 > 0 then
 	Update(Stat, 10)
 end
 
----------------------------------------------------
--- Datatext for System Stats
----------------------------------------------------
-
-if datatext.system and datatext.system > 0 then
+-------------------
+-- System Settings
+-------------------
+if cfg.system and cfg.system > 0 then
 
 	local Stat = CreateFrame("Frame")
 	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -2589,9 +2850,9 @@ if datatext.system and datatext.system > 0 then
 	Stat:EnableMouse(true)
 	Stat.tooltip = false
 
-	local Text  = PanelLeft:CreateFontString(nil, "OVERLAY")
-	Text:SetFont(media.font, datatext.fontsize)
-	PP(datatext.system, Text)
+	local Text  = DataPanel:CreateFontString(nil, "OVERLAY")
+	Text:SetFont(cfg.font, cfg.fontsize,'THINOUTLINE')
+	PP(cfg.system, Text)
 
 	local bandwidthString = "%.2f Mbps"
 	local percentageString = "%.2f%%"
@@ -2683,37 +2944,31 @@ if datatext.system and datatext.system > 0 then
 			elseif framerate >= 10 and framerate < 20 then
 				fpscolor = 3
 			end
-			local displayFormat = string.join("", hexa..'FPS: '..hexb, statusColors[fpscolor], "%d|r", hexa..' MS: ', statusColors[latencycolor], "%d|r")
+			local displayFormat = string.join("", hexa.."FPS: "..hexb, statusColors[fpscolor], "%d|r", hexa.." MS: "..hexb, statusColors[latencycolor], "%d|r")
 			Text:SetFormattedText(displayFormat, framerate, latency)
 			int2 = 1
 		end
 	end
 	Stat:SetScript("OnMouseDown", function () collectgarbage("collect") Update(Stat, 20) end)
 	Stat:SetScript("OnEnter", function(self)
+		if InCombatLockdown() then return end
 		local bandwidth = GetAvailableBandwidth()
 		local _, _, latencyHome, latencyWorld = GetNetStats() 
 		local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
 		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 		GameTooltip:ClearLines()
 		GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Latency")
-		GameTooltip:AddLine' '		
-		if datatext.fps.enable == true then 
-			if datatext.fps.home == true then
-				GameTooltip:AddDoubleLine('Home Latency: ', string.format('Home Latency: ', latencyHome), 0.80, 0.31, 0.31,0.84, 0.75, 0.65)
-			elseif datatext.fps.world == true then
-				GameTooltip:AddDoubleLine('World Latency: ', string.format('World Latency: ', latencyWorld), 0.80, 0.31, 0.31,0.84, 0.75, 0.65)
-			elseif datatext.fps.both == true then
-				GameTooltip:AddDoubleLine('Home Latency: ', string.format('Home Latency: ', latencyHome), 0.80, 0.31, 0.31,0.84, 0.75, 0.65)
-				GameTooltip:AddDoubleLine('World Latency: ', string.format('World Latency: ', latencyWorld), 0.80, 0.31, 0.31,0.84, 0.75, 0.65)
-			end
-		end
+		GameTooltip:AddLine' '			
+		GameTooltip:AddDoubleLine("Home Latency: ", string.format(homeLatencyString, latencyHome), 0.80, 0.31, 0.31,0.84, 0.75, 0.65)
+		GameTooltip:AddDoubleLine("World Latency: ", string.format(worldLatencyString, latencyWorld), 0.80, 0.31, 0.31,0.84, 0.75, 0.65)
+
 		if bandwidth ~= 0 then
-			GameTooltip:AddDoubleLine('Bandwidth: ' , string.format(bandwidthString, bandwidth),0.69, 0.31, 0.31,0.84, 0.75, 0.65)
-			GameTooltip:AddDoubleLine('Download: ' , string.format(percentageString, GetDownloadedPercentage() *100),0.69, 0.31, 0.31, 0.84, 0.75, 0.65)
+			GameTooltip:AddDoubleLine(L.datatext_bandwidth , string.format(bandwidthString, bandwidth),0.69, 0.31, 0.31,0.84, 0.75, 0.65)
+			GameTooltip:AddDoubleLine("Download: " , string.format(percentageString, GetDownloadedPercentage() *100),0.69, 0.31, 0.31, 0.84, 0.75, 0.65)
 			GameTooltip:AddLine(" ")
 		end
 		local totalMemory = UpdateMemory()
-		GameTooltip:AddDoubleLine('Total Memory Usage:', formatMem(totalMemory), 0.69, 0.31, 0.31,0.84, 0.75, 0.65)
+		GameTooltip:AddDoubleLine("Total Memory Usage:", formatMem(totalMemory), 0.69, 0.31, 0.31,0.84, 0.75, 0.65)
 		GameTooltip:AddLine(" ")
 		for i = 1, #memoryTable do
 			if (memoryTable[i][4]) then
@@ -2725,239 +2980,6 @@ if datatext.system and datatext.system > 0 then
 		GameTooltip:Show()
 	end)
 	Stat:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	Stat:SetScript("OnUpdate", Update)
-	Update(Stat, 10)
-end
-
----------------------
--- Datatext for TIME
----------------------
-
-if datatext.wowtime and datatext.wowtime > 0 then
-
-	local europeDisplayFormat = string.join("", "%02d", ":|r%02d")
-	local ukDisplayFormat = string.join("", "", "%d", ":|r%02d", " %s|r")
-	local timerLongFormat = "%d:%02d:%02d"
-	local timerShortFormat = "%d:%02d"
-	local lockoutInfoFormat = "%s |cffaaaaaa(%s%s, %s/%s)"
-	local formatBattleGroundInfo = "%s: "
-	local lockoutColorExtended, lockoutColorNormal = { r=0.3,g=1,b=0.3 }, { r=1,g=1,b=1 }
-	local difficultyInfo = { "N", "N", "H", "H" }
-	local curHr, curMin, curAmPm
-
-	local Stat = CreateFrame("Frame")
-	Stat:EnableMouse(true)
-	Stat:SetFrameStrata("MEDIUM")
-	Stat:SetFrameLevel(3)
-
-	local Text  = PanelLeft:CreateFontString(nil, 'OVERLAY')
-	Text:SetFont(media.font, datatext.fontsize)
-	PP(datatext.wowtime, Text)
-
-	local APM = { TIMEMANAGER_PM, TIMEMANAGER_AM }
-
-	local function CalculateTimeValues(tt)
-		if tt == nil then tt = false end
-		local Hr, Min, AmPm
-		if tt == true then
-			if datatext.localtime == true then
-				Hr, Min = GetGameTime()
-				if datatext.time24 == true then
-					return Hr, Min, -1
-				else
-					if Hr>=12 then
-						if Hr>12 then Hr = Hr - 12 end
-						AmPm = 1
-					else
-						if Hr == 0 then Hr = 12 end
-						AmPm = 2
-					end
-					return Hr, Min, AmPm
-				end			
-			else
-				local Hr24 = tonumber(date("%H"))
-				Hr = tonumber(date("%I"))
-				Min = tonumber(date("%M"))
-				if datatext.time24 == true then
-					return Hr24, Min, -1
-				else
-					if Hr24>=12 then AmPm = 1 else AmPm = 2 end
-					return Hr, Min, AmPm
-				end
-			end
-		else
-			if datatext.localtime == true then
-				local Hr24 = tonumber(date("%H"))
-				Hr = tonumber(date("%I"))
-				Min = tonumber(date("%M"))
-				if datatext.time24 == true then
-					return Hr24, Min, -1
-				else
-					if Hr24>=12 then AmPm = 1 else AmPm = 2 end
-					return Hr, Min, AmPm
-				end
-			else
-				Hr, Min = GetGameTime()
-				if datatext.time24 == true then
-					return Hr, Min, -1
-				else
-					if Hr>=12 then
-						if Hr>12 then Hr = Hr - 12 end
-						AmPm = 1
-					else
-						if Hr == 0 then Hr = 12 end
-						AmPm = 2
-					end
-					return Hr, Min, AmPm
-				end
-			end	
-		end
-	end
-
-	local function CalculateTimeLeft(time)
-			local hour = floor(time / 3600)
-			local min = floor(time / 60 - (hour*60))
-			local sec = time - (hour * 3600) - (min * 60)
-			
-			return hour, min, sec
-	end
-
-	local function formatResetTime(sec,table)
-		local table = table or {}
-		local d,h,m,s = ChatFrame_TimeBreakDown(floor(sec))
-		local string = gsub(gsub(format(" %dd %dh %dm "..((d==0 and h==0) and "%ds" or ""),d,h,m,s)," 0[dhms]"," "),"%s+"," ")
-		local string = strtrim(gsub(string, "([dhms])", {d=table.days or "d",h=table.hours or "h",m=table.minutes or "m",s=table.seconds or "s"})," ")
-		return strmatch(string,"^%s*$") and "0"..(table.seconds or L"s") or string
-	end
-
-	local int = 1
-	local function Update(self, t)
-		int = int - t
-		if int > 0 then return end
-		
-		local Hr, Min, AmPm = CalculateTimeValues()
-		
-		if CalendarGetNumPendingInvites() > 0 then
-			Text:SetTextColor(1, 0, 0)
-		else
-			Text:SetTextColor(1, 1, 1)
-		end
-		
-		-- no update quick exit
-		if (Hr == curHr and Min == curMin and AmPm == curAmPm) then
-			int = 2
-			return
-		end
-		
-		curHr = Hr
-		curMin = Min
-		curAmPm = AmPm
-			
-		if AmPm == -1 then
-			Text:SetFormattedText(europeDisplayFormat, Hr, Min)
-		else
-			Text:SetFormattedText(ukDisplayFormat, Hr, Min, hexa..APM[AmPm]..hexb)
-		end
-
-		self:SetAllPoints(Text)
-		int = 2
-	end
-
-	Stat:SetScript("OnEnter", function(self)
-		OnLoad = function(self) RequestRaidInfo() end
-		local anchor, panel, xoff, yoff = DataTextTooltipAnchor(Text)
-		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
-		GameTooltip:ClearLines()
-		GameTooltip:AddLine(hexa..myname.."'s"..hexb.." Time")
-		GameTooltip:AddLine' '	
-		local localizedName, isActive, canQueue, startTime, canEnter
-		for i = 1, GetNumWorldPVPAreas() do
-			_, localizedName, isActive, canQueue, startTime, canEnter = GetWorldPVPAreaInfo(i)
-			if canEnter then
-				if isActive then
-					startTime = WINTERGRASP_IN_PROGRESS
-				elseif startTime == nil then
-					startTime = QUEUE_TIME_UNAVAILABLE
-				else
-					local hour, min, sec = CalculateTimeLeft(startTime)
-					if hour > 0 then 
-						startTime = string.format(timerLongFormat, hour, min, sec) 
-					else 
-						startTime = string.format(timerShortFormat, min, sec)
-					end
-				end
-				GameTooltip:AddDoubleLine(format(formatBattleGroundInfo, localizedName), startTime)	
-			end
-		end	
-
-		local timeText
-		local Hr, Min, AmPm = CalculateTimeValues(true)
-
-		if datatext.localtime == true then
-			timeText = 'Server Time: '
-		else
-			timeText = 'Local Time: '
-		end
-		
-		if AmPm == -1 then
-			GameTooltip:AddDoubleLine(timeText, string.format(europeDisplayFormat, Hr, Min))
-		else
-			GameTooltip:AddDoubleLine(timeText, string.format(ukDisplayFormat, Hr, Min, APM[AmPm]))
-		end
-		
-		local oneraid, lockoutColor
-		for i = 1, GetNumSavedInstances() do
-			local name, _, reset, difficulty, locked, extended, _, isRaid, maxPlayers, _, numEncounters, encounterProgress  = GetSavedInstanceInfo(i)
-			if isRaid and (locked or extended) then
-				local tr,tg,tb,diff
-				if not oneraid then
-					GameTooltip:AddLine(" ")
-					GameTooltip:AddLine('Saved Raid(s)')
-					oneraid = true
-				end
-				if extended then lockoutColor = lockoutColorExtended else lockoutColor = lockoutColorNormal end
-				GameTooltip:AddDoubleLine(format(lockoutInfoFormat, name, maxPlayers, difficultyInfo[difficulty],encounterProgress,numEncounters), formatResetTime(reset), 1,1,1, lockoutColor.r,lockoutColor.g,lockoutColor.b)
-			end
-		end
-		GameTooltip:Show()
-	end)
-
-	Stat:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	Stat:RegisterEvent("CALENDAR_UPDATE_PENDING_INVITES")
-	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
-	Stat:SetScript("OnUpdate", Update)
-	Stat:RegisterEvent("UPDATE_INSTANCE_INFO")
-	Stat:SetScript("OnMouseDown", function(self, btn)
-		if btn == 'RightButton'  then
-			ToggleTimeManager()
-		else
-			GameTimeFrame:Click()
-		end
-	end)
-	Update(Stat, 10)
-end
-
----------------------------------------------------
--- Datatext for Zone Text
----------------------------------------------------
-if datatext.zone and datatext.zone > 0 then
-	local Stat = CreateFrame("Frame")
-	Stat:EnableMouse(true)
-	Stat:SetFrameStrata('BACKGROUND')
-	Stat:SetFrameLevel(3)
-
-	local Text = PanelLeft:CreateFontString(nil, "OVERLAY")
-	Text:SetFont(media.font, datatext.fontsize)
-	PP(datatext.zone, Text)
-
-	local function Update(self)
-		if GetMinimapZoneText() == "Putricide's Laboratory of Alchemical Horrors and Fun" then
-			Text:SetText("Putricides's Laboratory")
-		else
-			Text:SetText(hexa..GetMinimapZoneText()..hexb)
-		end
-	end
-
 	Stat:SetScript("OnUpdate", Update)
 	Update(Stat, 10)
 end
