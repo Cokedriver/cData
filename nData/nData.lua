@@ -81,18 +81,17 @@ function nData:SetDataPanel()
 	Datapanel:RegisterUnitEvent("PET_BATTLE_CLOSE")
 	Datapanel:RegisterUnitEvent("PLAYER_ENTERING_WORLD")
 
-	Datapanel:SetScript("OnEvent", function(self, event, ...)
-		if event == "UNIT_ENTERING_VEHICLE" or event == "PET_BATTLE_OPENING_START" then
-			self:Hide()
-		elseif event == "UNIT_EXITED_VEHICLE" or event == "PET_BATTLE_CLOSE" or event == "PLAYER_ENTERING_WORLD" then	
-			self:Show()
-		end
-	end)	
-	
 	if Adjust then	
-		Adjust:RegisterBottom(Datapanel)
+		Datapanel:SetScript("OnEvent", function(self, event, ...)
+			if event == "UNIT_ENTERING_VEHICLE" or event == "PET_BATTLE_OPENING_START" then
+				Adjust:Unregister(Datapanel)	
+				self:Hide()
+			elseif event == "UNIT_EXITED_VEHICLE" or event == "PET_BATTLE_CLOSE" or event == "PLAYER_ENTERING_WORLD" then	
+				Adjust:RegisterBottom(Datapanel)
+				self:Show()
+			end
+		end)	
 	end
-	
 		-- Move the tooltip above the Actionbar
 	hooksecurefunc('GameTooltip_SetDefaultAnchor', function(self)
 		self:SetPoint('BOTTOMRIGHT', UIParent, -95, 135)
