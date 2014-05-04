@@ -1,14 +1,24 @@
 ## Interface: 50400
-## Title: |cffCC3333n|rData
+## Title: |cffCC3333 n|rData
 ## Version: 5.4.7
 ## Author: Cokedriver
 ## SavedVariables: nDataDB
 ## SavedVariablesPerCharacter: nDataDBPerChar
 
-
-
 Libs\Libs.xml
 
 nData.lua
-Options.lua
-Datapanel.lua
+
+Plugins\Bags.lua
+Plugins\Battleground.lua
+Plugins\Call-To-Arms.lua
+Plugins\Coordinates.lua
+Plugins\Durability.lua
+Plugins\Friends.lua
+Plugins\Guild.lua
+Plugins\Professions.lua
+Plugins\Recount-DPS.lua
+Plugins\Spec.lua
+Plugins\Stat1.lua
+Plugins\Stat2.lua
+Plugins\System.lua

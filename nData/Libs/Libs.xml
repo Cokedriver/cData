@@ -16,4 +16,5 @@
 	<Include file="AceGUI-3.0-SharedMediaWidgets\widget.xml"/>
 	<Include file="LibAboutPanel\lib.xml"/>
 	<Script file="LibStub\tekShiner.lua"/>
+	<Script file="LibStub\LibBasicAdjust-1.0.lua"/>
 </Ui>

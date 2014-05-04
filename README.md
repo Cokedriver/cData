@@ -12,15 +12,6 @@ This is a stand alone data text bar that goes with Neav UI or Default Blizzard U
 ### Coordanents
  -- show your current coords on panel.
  
-### Currency
- -- show your tracked currency on panel.
- 
-### Damage Per Second
- -- show a dps meter on panel.
- 
-### Heals Per Second
- -- show a hps meter on panel.
- 
 ### Durability
  -- show your equipment durability on panel.
  
@@ -29,18 +20,12 @@ This is a stand alone data text bar that goes with Neav UI or Default Blizzard U
  
 ### Guild
  -- show number on guildmate connected on panel.
- 
-### Micromenu
- -- show the micromenu on panel.
- 
+
 ### Spec Switch
  -- show your current spec on panel.
  
 ### System
  -- show total fps/ms & memory usage info on panel.
- 
-### Zone
- -- show your current zone on panel.
  
 ### Profession
  -- show your current professions with mouse over on panel.
