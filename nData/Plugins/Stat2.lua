@@ -1,27 +1,11 @@
 local nData = LibStub("AceAddon-3.0"):GetAddon("nData")
 
 ------------------------------------------------------------------------
--- Constants (variables whose values are never altered):
-------------------------------------------------------------------------
-local _, class = UnitClass("player")
-local classColor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
-local PLAYER_NAME = UnitName("player")
---local playerRole
-------------------------------------------------------------------------
 --	 Statistics 2 Plugin Functions
 ------------------------------------------------------------------------
 nData.pluginConstructors["stat2"] = function()
 
 	db = nData.db.profile
-
-	if db.classcolor ~= true then
-		local r, g, b = db.customcolor.r, db.customcolor.g, db.customcolor.b
-		hexa = ("|cff%.2x%.2x%.2x"):format(r * 255, g * 255, b * 255)
-		hexb = "|r"
-	else
-		hexa = ("|cff%.2x%.2x%.2x"):format(classColor.r * 255, classColor.g * 255, classColor.b * 255)
-		hexb = "|r"
-	end		
 	
 	local plugin = CreateFrame('Frame', nil, Datapanel)
 	plugin:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -30,7 +14,7 @@ nData.pluginConstructors["stat2"] = function()
 	plugin:EnableMouse(true)
 
 	local Text  = plugin:CreateFontString(nil, "OVERLAY")
-	Text:SetFont(db.fontNormal, db.fontSize,'THINOUTLINE')
+	Text:SetFont(db.font, db.fontSize,'THINOUTLINE')
 	nData:PlacePlugin(db.stat2, Text)
 
 	local _G = getfenv(0)
@@ -75,32 +59,35 @@ nData.pluginConstructors["stat2"] = function()
 		GameTooltip:ClearLines()
 		GameTooltip:AddLine(hexa..PLAYER_NAME.."'s"..hexb.." Statistics")
 		GameTooltip:AddLine' '	
-		
-		if playerRole == "Tank" then
-			AddTooltipHeader("Mitigation By Level: ")
-			local lv = level +3
-			for i = 1, 4 do
-				GameTooltip:AddDoubleLine(lv,format(chanceString, CalculateMitigation(lv, effectiveArmor) * 100),1,1,1)
-				lv = lv - 1
+		if UnitLevel("player") >= 10 then
+			if playerRole == "Tank" then
+				AddTooltipHeader("Mitigation By Level: ")
+				local lv = level +3
+				for i = 1, 4 do
+					GameTooltip:AddDoubleLine(lv,format(chanceString, CalculateMitigation(lv, effectiveArmor) * 100),1,1,1)
+					lv = lv - 1
+				end
+				lv = UnitLevel("target")
+				if lv and lv > 0 and (lv > level + 3 or lv < level) then
+					GameTooltip:AddDoubleLine(lv, format(chanceString, CalculateMitigation(lv, effectiveArmor) * 100),1,1,1)
+				end	
+			elseif playerRole == "Caster" or playerRole == "Melee" then
+				AddTooltipHeader(MAGIC_RESISTANCES_COLON)
+				
+				local base, total, bonus, minus
+				for i = 2, 6 do
+					base, total, bonus, minus = UnitResistance("player", i)
+					GameTooltip:AddDoubleLine(_G["DAMAGE_SCHOOL"..(i+1)], format(chanceString, (total / (total + (500 + level + 2.5))) * 100),1,1,1)
+				end
+				
+				local spellpen = GetSpellPenetration()
+				if (UNIT_CLASS == "SHAMAN" or playerRole == "Caster") and spellpen > 0 then
+					GameTooltip:AddLine' '
+					GameTooltip:AddDoubleLine(ITEM_MOD_SPELL_PENETRATION_SHORT, spellpen,1,1,1)
+				end
 			end
-			lv = UnitLevel("target")
-			if lv and lv > 0 and (lv > level + 3 or lv < level) then
-				GameTooltip:AddDoubleLine(lv, format(chanceString, CalculateMitigation(lv, effectiveArmor) * 100),1,1,1)
-			end	
-		elseif playerRole == "Caster" or playerRole == "Melee" then
-			AddTooltipHeader(MAGIC_RESISTANCES_COLON)
-			
-			local base, total, bonus, minus
-			for i = 2, 6 do
-				base, total, bonus, minus = UnitResistance("player", i)
-				GameTooltip:AddDoubleLine(_G["DAMAGE_SCHOOL"..(i+1)], format(chanceString, (total / (total + (500 + level + 2.5))) * 100),1,1,1)
-			end
-			
-			local spellpen = GetSpellPenetration()
-			if (UNIT_CLASS == "SHAMAN" or playerRole == "Caster") and spellpen > 0 then
-				GameTooltip:AddLine' '
-				GameTooltip:AddDoubleLine(ITEM_MOD_SPELL_PENETRATION_SHORT, spellpen,1,1,1)
-			end
+		else 
+			GameTooltip:AddLine("No Stats Available unit Level 10")
 		end
 		GameTooltip:Show()
 	end
@@ -142,13 +129,16 @@ nData.pluginConstructors["stat2"] = function()
 	local function Update(self, t)
 		int = int - t
 		if int > 0 then return end
-		
-		if playerRole == "Tank" then
-			UpdateTank(self)
-		elseif playerRole == "Caster" then
-			UpdateCaster(self)
-		elseif playerRole == "Melee" then
-			UpdateMelee(self)		
+		if UnitLevel("player") >= 10 then
+			if playerRole == "Tank" then 
+				UpdateTank(self)
+			elseif playerRole == "Caster" then
+				UpdateCaster(self)
+			elseif playerRole == "Melee" then
+				UpdateMelee(self)
+			end
+		else
+			Text:SetText(hexa.."No Stats"..hexb)
 		end
 		int = 2
 	end

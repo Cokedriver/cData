@@ -10,13 +10,12 @@ end })
 ------------------------------------------------------------------------
 --	 nData Database
 ------------------------------------------------------------------------
-
 local db
 local defaults = {
 	profile = {
 		enable = true,
 		
-		fontNormal = 		[[Interface\Addons\nData\Media\NORMAL.ttf]],
+		font = [[Fonts\ARIALN.ttf]],
 		fontSize = 15,
 			
 		battleground = true,                            	-- enable 3 stats in battleground only that replace stat1,stat2,stat3.
@@ -45,70 +44,61 @@ local defaults = {
 }
 
 ------------------------------------------------------------------------
--- Constants (variables whose values are never altered):
-------------------------------------------------------------------------
-local GAME_LOCALE = GetLocale()
-local BACKGROUND = [[Interface\DialogFrame\UI-DialogBox-Background-Dark]]
-local BORDERPANEL = [[Interface\AddOns\nData\Media\UI-DialogBox-Border.blp]]
-
-
-------------------------------------------------------------------------
 -- Variables that point to frames or other objects:
 ------------------------------------------------------------------------
-local Datapanel, StatPanelLeft, StatPanelCenter, StatPanelRight, BGPanel
-local classColor, currentFightDPS
+local nDataMainPanel, nDataLeftStatPanel, nDataCenterStatPanel, nDataRightStatPanel, nDataBattleGroundStatPanel
+local currentFightDPS
+local _, class = UnitClass("player")
+local ccolor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
 
 ------------------------------------------------------------------------
 --	 nData Functions
 ------------------------------------------------------------------------
 
-function nData:SetDataPanel()
-
-	Datapanel = CreateFrame("Frame", "Datapanel", UIParent)
-
-	Datapanel:SetPoint("BOTTOM", UIParent, 0, 0)
-	Datapanel:SetWidth(1200)
-	Datapanel:SetFrameLevel(1)
-	Datapanel:SetHeight(35)
-	Datapanel:SetFrameStrata("LOW")
-	Datapanel:SetBackdrop({ bgFile = BACKGROUND, edgeFile = BORDERPANEL, edgeSize = 25, insets = { left = 5, right = 5, top = 5, bottom = 5 } })
-	Datapanel:SetBackdropColor(0, 0, 0, 1)
-
-	-- Hide Panels When in a Vehicle or Pet Battle
-	Datapanel:RegisterUnitEvent("UNIT_ENTERING_VEHICLE", "player")
-	Datapanel:RegisterUnitEvent("UNIT_EXITED_VEHICLE", "player")
-	Datapanel:RegisterUnitEvent("PET_BATTLE_OPENING_START")
-	Datapanel:RegisterUnitEvent("PET_BATTLE_CLOSE")
-	Datapanel:RegisterUnitEvent("PLAYER_ENTERING_WORLD")
-
-	if Adjust then	
-		Datapanel:SetScript("OnEvent", function(self, event, ...)
-			if event == "UNIT_ENTERING_VEHICLE" or event == "PET_BATTLE_OPENING_START" then
-				Adjust:Unregister(Datapanel)	
-				self:Hide()
-			elseif event == "UNIT_EXITED_VEHICLE" or event == "PET_BATTLE_CLOSE" or event == "PLAYER_ENTERING_WORLD" then	
-				Adjust:RegisterBottom(Datapanel)
-				self:Show()
-			end
-		end)	
-	end
-		-- Move the tooltip above the Actionbar
-	hooksecurefunc('GameTooltip_SetDefaultAnchor', function(self)
-		self:SetPoint('BOTTOMRIGHT', UIParent, -95, 135)
-	end)
-
-end
-
-function nData:SetStatPanelLeft()
-	StatPanelLeft = CreateFrame("Frame", nil, Datapanel)
-	StatPanelLeft:SetPoint("LEFT", Datapanel, 5, 0)
-	StatPanelLeft:SetHeight(35)
-	StatPanelLeft:SetWidth(1200 / 3)
-	StatPanelLeft:SetFrameStrata("MEDIUM")
-	StatPanelLeft:SetFrameLevel(1)
+function nData:CreatePanels()
+	if nDataMainPanel then return end -- already done
 	
-	StatPanelLeft:RegisterUnitEvent("PLAYER_ENTERING_WORLD")
-	StatPanelLeft:SetScript("OnEvent", function(self, event, ...)
+	-- Create All Panels
+	------------------------------------------------------------------------
+	nDataMainPanel = CreateFrame("Frame", "nDataMainPanel", UIParent)
+	nDataLeftStatPanel = CreateFrame("Frame", "nDataLeftStatPanel", nDataMainPanel)
+	nDataCenterStatPanel = CreateFrame("Frame", "nDataCenterStatPanel", nDataMainPanel)
+	nDataRightStatPanel = CreateFrame("Frame", "nDataRightStatPanel", nDataMainPanel)
+	nDataBattleGroundStatPanel = CreateFrame("Frame", "nDataBattleGroundStatPanel", nDataMainPanel)
+	
+	
+	-- Multi Panel Settings
+	------------------------------------------------------------------------
+	for _, panelz in pairs({
+		nDataMainPanel,
+		nDataLeftStatPanel,
+		nDataCenterStatPanel,
+		nDataRightStatPanel,
+		nDataBattleGroundStatPanel,
+	}) do
+		panelz:SetHeight(35)
+		panelz:SetFrameStrata("LOW")	
+		panelz:SetFrameLevel(1)
+	end
+
+	-- Main Panel Settings
+	------------------------------------------------------------------------
+	nDataMainPanel:SetPoint("BOTTOM", UIParent, 0, 0)
+	nDataMainPanel:SetWidth(1200)
+	nDataMainPanel:SetBackdrop({ 
+		bgFile = [[Interface\DialogFrame\UI-DialogBox-Background-Dark]], 
+		edgeFile = [[Interface\AddOns\nData\Media\UI-DialogBox-Border.blp]], 
+		edgeSize = 25, insets = { left = 5, right = 5, top = 5, bottom = 5 } 
+	})
+	nDataMainPanel:SetBackdropColor(0, 0, 0, 1)
+	
+	
+	-- Left Stat Panel Settings
+	------------------------------------------------------------------------
+	nDataLeftStatPanel:SetPoint("LEFT", nDataMainPanel, 5, 0)
+	nDataLeftStatPanel:SetWidth(1200 / 3)
+	nDataLeftStatPanel:RegisterUnitEvent("PLAYER_ENTERING_WORLD")
+	nDataLeftStatPanel:SetScript("OnEvent", function(self, event, ...)
 		if event == 'PLAYER_ENTERING_WORLD' then
 			local inInstance, instanceType = IsInInstance()
 			if inInstance and (instanceType == 'pvp') then			
@@ -117,31 +107,169 @@ function nData:SetStatPanelLeft()
 				self:Show()
 			end
 		end
-	end)
+	end)	
+	
+	-- Center Stat Panel Settings
+	-----------------------------------------------------------------------
+	nDataCenterStatPanel:SetPoint("CENTER", nDataMainPanel, 0, 0)
+	nDataCenterStatPanel:SetWidth(1200 / 3)
+	
+	-- Right Stat Panel Settings
+	-----------------------------------------------------------------------
+	nDataRightStatPanel:SetPoint("RIGHT", nDataMainPanel, -5, 0)
+	nDataRightStatPanel:SetWidth(1200 / 3)
+	
+	-- Battleground Stat Panel Settings
+	-----------------------------------------------------------------------
+	nDataBattleGroundStatPanel:SetAllPoints(nDataLeftStatPanel)
+	
+	-- Hide Panels When in a Vehicle or Pet Battle
+	------------------------------------------------------------------------
+	nDataMainPanel:RegisterUnitEvent("UNIT_ENTERING_VEHICLE", "player")
+	nDataMainPanel:RegisterUnitEvent("UNIT_EXITED_VEHICLE", "player")
+	nDataMainPanel:RegisterUnitEvent("PET_BATTLE_OPENING_START")
+	nDataMainPanel:RegisterUnitEvent("PET_BATTLE_CLOSE")
+	nDataMainPanel:RegisterUnitEvent("PLAYER_ENTERING_WORLD")
+	
+
+	if Adjust then	
+		nDataMainPanel:SetScript("OnEvent", function(self, event, ...)
+			if event == "UNIT_ENTERING_VEHICLE" or event == "PET_BATTLE_OPENING_START" then
+				Adjust:Unregister(nDataMainPanel)	
+				self:Hide()
+			elseif event == "UNIT_EXITED_VEHICLE" or event == "PET_BATTLE_CLOSE" or event == "PLAYER_ENTERING_WORLD" then	
+				Adjust:RegisterBottom(nDataMainPanel)
+				self:Show()
+			end
+		end)	
+	end
+
 end
 
-function nData:SetStatPanelCenter()	
-	StatPanelCenter = CreateFrame("Frame", nil, Datapanel)
-	StatPanelCenter:SetPoint("CENTER", Datapanel, 0, 0)
-	StatPanelCenter:SetHeight(35)
-	StatPanelCenter:SetWidth(1200 / 3)
-	StatPanelCenter:SetFrameStrata("MEDIUM")
-	StatPanelCenter:SetFrameLevel(1)
-end
+function nData:SetBattlegroundPanel()
+	
+	--Map IDs
+	local WSG = 443
+	local TP = 626
+	local AV = 401
+	local SOTA = 512
+	local IOC = 540
+	local EOTS = 482
+	local TBFG = 736
+	local AB = 461
 
-function nData:SetStatPanelRight()
-	StatPanelRight = CreateFrame("Frame", nil, Datapanel)
-	StatPanelRight:SetPoint("RIGHT", Datapanel, -5, 0)
-	StatPanelRight:SetHeight(35)
-	StatPanelRight:SetWidth(1200 / 3)
-	StatPanelRight:SetFrameStrata("MEDIUM")
-	StatPanelRight:SetFrameLevel(1)
+	nDataBattleGroundStatPanel:SetScript('OnEnter', function(self)
+		local numScores = GetNumBattlefieldScores()
+		for i=1, numScores do
+			local name, killingBlows, honorableKills, deaths, honorGained, faction, race, class, classToken, damageDone, healingDone, bgRating, ratingChange = GetBattlefieldScore(i)
+			if ( name ) then
+				if ( name == UnitName('player') ) then
+					GameTooltip:SetOwner(self, 'ANCHOR_TOPLEFT', 0, 4)
+					GameTooltip:ClearLines()
+					GameTooltip:SetPoint('BOTTOM', self, 'TOP', 0, 1)
+					GameTooltip:ClearLines()
+					GameTooltip:AddLine("Stats for : "..hexa..name..hexb)
+					GameTooltip:AddLine' '
+					GameTooltip:AddDoubleLine("Killing Blows:", killingBlows,1,1,1)
+					GameTooltip:AddDoubleLine("Honorable Kills:", honorableKills,1,1,1)
+					GameTooltip:AddDoubleLine("Deaths:", deaths,1,1,1)
+					GameTooltip:AddDoubleLine("Honor Gained:", format('%d', honorGained),1,1,1)
+					GameTooltip:AddDoubleLine("Damage Done:", damageDone,1,1,1)
+					GameTooltip:AddDoubleLine("Healing Done:", healingDone,1,1,1)
+					--Add extra statistics to watch based on what BG you are in.
+					if curmapid == WSG or curmapid == TP then 
+						GameTooltip:AddDoubleLine("Flags Captured:",GetBattlefieldStatData(i, 1),1,1,1)
+						GameTooltip:AddDoubleLine("Flags Returned:",GetBattlefieldStatData(i, 2),1,1,1)
+					elseif curmapid == EOTS then
+						GameTooltip:AddDoubleLine("Flags Captured:",GetBattlefieldStatData(i, 1),1,1,1)
+					elseif curmapid == AV then
+						GameTooltip:AddDoubleLine("Graveyards Assaulted:",GetBattlefieldStatData(i, 1),1,1,1)
+						GameTooltip:AddDoubleLine("Graveyards Defended:",GetBattlefieldStatData(i, 2),1,1,1)
+						GameTooltip:AddDoubleLine("Towers Assaulted:",GetBattlefieldStatData(i, 3),1,1,1)
+						GameTooltip:AddDoubleLine("Towers Defended:",GetBattlefieldStatData(i, 4),1,1,1)
+					elseif curmapid == SOTA then
+						GameTooltip:AddDoubleLine("Demolishers Destroyed:",GetBattlefieldStatData(i, 1),1,1,1)
+						GameTooltip:AddDoubleLine("Gates Destroyed:",GetBattlefieldStatData(i, 2),1,1,1)
+					elseif curmapid == IOC or curmapid == TBFG or curmapid == AB then
+						GameTooltip:AddDoubleLine("Bases Assaulted:",GetBattlefieldStatData(i, 1),1,1,1)
+						GameTooltip:AddDoubleLine("Bases Defended:",GetBattlefieldStatData(i, 2),1,1,1)
+					end					
+					GameTooltip:Show()
+				end
+			end
+		end
+	end) 
+	nDataBattleGroundStatPanel:SetScript('OnLeave', function(self) GameTooltip:Hide() end)
+
+	local f = CreateFrame('Frame', nil)
+	f:EnableMouse(true)
+
+	local Text1  = nDataBattleGroundStatPanel:CreateFontString(nil, 'OVERLAY')
+	Text1:SetFont(db.font, db.fontSize,'THINOUTLINE')
+	Text1:SetPoint('LEFT', nDataBattleGroundStatPanel, 30, 0)
+	Text1:SetHeight(nDataMainPanel:GetHeight())
+
+	local Text2  = nDataBattleGroundStatPanel:CreateFontString(nil, 'OVERLAY')
+	Text2:SetFont(db.font, db.fontSize,'THINOUTLINE')
+	Text2:SetPoint('CENTER', nDataBattleGroundStatPanel, 0, 0)
+	Text2:SetHeight(nDataMainPanel:GetHeight())
+
+	local Text3  = nDataBattleGroundStatPanel:CreateFontString(nil, 'OVERLAY')
+	Text3:SetFont(db.font, db.fontSize,'THINOUTLINE')
+	Text3:SetPoint('RIGHT', nDataBattleGroundStatPanel, -30, 0)
+	Text3:SetHeight(nDataMainPanel:GetHeight())
+
+	local int = 2
+	local function Update(self, t)
+		int = int - t
+		if int < 0 then
+			local dmgtxt
+			RequestBattlefieldScoreData()
+			local numScores = GetNumBattlefieldScores()
+			for i=1, numScores do
+				local name, killingBlows, honorableKills, deaths, honorGained, faction, race, class, classToken, damageDone, healingDone, bgRating, ratingChange = GetBattlefieldScore(i)
+				if healingDone > damageDone then
+					dmgtxt = ("Healing : "..hexa..healingDone..hexb)
+				else
+					dmgtxt = ("Damage : "..hexa..damageDone..hexb)
+				end
+				if ( name ) then
+					if ( name == PLAYER_NAME ) then
+						Text2:SetText("Honor : "..hexa..format('%d', honorGained)..hexb)
+						Text1:SetText(dmgtxt)
+						Text3:SetText("Killing Blows : "..hexa..killingBlows..hexb)
+					end   
+				end
+			end 
+			int  = 0
+		end
+	end
+
+	--hide text when not in an bg
+	local function OnEvent(self, event)
+		if event == 'PLAYER_ENTERING_WORLD' then
+			local inInstance, instanceType = IsInInstance()
+			if inInstance and (instanceType == 'pvp') then			
+				nDataBattleGroundStatPanel:Show()
+			else
+				Text1:SetText('')
+				Text2:SetText('')
+				Text3:SetText('')
+				nDataBattleGroundStatPanel:Hide()
+			end
+		end
+	end
+
+	f:RegisterEvent('PLAYER_ENTERING_WORLD')
+	f:SetScript('OnEvent', OnEvent)
+	f:SetScript('OnUpdate', Update)
+	Update(f, 10)
 end
 
 function nData:PlacePlugin(position, plugin)
-	local left = StatPanelLeft
-	local center = StatPanelCenter
-	local right = StatPanelRight
+	local left = nDataLeftStatPanel
+	local center = nDataCenterStatPanel
+	local right = nDataRightStatPanel
 
 	-- Left Panel Data
 	if position == "P1" then
@@ -212,9 +340,9 @@ function nData:DataTextTooltipAnchor(self)
 	
 	
 	for _, panel in pairs ({
-		StatPanelLeft,
-		StatPanelCenter,
-		StatPanelRight,
+		nDataLeftStatPanel,
+		nDataCenterStatPanel,
+		nDataRightStatPanel,
 	})	do
 		anchor = 'ANCHOR_TOP'
 	end	
@@ -227,21 +355,27 @@ function nData:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("nDataDB", defaults, true)
 	db = self.db.profile
 	
+	if not db.enable then return end
+	
 	self:SetUpOptions();
-
-	self.OnInitialize = nil	
+	self:CreatePanels() -- factor this giant blob out into its own function to keep things clean
 end
 
 function nData:OnEnable()
-	-- This line should not be needed if you're using modules correctly:
-	if not db.enable then return end
 
-	if db.enable then -- How is this different than "enable" ? If the panel is not enabled, what's the point of doing anything else?
-		self:CreatePanel() -- factor this giant blob out into its own function to keep things clean
-		self:Refresh()
-	end
+	local db = self.db.profile
+	PLAYER_NAME = UnitName("player")
 	
-		-- Rather than hardcode all the possible plugins here just use a nice table that you can add/remove stuff to much more easily. Scroll to the bottom to see it.
+	if db.classcolor ~= true then
+		local r, g, b = db.customcolor.r, db.customcolor.g, db.customcolor.b
+		hexa = ("|cff%.2x%.2x%.2x"):format(r * 255, g * 255, b * 255)
+		hexb = "|r"
+	else
+		hexa = ("|cff%.2x%.2x%.2x"):format(ccolor.r * 255, ccolor.g * 255, ccolor.b * 255)
+		hexb = "|r"
+	end		
+	
+	-- Rather than hardcode all the possible plugins here just use a nice table that you can add/remove stuff to much more easily. Scroll to the bottom to see it.
 	self.plugins = {}
 	for name, constructor in pairs(self.pluginConstructors) do
 		local position = db[name]
@@ -252,12 +386,20 @@ function nData:OnEnable()
 		end
 	end
 	
+	-- Move the tooltip above the Actionbar
+	hooksecurefunc('GameTooltip_SetDefaultAnchor', function(self)
+		self:SetPoint('BOTTOMRIGHT', UIParent, -95, 135)
+	end)
+	
 	-- no need to make a separate frame to handle events, your module object already does this!
 	self:UpdatePlayerRole()
-	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", "UpdatePlayerRole")	
+	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", "UpdatePlayerRole")
+	self:Refresh()
 end
 
 function nData:Refresh()
+	db = self.db.profile
+
 	if InCombatLockdown() then
 		return self:RegisterEvent("PLAYER_REGEN_ENABLED", "OnEnable")
 	end
@@ -273,33 +415,25 @@ function nData:SetFontString(parent, file, size, flags)
 	return fs
 end
 
-function nData:CreatePanel()
-
-	if Datapanel then return end -- already done
-	
-	-- Setup the Panels
-	self:SetDataPanel()
-	self:SetStatPanelLeft()
-	self:SetStatPanelCenter()
-	self:SetStatPanelRight()
-
-end
-
 function nData:UpdatePlayerRole()
-	local spec = GetSpecialization()
-	local specRole = GetSpecializationRole(spec) -- no need for a giant table that must be maintained by hand
-	if specRole == "TANK" then
-		playerRole = "Tank"
-	elseif specRole == "HEALER" then
-		playerRole = "Caster"
-	elseif specRole == "DAMAGER" then
-		if UnitPowerType("player") == SPELL_POWER_MANA then
+	if UnitLevel("player") >= 10 then
+		local spec = GetSpecialization()
+		local specRole = GetSpecializationRole(spec) -- no need for a giant table that must be maintained by hand
+		if specRole == "TANK" then
+			playerRole = "Tank"
+		elseif specRole == "HEALER" then
 			playerRole = "Caster"
-		else
-			playerRole = "Melee"
+		elseif specRole == "DAMAGER" then
+			if UnitPowerType("player") == SPELL_POWER_MANA then
+				playerRole = "Caster"
+			else
+				playerRole = "Melee"
+			end
+		elseif specRole == nil then
+			playerRole = nil -- no spec
 		end
 	else
-		playerRole = nil -- no spec
+		return
 	end
 end
 
@@ -366,29 +500,6 @@ function nData:GetOptions()
 				order = 1,
 				name = "nData",
 				args = {			
-					---------------------------
-					--Option Type Seperators
-					sep1 = {
-						type = "description",
-						order = 2,
-						name = " ",
-					},
-					sep2 = {
-						type = "description",
-						order = 3,
-						name = " ",
-					},
-					sep3 = {
-						type = "description",
-						order = 4,
-						name = " ",
-					},
-					sep4 = {
-						type = "description",
-						order = 5,
-						name = " ",
-					},
-					---------------------------
 					reloadUI = {
 						type = "execute",
 						name = "Reload UI",
@@ -409,19 +520,6 @@ function nData:GetOptions()
 						order = 1,
 						name = " ",
 						width = "full",
-					},
-					enable = {
-						type = "toggle",
-						order = 1,
-						name = L["Enable nData"],
-						width = "full"
-					},
-					time24 = {
-						type = "toggle",
-						order = 2,
-						name = L["24-Hour Time"],
-						desc = L["Display time datapanel on a 24 hour time scale"],
-						disabled = function() return  not db.enable end,
 					},
 					bag = {
 						type = "toggle",
@@ -447,8 +545,8 @@ function nData:GetOptions()
 					fontSize = {
 						type = "range",
 						order = 5,						
-						name = L["Game Font Size"],
-						desc = L["Controls the Size of the Game Font"],
+						name = L["Stat Font Size"],
+						desc = L["Controls the Size of the Stat Font"],
 						disabled = function() return not db.enable end,
 						min = 0, max = 30, step = 1,
 					},
@@ -462,36 +560,12 @@ function nData:GetOptions()
 					DataGroup = {
 						type = "group",
 						order = 6,
-						name = L["Text Positions"],
+						name = L["Stat Positions"],
 						guiInline  = true,
 						disabled = function() return  not db.enable end,
-						args = {
-							---------------------------
-							--Option Type Seperators
-							sep1 = {
-								type = "description",
-								order = 2,
-								name = " ",
-							},
-							sep2 = {
-								type = "description",
-								order = 3,
-								name = " ",
-							},
-							sep3 = {
-								type = "description",
-								order = 4,
-								name = " ",
-							},
-							sep4 = {
-								type = "description",
-								order = 5,
-								name = " ",
-							},
-							---------------------------							
+						args = {						
 							bags = {
 								type = "select",
-								order = 5,
 								name = L["Bags"],
 								desc = L["Display amount of bag space"],
 								values = statposition;
@@ -499,7 +573,6 @@ function nData:GetOptions()
 							},
 							calltoarms = {
 								type = "select",
-								order = 5,
 								name = L["Call to Arms"],
 								desc = L["Display the active roles that will recieve a reward for completing a random dungeon"],
 								values = statposition;
@@ -507,23 +580,13 @@ function nData:GetOptions()
 							},
 							coords = {
 								type = "select",
-								order = 5,
 								name = L["Coordinates"],
 								desc = L["Display Player's Coordinates"],
 								values = statposition;
 								disabled = function() return  not db.enable end,
 							},
-							dps_text = {
-								type = "select",
-								order = 5,
-								name = L["DPS"],
-								desc = L["Display amount of DPS"],
-								values = statposition;
-								disabled = function() return  not db.enable end,
-							},
 							dur = {
 								type = "select",
-								order = 5,
 								name = L["Durability"],
 								desc = L["Display your current durability"],
 								values = statposition;
@@ -531,7 +594,6 @@ function nData:GetOptions()
 							},
 							friends = {
 								type = "select",
-								order = 5,
 								name = L["Friends"],
 								desc = L["Display current online friends"],
 								values = statposition;
@@ -539,23 +601,13 @@ function nData:GetOptions()
 							},
 							guild = {
 								type = "select",
-								order = 5,
 								name = L["Guild"],
 								desc = L["Display current online people in guild"],
 								values = statposition;
 								disabled = function() return  not db.enable end,
 							},
-							hps_text = {
-								type = "select",
-								order = 5,
-								name = L["HPS"],
-								desc = L["Display amount of HPS"],
-								values = statposition;
-								disabled = function() return  not db.enable end,
-							},
 							pro = {
 								type = "select",
-								order = 5,
 								name = L["Professions"],
 								desc = L["Display Professions"],
 								values = statposition;
@@ -563,7 +615,6 @@ function nData:GetOptions()
 							},
 							recount = {
 								type = "select",
-								order = 5,
 								name = L["Recount"],
 								desc = L["Display Recount's DPS (RECOUNT MUST BE INSTALLED)"],
 								values = statposition;
@@ -571,7 +622,6 @@ function nData:GetOptions()
 							},
 							spec = {
 								type = "select",
-								order = 5,
 								name = L["Talent Spec"],
 								desc = L["Display current spec"],
 								values = statposition;
@@ -579,7 +629,6 @@ function nData:GetOptions()
 							},
 							stat1 = {
 								type = "select",
-								order = 5,
 								name = L["Stat #1"],
 								desc = L["Display stat based on your role (Avoidance-Tank, AP-Melee, SP/HP-Caster)"],
 								values = statposition;
@@ -587,7 +636,6 @@ function nData:GetOptions()
 							},
 							stat2 = {
 								type = "select",
-								order = 5,
 								name = L["Stat #2"],
 								desc = L["Display stat based on your role (Armor-Tank, Crit-Melee, Crit-Caster)"],
 								values = statposition;
@@ -595,7 +643,6 @@ function nData:GetOptions()
 							},
 							system = {
 								type = "select",
-								order = 5,
 								name = L["System"],
 								desc = L["Display FPS and Latency"],
 								values = statposition;

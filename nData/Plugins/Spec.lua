@@ -1,26 +1,11 @@
 local nData = LibStub("AceAddon-3.0"):GetAddon("nData")
 
 ------------------------------------------------------------------------
--- Constants (variables whose values are never altered):
-------------------------------------------------------------------------
-local _, class = UnitClass("player")
-local classColor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
-local PLAYER_NAME = UnitName("player")
-------------------------------------------------------------------------
 --	 Talent Spec Swap Plugin Functions
 ------------------------------------------------------------------------
 nData.pluginConstructors["spec"] = function()
 
 	db = nData.db.profile
-
-	if db.classcolor ~= true then
-		local r, g, b = db.customcolor.r, db.customcolor.g, db.customcolor.b
-		hexa = ("|cff%.2x%.2x%.2x"):format(r * 255, g * 255, b * 255)
-		hexb = "|r"
-	else
-		hexa = ("|cff%.2x%.2x%.2x"):format(classColor.r * 255, classColor.g * 255, classColor.b * 255)
-		hexb = "|r"
-	end		
 	
 	local plugin = CreateFrame('Frame', nil, Datapanel)
 	plugin:EnableMouse(true)
@@ -28,7 +13,7 @@ nData.pluginConstructors["spec"] = function()
 	plugin:SetFrameLevel(3)
 
 	local Text  = plugin:CreateFontString(nil, 'OVERLAY')
-	Text:SetFont(db.fontNormal, db.fontSize,'THINOUTLINE')
+	Text:SetFont(db.font, db.fontSize,'THINOUTLINE')
 	nData:PlacePlugin(db.spec, Text)
 
 	local talent = {}
@@ -50,15 +35,18 @@ nData.pluginConstructors["spec"] = function()
 
 	local int = 1
 	local function Update(self, t)
-		int = int - t
-		if int > 0 or not GetSpecialization() then return end
+		if UnitLevel("player") >= 10 then
+			int = int - t
+			if int > 0 or not GetSpecialization() then return end
+			active = GetActiveSpecGroup(false, false)
+			Text:SetFormattedText(talentString, hexa..select(2, GetSpecializationInfo(GetSpecialization(false, false, active)))..hexb)
+			int = 1
 
-		active = GetActiveSpecGroup(false, false)
-		Text:SetFormattedText(talentString, hexa..select(2, GetSpecializationInfo(GetSpecialization(false, false, active)))..hexb)
-		int = 1
-
-		-- disable script	
-		self:SetScript('OnUpdate', nil)
+			-- disable script	
+			self:SetScript('OnUpdate', nil)
+		else
+			Text:SetText(hexa.."No Spec"..hexb)
+		end
 	end
 
 
@@ -70,13 +58,16 @@ nData.pluginConstructors["spec"] = function()
 
 		GameTooltip:ClearLines()
 		GameTooltip:AddLine(hexa..PLAYER_NAME.."'s"..hexb.." Spec")
-		GameTooltip:AddLine' '		
-		for i = 1, GetNumSpecGroups() do
-			if GetSpecialization(false, false, i) then
-				GameTooltip:AddLine(string.join('- ', string.format(talentString, select(2, GetSpecializationInfo(GetSpecialization(false, false, i)))), (i == active and activeString or inactiveString)),1,1,1)
+		GameTooltip:AddLine' '
+		if UnitLevel("player") >= 10 then
+			for i = 1, GetNumSpecGroups() do
+				if GetSpecialization(false, false, i) then
+					GameTooltip:AddLine(string.join('- ', string.format(talentString, select(2, GetSpecializationInfo(GetSpecialization(false, false, i)))), (i == active and activeString or inactiveString)),1,1,1)
+				end
 			end
+		else
+			GameTooltip:AddLine("No Spec Available till Level 10.")
 		end
-		
 		GameTooltip:AddLine' '
 		GameTooltip:AddLine("|cffeda55fLeft Click|r to Switch Spec's")		
 		GameTooltip:AddLine("|cffeda55fRight Click|r to Open Talent Tree")

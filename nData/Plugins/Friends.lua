@@ -1,27 +1,12 @@
 local nData = LibStub("AceAddon-3.0"):GetAddon("nData")
 
 ------------------------------------------------------------------------
--- Constants (variables whose values are never altered):
-------------------------------------------------------------------------
-local _, class = UnitClass("player")
-local classColor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
-local PLAYER_NAME = UnitName("player")
-------------------------------------------------------------------------
 --	 Friends Plugin Functions
 ------------------------------------------------------------------------
 nData.pluginConstructors["friends"] = function()
 
 	db = nData.db.profile
 
-	if db.classcolor ~= true then
-		local r, g, b = db.customcolor.r, db.customcolor.g, db.customcolor.b
-		hexa = ("|cff%.2x%.2x%.2x"):format(r * 255, g * 255, b * 255)
-		hexb = "|r"
-	else
-		hexa = ("|cff%.2x%.2x%.2x"):format(classColor.r * 255, classColor.g * 255, classColor.b * 255)
-		hexb = "|r"
-	end		
-	
 	local _, _, _, broadcastText = BNGetInfo();
 	
 	StaticPopupDialogs["SET_BN_BROADCAST"] = {
@@ -59,7 +44,7 @@ nData.pluginConstructors["friends"] = function()
 	plugin:SetFrameLevel(3)
 
 	local Text  = plugin:CreateFontString(nil, "OVERLAY")
-	Text:SetFont(db.fontNormal, db.fontSize,'THINOUTLINE')
+	Text:SetFont(db.font, db.fontSize,'THINOUTLINE')
 	nData:PlacePlugin(db.friends, Text)
 
 	local menuFrame = CreateFrame("Frame", "FriendRightClickMenu", UIParent, "UIDropDownMenuTemplate")

@@ -1,27 +1,11 @@
 local nData = LibStub("AceAddon-3.0"):GetAddon("nData")
 
 ------------------------------------------------------------------------
--- Constants (variables whose values are never altered):
-------------------------------------------------------------------------
-local _, class = UnitClass("player")
-local classColor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
-local PLAYER_NAME = UnitName("player")
-
-------------------------------------------------------------------------
 --	 Statistics 1 Plugin Functions
 ------------------------------------------------------------------------
 nData.pluginConstructors["stat1"] = function()
 
 	db = nData.db.profile
-
-	if db.classcolor ~= true then
-		local r, g, b = db.customcolor.r, db.customcolor.g, db.customcolor.b
-		hexa = ("|cff%.2x%.2x%.2x"):format(r * 255, g * 255, b * 255)
-		hexb = "|r"
-	else
-		hexa = ("|cff%.2x%.2x%.2x"):format(classColor.r * 255, classColor.g * 255, classColor.b * 255)
-		hexb = "|r"
-	end		
 	
 	local plugin = CreateFrame('Frame', nil, Datapanel)
 	plugin:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -30,7 +14,7 @@ nData.pluginConstructors["stat1"] = function()
 	plugin:EnableMouse(true)
 
 	local Text  = plugin:CreateFontString(nil, "OVERLAY")
-	Text:SetFont(db.fontNormal, db.fontSize,'THINOUTLINE')
+	Text:SetFont(db.font, db.fontSize,'THINOUTLINE')
 	nData:PlacePlugin(db.stat1, Text)
 
 	local format = string.format
@@ -53,35 +37,38 @@ nData.pluginConstructors["stat1"] = function()
 		GameTooltip:ClearLines()
 		GameTooltip:AddLine(hexa..PLAYER_NAME.."'s"..hexb.." Statistics")
 		GameTooltip:AddLine' '		
-		
-		if playerRole == "Tank" then
-			if targetlv > 1 then
-				GameTooltip:AddDoubleLine("Avoidance Breakdown", string.join("", " (", "lvl", " ", targetlv, ")"))
-			elseif targetlv == -1 then
-				GameTooltip:AddDoubleLine("Avoidance Breakdown", string.join("", " (", "Boss", ")"))
-			else
-				GameTooltip:AddDoubleLine("Avoidance Breakdown", string.join("", " (", "lvl", " ", playerlv, ")"))
+		if UnitLevel("player") >= 10 then
+			if playerRole == "Tank" then
+				if targetlv > 1 then
+					GameTooltip:AddDoubleLine("Avoidance Breakdown", string.join("", " (", "lvl", " ", targetlv, ")"))
+				elseif targetlv == -1 then
+					GameTooltip:AddDoubleLine("Avoidance Breakdown", string.join("", " (", "Boss", ")"))
+				else
+					GameTooltip:AddDoubleLine("Avoidance Breakdown", string.join("", " (", "lvl", " ", playerlv, ")"))
+				end
+				GameTooltip:AddLine' '
+				GameTooltip:AddDoubleLine(DODGE_CHANCE, format(chanceString, dodge),1,1,1)
+				GameTooltip:AddDoubleLine(PARRY_CHANCE, format(chanceString, parry),1,1,1)
+				GameTooltip:AddDoubleLine(BLOCK_CHANCE, format(chanceString, block),1,1,1)
+				GameTooltip:AddDoubleLine(MISS_CHANCE, format(chanceString, basemisschance),1,1,1)
+			elseif playerRole == "Caster" then
+				GameTooltip:AddDoubleLine(STAT_HIT_CHANCE, format(modifierString, GetCombatRating(CR_HIT_SPELL), GetCombatRatingBonus(CR_HIT_SPELL)), 1, 1, 1)
+				GameTooltip:AddDoubleLine(STAT_HASTE, format(modifierString, GetCombatRating(CR_HASTE_SPELL), GetCombatRatingBonus(CR_HASTE_SPELL)), 1, 1, 1)
+				local base, combat = GetManaRegen()
+				GameTooltip:AddDoubleLine(MANA_REGEN, format(manaRegenString, base * 5, combat * 5), 1, 1, 1)
+			elseif playerRole == "Melee" then
+				local hit =  UNIT_CLASS == "HUNTER" and GetCombatRating(CR_HIT_RANGED) or GetCombatRating(CR_HIT_MELEE)
+				local hitBonus =  UNIT_CLASS == "HUNTER" and GetCombatRatingBonus(CR_HIT_RANGED) or GetCombatRatingBonus(CR_HIT_MELEE)
+			
+				GameTooltip:AddDoubleLine(STAT_HIT_CHANCE, format(modifierString, hit, hitBonus), 1, 1, 1)
+				
+				local haste = UNIT_CLASS == "HUNTER" and GetCombatRating(CR_HASTE_RANGED) or GetCombatRating(CR_HASTE_MELEE)
+				local hasteBonus = UNIT_CLASS == "HUNTER" and GetCombatRatingBonus(CR_HASTE_RANGED) or GetCombatRatingBonus(CR_HASTE_MELEE)
+				
+				GameTooltip:AddDoubleLine(STAT_HASTE, format(modifierString, haste, hasteBonus), 1, 1, 1)
 			end
-			GameTooltip:AddLine' '
-			GameTooltip:AddDoubleLine(DODGE_CHANCE, format(chanceString, dodge),1,1,1)
-			GameTooltip:AddDoubleLine(PARRY_CHANCE, format(chanceString, parry),1,1,1)
-			GameTooltip:AddDoubleLine(BLOCK_CHANCE, format(chanceString, block),1,1,1)
-			GameTooltip:AddDoubleLine(MISS_CHANCE, format(chanceString, basemisschance),1,1,1)
-		elseif playerRole == "Caster" then
-			GameTooltip:AddDoubleLine(STAT_HIT_CHANCE, format(modifierString, GetCombatRating(CR_HIT_SPELL), GetCombatRatingBonus(CR_HIT_SPELL)), 1, 1, 1)
-			GameTooltip:AddDoubleLine(STAT_HASTE, format(modifierString, GetCombatRating(CR_HASTE_SPELL), GetCombatRatingBonus(CR_HASTE_SPELL)), 1, 1, 1)
-			local base, combat = GetManaRegen()
-			GameTooltip:AddDoubleLine(MANA_REGEN, format(manaRegenString, base * 5, combat * 5), 1, 1, 1)
-		elseif playerRole == "Melee" then
-			local hit =  UNIT_CLASS == "HUNTER" and GetCombatRating(CR_HIT_RANGED) or GetCombatRating(CR_HIT_MELEE)
-			local hitBonus =  UNIT_CLASS == "HUNTER" and GetCombatRatingBonus(CR_HIT_RANGED) or GetCombatRatingBonus(CR_HIT_MELEE)
-		
-			GameTooltip:AddDoubleLine(STAT_HIT_CHANCE, format(modifierString, hit, hitBonus), 1, 1, 1)
-			
-			local haste = UNIT_CLASS == "HUNTER" and GetCombatRating(CR_HASTE_RANGED) or GetCombatRating(CR_HASTE_MELEE)
-			local hasteBonus = UNIT_CLASS == "HUNTER" and GetCombatRatingBonus(CR_HASTE_RANGED) or GetCombatRatingBonus(CR_HASTE_MELEE)
-			
-			GameTooltip:AddDoubleLine(STAT_HASTE, format(modifierString, haste, hasteBonus), 1, 1, 1)
+		else
+			GameTooltip:AddLine("No Stats Available unit Level 10")
 		end
 		
 		local masteryspell
@@ -190,12 +177,16 @@ nData.pluginConstructors["stat1"] = function()
 	local function Update(self, t)
 		int = int - t
 		if int > 0 then return end
-		if playerRole == "Tank" then 
-			UpdateTank(self)
-		elseif playerRole == "Caster" then
-			UpdateCaster(self)
-		elseif playerRole == "Melee" then
-			UpdateMelee(self)
+		if UnitLevel("player") >= 10 then
+			if playerRole == "Tank" then 
+				UpdateTank(self)
+			elseif playerRole == "Caster" then
+				UpdateCaster(self)
+			elseif playerRole == "Melee" then
+				UpdateMelee(self)
+			end
+		else
+			Text:SetText(hexa.."No Stats"..hexb)
 		end
 		int = 2
 	end

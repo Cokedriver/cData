@@ -1,12 +1,6 @@
 local nData = LibStub("AceAddon-3.0"):GetAddon("nData")
 
 ------------------------------------------------------------------------
--- Constants (variables whose values are never altered):
-------------------------------------------------------------------------
-local _, class = UnitClass("player")
-local classColor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
-local PLAYER_NAME = UnitName("player")
-------------------------------------------------------------------------
 --	 Guild Plugin Functions
 ------------------------------------------------------------------------
 local function RGBToHex(r, g, b)
@@ -30,22 +24,13 @@ nData.pluginConstructors["guild"] = function()
 
 	db = nData.db.profile
 
-	if db.classcolor ~= true then
-		local r, g, b = db.customcolor.r, db.customcolor.g, db.customcolor.b
-		hexa = ("|cff%.2x%.2x%.2x"):format(r * 255, g * 255, b * 255)
-		hexb = "|r"
-	else
-		hexa = ("|cff%.2x%.2x%.2x"):format(classColor.r * 255, classColor.g * 255, classColor.b * 255)
-		hexb = "|r"
-	end		
-	
 	local plugin = CreateFrame('Frame', nil, Datapanel)
 	plugin:EnableMouse(true)
 	plugin:SetFrameStrata("MEDIUM")
 	plugin:SetFrameLevel(3)
 
 	local Text  = plugin:CreateFontString(nil, "OVERLAY")
-	Text:SetFont(db.fontNormal, db.fontSize,'THINOUTLINE')
+	Text:SetFont(db.font, db.fontSize,'THINOUTLINE')
 	nData:PlacePlugin(db.guild, Text)
 
 	local tthead, ttsubh, ttoff = {r=0.4, g=0.78, b=1}, {r=0.75, g=0.9, b=1}, {r=.3,g=1,b=.3}

@@ -1,27 +1,12 @@
 local nData = LibStub("AceAddon-3.0"):GetAddon("nData")
 
 ------------------------------------------------------------------------
--- Constants (variables whose values are never altered):
-------------------------------------------------------------------------
-local _, class = UnitClass("player")
-local classColor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
-local PLAYER_NAME = UnitName("player")
-------------------------------------------------------------------------
 --	 Professions Plugin Functions
 ------------------------------------------------------------------------
 nData.pluginConstructors["pro"] = function()
 
 	db = nData.db.profile
 
-	if db.classcolor ~= true then
-		local r, g, b = db.customcolor.r, db.customcolor.g, db.customcolor.b
-		hexa = ("|cff%.2x%.2x%.2x"):format(r * 255, g * 255, b * 255)
-		hexb = "|r"
-	else
-		hexa = ("|cff%.2x%.2x%.2x"):format(classColor.r * 255, classColor.g * 255, classColor.b * 255)
-		hexb = "|r"
-	end		
-	
 	local plugin = CreateFrame('Button', nil, Datapanel)
 	plugin:RegisterEvent('PLAYER_ENTERING_WORLD')
 	plugin:SetFrameStrata('BACKGROUND')
@@ -30,17 +15,16 @@ nData.pluginConstructors["pro"] = function()
 	plugin.tooltip = false
 
 	local Text = plugin:CreateFontString(nil, 'OVERLAY')
-	Text:SetFont(db.fontNormal, db.fontSize,'THINOUTLINE')
+	Text:SetFont(db.font, db.fontSize,'THINOUTLINE')
 	nData:PlacePlugin(db.pro, Text)
 
 	local function Update(self)
-		for i = 1, select("#", GetProfessions()) do
-			local v = select(i, GetProfessions());
-			if v ~= nil then
-				local name, texture, rank, maxRank = GetProfessionInfo(v)
+		local prof1, prof2 = GetProfessions()
+			if prof1 ~= nil then
 				Text:SetFormattedText(hexa.."Professions"..hexb)
+			else
+				Text:SetFormattedText(hexa.."No Professions"..hexb)
 			end
-		end
 		self:SetAllPoints(Text)
 	end
 
@@ -72,32 +56,32 @@ nData.pluginConstructors["pro"] = function()
 		if btn == "LeftButton" then
 			if prof1 then
 				if (GetProfessionInfo(prof1) == ('Herbalism')) then
-					print('|cff00B4FFBasic|rUI: |cffFF0000Herbalism has no options!|r')
+					print('|cff33ff99nData:|r |cffFF0000Herbalism has no options!|r')
 				elseif(GetProfessionInfo(prof1) == ('Skinning')) then
-					print('|cff00B4FFBasic|rUI: |cffFF0000Skinning has no options!|r')
+					print('|cff33ff99nData:|r |cffFF0000Skinning has no options!|r')
 				elseif(GetProfessionInfo(prof1) == ('Mining')) then
 					CastSpellByName("Smelting")
 				else	
 					CastSpellByName((GetProfessionInfo(prof1)))
 				end
 			else
-				print('|cff00B4FFBasic|rUI: |cffFF0000No Profession Found!|r')
+				print('|cff33ff99nData:|r |cffFF0000No Profession Found!|r')
 			end
 		elseif btn == 'MiddleButton' then
-			ToggleSpellBook(BOOKTYPE_PROFESSION);	
+			ToggleSpellBook(BOOKTYPE_PROFESSION)	
 		elseif btn == "RightButton" then
 			if prof2 then
 				if (GetProfessionInfo(prof2) == ('Herbalism')) then
-					print('|cff00B4FFBasic|rUI: |cffFF0000Herbalism has no options!|r')
+					print('|cff33ff99nData:|r |cffFF0000Herbalism has no options!|r')
 				elseif(GetProfessionInfo(prof2) == ('Skinning')) then
-					print('|cff00B4FFBasic|rUI: |cffFF0000Skinning has no options!|r')
+					print('|cff33ff99nData:|r |cffFF0000Skinning has no options!|r')
 				elseif(GetProfessionInfo(prof2) == ('Mining')) then
 					CastSpellByName("Smelting")
 				else
 					CastSpellByName((GetProfessionInfo(prof2)))
 				end
 			else
-				print('|cff00B4FFBasic|rUI: |cffFF0000No Profession Found!|r')
+				print('|cff33ff99nData:|r |cffFF0000No Profession Found!|r')
 			end
 		end
 	end)
