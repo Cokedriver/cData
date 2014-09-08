@@ -122,7 +122,7 @@ nData.pluginConstructors["bags"] = function()
 			local anchor, panel, xoff, yoff = nData:DataTextTooltipAnchor(Text)
 			GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 			GameTooltip:ClearLines()
-			GameTooltip:AddLine(hexa..PLAYER_NAME.."'s"..hexb.." Gold")
+			GameTooltip:AddDoubleLine(hexa..PLAYER_NAME.."'s"..hexb.." Gold", formatMoney(OldMoney), 1, 1, 1, 1, 1, 1)
 			GameTooltip:AddLine' '			
 			GameTooltip:AddLine("This Session: ")				
 			GameTooltip:AddDoubleLine("Earned:", formatMoney(Profit), 1, 1, 1, 1, 1, 1)
@@ -132,7 +132,7 @@ nData.pluginConstructors["bags"] = function()
 			elseif (Profit-Spent)>0 then
 				GameTooltip:AddDoubleLine("Profit:", formatMoney(Profit-Spent), 0, 1, 0, 1, 1, 1)
 			end				
-			GameTooltip:AddDoubleLine("Total:", formatMoney(OldMoney), 1, 1, 1, 1, 1, 1)
+			--GameTooltip:AddDoubleLine("Total:", formatMoney(OldMoney), 1, 1, 1, 1, 1, 1)
 			GameTooltip:AddLine' '
 			
 			local totalGold = 0				
