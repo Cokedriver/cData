@@ -29,15 +29,14 @@ local defaults = {
 		
 		-- Stat Locations
 		bags			= "P9",		-- show space used in bags on panel.	
-		system 			= "P0",		-- show total memory and others systems info (FPS/MS) on panel.	
+		system 			= "P1",		-- show total memory and others systems info (FPS/MS) on panel.	
 		guild 			= "P4",		-- show number on guildmate connected on panel.
 		dur 			= "P8",		-- show your equipment durability on panel.
 		friends 		= "P6",		-- show number of friends connected.
 		spec 			= "P5",		-- show your current spec on panel.
 		coords 			= "P0",		-- show your current coords on panel.
 		pro 			= "P7",		-- shows your professions and tradeskills
-		stat1 			= "P1",		-- Stat Based on your Role (Avoidance-Tank, AP-Melee, SP/HP-Caster)
-		stat2 			= "P3",		-- Stat Based on your Role (Armor-Tank, Crit-Melee, Crit-Caster)
+		stats 			= "P3",		-- Stat Based on your Role (Avoidance-Tank, AP-Melee, SP/HP-Caster)
 		recount 		= "P2",		-- Stat Based on Recount"s DPS	
 		calltoarms 		= "P0",		-- Show Current Call to Arms.		
 	}
@@ -416,16 +415,22 @@ function nData:SetFontString(parent, file, size, flags)
 end
 
 function nData:UpdatePlayerRole()
+	
 	if UnitLevel("player") >= 10 then
+		local _, class = UnitClass("player")
 		local spec = GetSpecialization()
-		local specRole = GetSpecializationRole(spec) -- no need for a giant table that must be maintained by hand
+		local specRole = GetSpecializationRole(spec) -- no need for a giant table that must be maintained by hand		
 		if specRole == "TANK" then
 			playerRole = "Tank"
 		elseif specRole == "HEALER" then
 			playerRole = "Caster"
 		elseif specRole == "DAMAGER" then
 			if UnitPowerType("player") == SPELL_POWER_MANA then
-				playerRole = "Caster"
+				if (class == "PALADIN" and spec == 3) or (class == "SHAMAN" and spec == 2) then 
+					playerRole = "Melee"
+				else
+					playerRole = "Caster"
+				end
 			else
 				playerRole = "Melee"
 			end
@@ -627,17 +632,10 @@ function nData:GetOptions()
 								values = statposition;
 								disabled = function() return  not db.enable end,
 							},
-							stat1 = {
+							stats = {
 								type = "select",
-								name = L["Stat #1"],
+								name = L["Statistics"],
 								desc = L["Display stat based on your role (Avoidance-Tank, AP-Melee, SP/HP-Caster)"],
-								values = statposition;
-								disabled = function() return  not db.enable end,
-							},
-							stat2 = {
-								type = "select",
-								name = L["Stat #2"],
-								desc = L["Display stat based on your role (Armor-Tank, Crit-Melee, Crit-Caster)"],
 								values = statposition;
 								disabled = function() return  not db.enable end,
 							},

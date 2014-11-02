@@ -103,19 +103,6 @@ nData.pluginConstructors["guild"] = function()
 		end
 	end
 
-	local function UpdateGuildXP()
-		local currentXP, remainingXP = UnitGetGuildXP("player")
-		local nextLevelXP = currentXP + remainingXP
-		local percentTotal
-		if currentXP > 0 and nextLevelXP > 0  then
-			percentTotal = ceil((currentXP / nextLevelXP) * 100)
-		else 
-			percentTotal = 0
-		end
-		
-		guildXP[0] = { currentXP, nextLevelXP, percentTotal }
-	end
-
 	local function UpdateGuildMessage()
 		guildMotD = GetGuildRosterMOTD()
 	end
@@ -134,7 +121,6 @@ nData.pluginConstructors["guild"] = function()
 		
 			if not GuildFrame and IsInGuild() then 
 				LoadAddOn("Blizzard_GuildUI")
-				UpdateGuildXP() 
 				GuildRoster() 
 			end
 		end,
@@ -152,9 +138,6 @@ nData.pluginConstructors["guild"] = function()
 			end
 		end,
 		-- our guild xp changed, recalculate it	
-		["GUILD_XP_UPDATE"] = function (self, arg1)
-			UpdateGuildXP()
-		end,
 		["PLAYER_GUILD_UPDATE"] = function (self, arg1)
 			GuildRoster()
 		end,
@@ -247,7 +230,6 @@ nData.pluginConstructors["guild"] = function()
 		
 		local anchor, panel, xoff, yoff = nData:DataTextTooltipAnchor(Text)
 		local guildName, guildRank = GetGuildInfo('player')
-		local guildLevel = GetGuildLevel()
 		
 		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 		GameTooltip:ClearLines()		
@@ -255,24 +237,12 @@ nData.pluginConstructors["guild"] = function()
 		
 		SortGuildTable(IsShiftKeyDown())
 		
-		if guildName and guildRank and guildLevel then
-			GameTooltip:AddDoubleLine(format(guildInfoString, guildName, guildLevel), "Guild Rank - "..guildRank,tthead.r,tthead.g,tthead.b,tthead.r,tthead.g,tthead.b)
-		end
-		
 		if guildMotD ~= "" then 
 			GameTooltip:AddLine(' ')
 			GameTooltip:AddLine(format(guildMotDString, GUILD_MOTD, guildMotD), ttsubh.r, ttsubh.g, ttsubh.b, 1) 
 		end
 		
 		local col = RGBToHex(ttsubh.r, ttsubh.g, ttsubh.b)
-		if GetGuildLevel() ~= 25 then
-			if guildXP[0] then
-				local currentXP, nextLevelXP, percentTotal = unpack(guildXP[0])
-				
-				GameTooltip:AddLine(' ')
-				GameTooltip:AddLine(format(guildXpCurrentString, ShortValue(currentXP), ShortValue(nextLevelXP), percentTotal))
-			end
-		end
 		
 		local _, _, standingID, barMin, barMax, barValue = GetGuildFactionInfo()
 		if standingID ~= 8 then -- Not Max Rep
