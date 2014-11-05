@@ -33,20 +33,22 @@ nData.pluginConstructors["spec"] = function()
 		end
 	end
 
-	local int = 1
+	local int = 5
 	local function Update(self, t)
-		if UnitLevel("player") >= 10 then
-			int = int - t
-			if int > 0 or not GetSpecialization() then return end
-			active = GetActiveSpecGroup(false, false)
+		
+		int = int - t
+		if int > 0 then return end
+		active = GetActiveSpecGroup(false, false)
+		if nData.playerRole ~= nil then
 			Text:SetFormattedText(talentString, hexa..select(2, GetSpecializationInfo(GetSpecialization(false, false, active)))..hexb)
-			int = 1
-
-			-- disable script	
-			self:SetScript('OnUpdate', nil)
 		else
 			Text:SetText(hexa.."No Spec"..hexb)
 		end
+		int = 2
+
+		-- disable script	
+		--self:SetScript('OnUpdate', nil)
+		
 	end
 
 
@@ -59,14 +61,14 @@ nData.pluginConstructors["spec"] = function()
 		GameTooltip:ClearLines()
 		GameTooltip:AddLine(hexa..PLAYER_NAME.."'s"..hexb.." Spec")
 		GameTooltip:AddLine' '
-		if UnitLevel("player") >= 10 then
+		if nData.playerRole ~= nil then
 			for i = 1, GetNumSpecGroups() do
 				if GetSpecialization(false, false, i) then
 					GameTooltip:AddLine(string.join('- ', string.format(talentString, select(2, GetSpecializationInfo(GetSpecialization(false, false, i)))), (i == active and activeString or inactiveString)),1,1,1)
 				end
 			end
 		else
-			GameTooltip:AddLine("No Spec Available till Level 10.")
+			GameTooltip:AddLine("You have not chosen a Spec yet.")
 		end
 		GameTooltip:AddLine' '
 		GameTooltip:AddLine("|cffeda55fLeft Click|r to Switch Spec's")		

@@ -27,9 +27,10 @@ nData.pluginConstructors["stat1"] = function()
 		GameTooltip:ClearLines()
 		GameTooltip:AddLine(hexa..PLAYER_NAME.."'s"..hexb.." Statistics")
 		GameTooltip:AddLine' '		
-		if UnitLevel("player") > 10 then
-				
-			if playerRole == "Tank" then
+		if nData.playerRole == nil then
+			GameTooltip:AddLine("Choose a Specialization to see Stats")
+		else
+			if nData.playerRole == "TANK" then
 				local Total_Dodge = GetDodgeChance()
 				local Total_Parry = GetParryChance()
 				local Total_Block = GetBlockChance()
@@ -39,7 +40,7 @@ nData.pluginConstructors["stat1"] = function()
 				GameTooltip:AddDoubleLine(PARRY_CHANCE, format("%.2f%%", Total_Parry),1,1,1)
 				GameTooltip:AddDoubleLine(BLOCK_CHANCE, format("%.2f%%", Total_Block),1,1,1)				
 				
-			elseif playerRole == "Caster" then
+			elseif nData.playerRole == "HEALER" or nData.playerRole == "CASTER" then
 				local SC = GetSpellCritChance("2")
 				local Total_Spell_Haste = UnitSpellHaste("player")
 				local base, casting = GetManaRegen()
@@ -50,8 +51,7 @@ nData.pluginConstructors["stat1"] = function()
 				GameTooltip:AddDoubleLine(STAT_HASTE, format("%.2f%%", Total_Spell_Haste), 1, 1, 1)		
 				GameTooltip:AddDoubleLine(MANA_REGEN, format(manaRegenString, base * 5, casting * 5), 1, 1, 1)
 
-			elseif playerRole == "Melee" then
-			
+			elseif nData.playerRole == "DAMAGER" then			
 				if englishClass == "HUNTER" then
 					local Total_Range_Haste = GetRangedHaste("player")
 					local Range_Armor_Pen = GetArmorPenetration();
@@ -96,9 +96,9 @@ nData.pluginConstructors["stat1"] = function()
 			GameTooltip:AddDoubleLine(STAT_AVOIDANCE, format("%.2f%%", Avoidance), 1, 1, 1)
 			if GetCombatRating(CR_MASTERY) ~= 0 and GetSpecialization() then
 				if englishClass == "DRUID" then
-					if playerRole == "Melee" then
+					if nData.playerRole == "DAMAGER" and not nData.playerRole == "CASTER" then
 						masteryspell = select(2, GetSpecializationMasterySpells(GetSpecialization()))
-					elseif playerRole == "Tank" then
+					elseif nData.playerRole == "TANK" then
 						masteryspell = select(1, GetSpecializationMasterySpells(GetSpecialization()))
 					else
 						masteryspell = GetSpecializationMasterySpells(GetSpecialization())
@@ -114,8 +114,6 @@ nData.pluginConstructors["stat1"] = function()
 					GameTooltip:AddDoubleLine(masteryName, format("%.2f%%", Mastery), 1, 1, 1)
 				end
 			end			
-		else
-			GameTooltip:AddLine("No Stats Available unit Level 10")
 		end
 
 		GameTooltip:Show()
@@ -141,7 +139,7 @@ nData.pluginConstructors["stat1"] = function()
 		self:SetAllPoints(Text)
 	end
 
-	local function UpdateMelee(self)	
+	local function UpdateDamager(self)	
 		local displayNumberString = string.join("", "%s", "%d|r");
 			
 		if englishClass == "HUNTER" then
@@ -164,16 +162,16 @@ nData.pluginConstructors["stat1"] = function()
 	local function Update(self, t)
 		int = int - t
 		if int > 0 then return end
-		if UnitLevel("player") >= 10 then
-			if playerRole == "Tank" then 
-				UpdateTank(self)
-			elseif playerRole == "Caster" then
-				UpdateCaster(self)
-			elseif playerRole == "Melee" then
-				UpdateMelee(self)
-			end
-		else
+		if nData.playerRole == nil then
 			Text:SetText(hexa.."No Stats"..hexb)
+		else
+			if nData.playerRole == "TANK" then 
+				UpdateTank(self)
+			elseif nData.playerRole == "HEALER" or nData.playerRole == "CASTER" then
+				UpdateCaster(self)
+			elseif nData.playerRole == "DAMAGER" then
+				UpdateDamager(self)
+			end
 		end
 		int = 2
 	end

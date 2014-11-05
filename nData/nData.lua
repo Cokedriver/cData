@@ -414,32 +414,83 @@ function nData:SetFontString(parent, file, size, flags)
 	return fs
 end
 
-function nData:UpdatePlayerRole()
-	
-	if UnitLevel("player") >= 10 then
-		local _, class = UnitClass("player")
-		local spec = GetSpecialization()
-		local specRole = GetSpecializationRole(spec) -- no need for a giant table that must be maintained by hand		
-		if specRole == "TANK" then
-			playerRole = "Tank"
-		elseif specRole == "HEALER" then
-			playerRole = "Caster"
-		elseif specRole == "DAMAGER" then
-			if UnitPowerType("player") == SPELL_POWER_MANA then
-				if (class == "PALADIN" and spec == 3) or (class == "SHAMAN" and spec == 2) then 
-					playerRole = "Melee"
-				else
-					playerRole = "Caster"
-				end
-			else
-				playerRole = "Melee"
-			end
-		elseif specRole == nil then
-			playerRole = nil -- no spec
-		end
-	else
+local isCaster = {
+	-- All Classes are needed as to not cause a error when the table is called.
+	-- SpecID - Spec - Role
+	DEATHKNIGHT = {
+		nil, -- 250 - Blood - (TANK) 
+		nil, -- 251 - Frost - (MELEE_DPS)
+		nil, -- 252 - Unholy - (MELEE_DPS)
+	},
+	DRUID = { 
+		true, -- 102 - Balance - (CASTER_DPS)
+		nil,  -- 103 - Feral - (MELEE_DPS)
+		nil,  -- 104 Guardian - (TANK)
+		nil,  -- 105 Restoration - (HEALER)
+	},
+	HUNTER = {
+		nil, -- 253 - Beast Mastery - (RANGED_DPS)
+		nil, -- 254 - Marksmanship - (RANGED_DPS)
+		nil, -- 255 - Survival - (RANGED_DPS)
+	},
+	MAGE = { 
+		true, -- 62 - Arcane - (CASTER_DPS)
+		true, -- 63 - Fire - (CASTER_DPS)
+		true, -- 64 - Frost - (CASTER_DPS)
+	}, 
+	MONK = {
+		nil, -- 268 - Brewmaster - (TANK)
+		nil, -- 269 - Windwalker - (MELEE_DPS)
+		nil, -- 270 - Mistweaver - (HEALER)
+	}, 
+	PALADIN = {
+		nil, -- 65 - Holy - (HEALER)
+		nil, -- 66 - Protection - (TANK)
+		nil, -- 70 - Retribution - (MELEE_DPS)
+	},
+	PRIEST = { 
+		nil,  -- 256 - Discipline - (HEALER}
+		nil,  -- 257 - Holy - (HEALER)
+		true, -- 258 - Shadow - (CASTER_DPS)
+	},
+	ROGUE = {
+		nil, -- 259 - Assassination - (MELEE_DPS)
+		nil, -- 260 - Combat - (MELEE_DPS)
+		nil, -- 261 - Subtlety - (MELEE_DPS)
+	}, 
+	SHAMAN = { 
+		true, -- 262 - Elemental - (CASTER_DPS)
+		nil,  -- 263 - Enhancement - (MELEE_DPS)
+		nil,  -- 264 - Restoration - (HEALER)
+	},
+	WARLOCK = { 
+		true, -- 265 - Affliction - (CASTER_DPS)
+		true, -- 266 - Demonology - (CASTER_DPS)
+		true, -- 267 - Destruction - (CASTER_DPS)
+	}, 
+	WARRIOR = {
+		nil, -- 71 - Arms - (MELEE_DPS)
+		nil, -- 72 - Furry - (MELEE_DPS)
+		nil, -- 73 - Protection - (TANK)
+	},
+}
+
+function nData:UpdatePlayerRole()	
+	local spec = GetSpecialization()
+	if not spec then
+		self.playerRole = nil
 		return
 	end
+
+	local specRole = GetSpecializationRole(spec)
+	if specRole == "DAMAGER" then
+		if isCaster[class][spec] then
+			self.playerRole = "CASTER"
+			return
+		end
+	end
+
+	self.playerRole = specRole
 end
 
 function nData:SetUpOptions()
