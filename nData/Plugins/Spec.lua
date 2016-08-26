@@ -70,9 +70,8 @@ nData.pluginConstructors["spec"] = function()
 		else
 			GameTooltip:AddLine("You have not chosen a Spec yet.")
 		end
-		GameTooltip:AddLine' '
-		GameTooltip:AddLine("|cffeda55fLeft Click|r to Switch Spec's")		
-		GameTooltip:AddLine("|cffeda55fRight Click|r to Open Talent Tree")
+		GameTooltip:AddLine' '		
+		GameTooltip:AddLine("|cffeda55f Click|r to Open Talent Tree")
 		GameTooltip:Show()
 	end)
 
@@ -106,9 +105,7 @@ nData.pluginConstructors["spec"] = function()
 	plugin:SetScript('OnUpdate', Update)
 
 	plugin:SetScript("OnMouseDown", function(self, button)
-		if button == "LeftButton" then
-			SetActiveSpecGroup (active == 1 and 2 or 1)
-		elseif button == "RightButton" then
+		if button == "LeftButton" or "RightButton" then
 			ToggleTalentFrame()
 		end
 	end)

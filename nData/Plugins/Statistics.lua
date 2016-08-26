@@ -3,7 +3,7 @@ local nData = LibStub("AceAddon-3.0"):GetAddon("nData")
 ------------------------------------------------------------------------
 --	 Statistics Plugin Functions
 ------------------------------------------------------------------------
-nData.pluginConstructors["stat1"] = function()
+nData.pluginConstructors["stats"] = function()
 
 	db = nData.db.profile
 	
@@ -15,7 +15,7 @@ nData.pluginConstructors["stat1"] = function()
 
 	local Text  = plugin:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(db.font, db.fontSize,'THINOUTLINE')
-	nData:PlacePlugin(db.stat1, Text)
+	nData:PlacePlugin(db.stats, Text)
 
 	local playerClass, englishClass = UnitClass("player");
 
@@ -54,34 +54,42 @@ nData.pluginConstructors["stat1"] = function()
 			elseif nData.playerRole == "DAMAGER" then			
 				if englishClass == "HUNTER" then
 					local Total_Range_Haste = GetRangedHaste("player")
-					local Range_Armor_Pen = GetArmorPenetration();
+					--local Range_Armor_Pen = GetArmorPenetration();
 					local Range_Crit = GetRangedCritChance("25")
 					local speed = UnitRangedDamage("player")
 					local Total_Range_Speed = speed
 					
 					GameTooltip:AddLine(STAT_CATEGORY_RANGED)					
-					GameTooltip:AddDoubleLine("Armor Penetration", format("%.2f%%", Range_Armor_Pen), 1, 1, 1)
+					--GameTooltip:AddDoubleLine("Armor Penetration", format("%.2f%%", Range_Armor_Pen), 1, 1, 1)
 					GameTooltip:AddDoubleLine(STAT_CRITICAL_STRIKE, format("%.2f%%", Range_Crit), 1, 1, 1)	
 					GameTooltip:AddDoubleLine(STAT_HASTE, format("%.2f%%", Total_Range_Haste), 1, 1, 1)
 					GameTooltip:AddDoubleLine(STAT_ATTACK_SPEED, format("%.2f".." (sec)", Total_Range_Speed), 1, 1, 1)					
 				else
 					local Melee_Crit = GetCritChance("player")
-					local Melee_Armor_Pen = GetArmorPenetration();
+					--local Melee_Armor_Pen = GetArmorPenetration();
 					local Total_Melee_Haste = GetMeleeHaste("player")
 					local mainSpeed = UnitAttackSpeed("player");
 					local MH = mainSpeed
 					
 					GameTooltip:AddLine(STAT_CATEGORY_MELEE)
-					GameTooltip:AddDoubleLine("Armor Penetration", format("%.2f%%", Melee_Armor_Pen), 1, 1, 1)
+					--GameTooltip:AddDoubleLine("Armor Penetration", format("%.2f%%", Melee_Armor_Pen), 1, 1, 1)
 					GameTooltip:AddDoubleLine(STAT_CRITICAL_STRIKE, format("%.2f%%", Melee_Crit), 1, 1, 1)		
 					GameTooltip:AddDoubleLine(STAT_HASTE, format("%.2f%%", Total_Melee_Haste), 1, 1, 1)
 					GameTooltip:AddDoubleLine(STAT_ATTACK_SPEED, format("%.2f".." (sec)", MH), 1, 1, 1)
 				end
 			end
+			if GetCombatRating(CR_MASTERY) ~= 0 and GetSpecialization() then
+				local masteryspell = GetSpecializationMasterySpells(GetSpecialization())
+				local Mastery = GetMasteryEffect("player")
+				local masteryName, _, _, _, _, _, _, _, _ = GetSpellInfo(masteryspell)
+				if masteryName then
+					GameTooltip:AddDoubleLine(masteryName, format("%.2f%%", Mastery), 1, 1, 1)
+				end
+			end
+				
 			GameTooltip:AddLine' '
 			GameTooltip:AddLine(STAT_CATEGORY_GENERAL)
-			local masteryspell
-			local Multi_Strike = GetMultistrike();
+			
 			local Life_Steal = GetLifesteal();
 			--local Versatility = GetVersatility();
 			local Versatility_Damage_Bonus = GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE) + GetVersatilityBonus(CR_VERSATILITY_DAMAGE_DONE);
@@ -89,31 +97,10 @@ nData.pluginConstructors["stat1"] = function()
 			local bonusArmor, isNegatedForSpec = UnitBonusArmor("player");
 			
 			GameTooltip:AddDoubleLine(STAT_BONUS_ARMOR, format("%s", bonusArmor), 1, 1, 1)
-			GameTooltip:AddDoubleLine(STAT_MULTISTRIKE, format("%.2f%%", Multi_Strike), 1, 1, 1)
 			GameTooltip:AddDoubleLine(STAT_LIFESTEAL, format("%.2f%%", Life_Steal), 1, 1, 1)
 			GameTooltip:AddDoubleLine(STAT_VERSATILITY, format("%.2f%%", Versatility_Damage_Bonus), 1, 1, 1)
 			--GameTooltip:AddDoubleLine(STAT_VERSATILITY, format("%d", Versatility), 1, 1, 1)
-			GameTooltip:AddDoubleLine(STAT_AVOIDANCE, format("%.2f%%", Avoidance), 1, 1, 1)
-			if GetCombatRating(CR_MASTERY) ~= 0 and GetSpecialization() then
-				if englishClass == "DRUID" then
-					if nData.playerRole == "DAMAGER" and not nData.playerRole == "CASTER" then
-						masteryspell = select(2, GetSpecializationMasterySpells(GetSpecialization()))
-					elseif nData.playerRole == "TANK" then
-						masteryspell = select(1, GetSpecializationMasterySpells(GetSpecialization()))
-					else
-						masteryspell = GetSpecializationMasterySpells(GetSpecialization())
-					end
-				else
-					masteryspell = GetSpecializationMasterySpells(GetSpecialization())
-				end
-				
-
-				local Mastery = GetMasteryEffect("player")
-				local masteryName, _, _, _, _, _, _, _, _ = GetSpellInfo(masteryspell)
-				if masteryName then
-					GameTooltip:AddDoubleLine(masteryName, format("%.2f%%", Mastery), 1, 1, 1)
-				end
-			end			
+			GameTooltip:AddDoubleLine(STAT_AVOIDANCE, format("%.2f%%", Avoidance), 1, 1, 1)			
 		end
 
 		GameTooltip:Show()
