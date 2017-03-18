@@ -46,7 +46,7 @@ This is a stand alone data text bar that goes with Neav UI or Default Blizzard U
 
 There are 12 Stats included with cData but only 9 positions so you can choose which stats you want to see:
 
-[LIST=1
+[LIST=1]
 [*] [COLOR="SandyBrown"]Bags[/COLOR] = This stat shows Empty Bag space, the number text turns red when you have less then 10 empty slots, the tooltip shows your current realms total gold per player and what items you have checked to show in bags.
 [*] [COLOR="SandyBrown"]Call-To-Arms[/COLOR] = This stat shows what type of person is wanted for the Call To Arms Bonus (Tank, Healer or DPS). Clicking on this stat will open the LFG window.
 [*] [COLOR="SandyBrown"]Coordinates[/COLOR] = This stat shows the player's current coordinates.
