@@ -19,17 +19,18 @@ There are 12 Stats included with cData but only 9 positions so you can choose wh
 ### Professions
 * When moussed over this stat will show all the players current level of the 2 main professions and also show the players secondary professions like cooking, first aid, archeology, fishing. Left click of the stat opens the player's first main profession, middle click opens the professions tab int he spell book, and right click opens the player's second main profession.
 ### Recount 
-* This stat simply shows you your current DPS using Recount. In order for this to work you _MUST_ have [Recount](http://www.curse.com/addons/wow/recount) installed.
+* This stat simply shows you your current DPS using Recount. In order for this to work you **MUST** have [Recount](http://www.curse.com/addons/wow/recount) installed.
 ### Spec
 * This stat shows you your current spec. When the stat is clicked it will open your Specialization window. 
 ### Statatistics 
 * This stat is class specific. 
-+* Tank Class = Shows your current Armor. 
-+* Melee Class = Shows your current Attack Power. 
-+* Caster/Healer = Shows your current Spell Power. 
-+* Tooltip also changes per class.
+⋅⋅* Tank Class = Shows your current Armor. 
+⋅⋅* Melee Class = Shows your current Attack Power. 
+⋅⋅* Caster/Healer = Shows your current Spell Power. 
+⋅⋅* Tooltip also changes per class.
 
-### System This stat show your current FPS and MS.
+### System 
+* This stat show your current FPS and MS.
 
 
 In-Game Options make changing the stats you want to show as easy as clicking the dropdown selecting the position and then clicking the "ReloadUI" button.
@@ -45,5 +46,5 @@ Any feed back would be great.
 * [Treeston](http://www.mmo-champion.com/members/562614-Treeston) from MMO-Champions.
 * And Many others along the way.
 
-Thank you all for your help and understanding that one mans dream can become a reality.
-Cokedrivers
+##### Thank you all for your help and understanding that one mans dream can become a reality.
+##### Cokedrivers
