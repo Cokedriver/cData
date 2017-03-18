@@ -1,11 +1,11 @@
-local nData = LibStub("AceAddon-3.0"):GetAddon("nData")
+local cData = LibStub("AceAddon-3.0"):GetAddon("cData")
 
 ------------------------------------------------------------------------
 --	 System Settings Plugin Functions
 ------------------------------------------------------------------------
-nData.pluginConstructors["system"] = function()
+cData.pluginConstructors["system"] = function()
 
-	db = nData.db.profile
+	db = cData.db.profile
 	
 	local plugin = CreateFrame('Frame', nil, Datapanel)
 	plugin:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -16,7 +16,7 @@ nData.pluginConstructors["system"] = function()
 
 	local Text  = plugin:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(db.font, db.fontSize,'THINOUTLINE')
-	nData:PlacePlugin(db.system, Text)
+	cData:PlacePlugin(db.system, Text)
 
 	local bandwidthString = "%.2f Mbps"
 	local percentageString = "%.2f%%"
@@ -118,7 +118,7 @@ nData.pluginConstructors["system"] = function()
 		if InCombatLockdown() then return end
 		local bandwidth = GetAvailableBandwidth()
 		local _, _, latencyHome, latencyWorld = GetNetStats() 
-		local anchor, panel, xoff, yoff = nData:DataTextTooltipAnchor(Text)
+		local anchor, panel, xoff, yoff = cData:DataTextTooltipAnchor(Text)
 		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 		GameTooltip:ClearLines()
 		GameTooltip:AddLine(hexa..PLAYER_NAME.."'s"..hexb.." Latency")

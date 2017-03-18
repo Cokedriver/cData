@@ -1,11 +1,11 @@
-local nData = LibStub("AceAddon-3.0"):GetAddon("nData")
+local cData = LibStub("AceAddon-3.0"):GetAddon("cData")
 
 ------------------------------------------------------------------------
 --	 Bags Plugin Functions
 ------------------------------------------------------------------------
-nData.pluginConstructors["bags"] = function()
+cData.pluginConstructors["bags"] = function()
 
-	db = nData.db.profile
+	db = cData.db.profile
 	
 	local plugin = CreateFrame('Frame', nil, Datapanel)
 	plugin:EnableMouse(true)
@@ -14,7 +14,7 @@ nData.pluginConstructors["bags"] = function()
 
 	local Text = plugin:CreateFontString(nil, 'OVERLAY')
 	Text:SetFont(db.font, db.fontSize,'THINOUTLINE')
-	nData:PlacePlugin(db.bags, Text)
+	cData:PlacePlugin(db.bags, Text)
 
 	local Profit	= 0
 	local Spent		= 0
@@ -90,10 +90,10 @@ nData.pluginConstructors["bags"] = function()
 		self:SetAllPoints(Text)
 
 		local myPlayerName  = UnitName("player")				
-		if not nDataDB then nDataDB = {} end
-		if not nDataDB.gold then nDataDB.gold = {} end
-		if not nDataDB.gold[myPlayerRealm] then nDataDB.gold[myPlayerRealm]={} end
-		nDataDB.gold[myPlayerRealm][myPlayerName] = GetMoney()	
+		if not cDataDB then cDataDB = {} end
+		if not cDataDB.gold then cDataDB.gold = {} end
+		if not cDataDB.gold[myPlayerRealm] then cDataDB.gold[myPlayerRealm]={} end
+		cDataDB.gold[myPlayerRealm][myPlayerName] = GetMoney()	
 			
 		OldMoney = NewMoney	
 			
@@ -119,10 +119,10 @@ nData.pluginConstructors["bags"] = function()
 	plugin:SetScript('OnEvent', OnEvent)	
 	plugin:SetScript("OnEnter", function(self)
 		if not InCombatLockdown() then
-			local anchor, panel, xoff, yoff = nData:DataTextTooltipAnchor(Text)
+			local anchor, panel, xoff, yoff = cData:DataTextTooltipAnchor(Text)
 			GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 			GameTooltip:ClearLines()
-			GameTooltip:AddDoubleLine(hexa..PLAYER_NAME.."'s"..hexb.." Gold", formatMoney(OldMoney), 1, 1, 1, 1, 1, 1)
+			GameTooltip:AddDoubleLine(hexa..PLAYER_NAME.."'s"..hexb.."|cffffd700 Gold|r", formatMoney(OldMoney), 1, 1, 1, 1, 1, 1)
 			GameTooltip:AddLine' '			
 			GameTooltip:AddLine("This Session: ")				
 			GameTooltip:AddDoubleLine("Earned:", formatMoney(Profit), 1, 1, 1, 1, 1, 1)
@@ -137,7 +137,7 @@ nData.pluginConstructors["bags"] = function()
 			
 			local totalGold = 0				
 			GameTooltip:AddLine("Character's: ")			
-			local thisRealmList = nDataDB.gold[myPlayerRealm];
+			local thisRealmList = cDataDB.gold[myPlayerRealm];
 			for k,v in pairs(thisRealmList) do
 				GameTooltip:AddDoubleLine(k, formatMoney(v), 1, 1, 1, 1, 1, 1)
 				totalGold=totalGold+v;
@@ -168,9 +168,9 @@ nData.pluginConstructors["bags"] = function()
 		local myPlayerRealm = GetRealmName();
 		local myPlayerName  = UnitName("player");
 		
-		nDataDB.gold = {}
-		nDataDB.gold[myPlayerRealm]={}
-		nDataDB.gold[myPlayerRealm][myPlayerName] = GetMoney();
+		cDataDB.gold = {}
+		cDataDB.gold[myPlayerRealm]={}
+		cDataDB.gold[myPlayerRealm][myPlayerName] = GetMoney();
 	end
 	SLASH_RESETGOLD1 = "/resetgold"
 	SlashCmdList["RESETGOLD"] = RESETGOLD	

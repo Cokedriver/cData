@@ -1,4 +1,4 @@
-local nData = LibStub("AceAddon-3.0"):GetAddon("nData")
+local cData = LibStub("AceAddon-3.0"):GetAddon("cData")
 
 ------------------------------------------------------------------------
 --	 Guild Plugin Functions
@@ -20,9 +20,9 @@ local function ShortValue(v)
 	end
 end
 
-nData.pluginConstructors["guild"] = function()
+cData.pluginConstructors["guild"] = function()
 
-	db = nData.db.profile
+	db = cData.db.profile
 
 	local plugin = CreateFrame('Frame', nil, Datapanel)
 	plugin:EnableMouse(true)
@@ -31,7 +31,7 @@ nData.pluginConstructors["guild"] = function()
 
 	local Text  = plugin:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(db.font, db.fontSize,'THINOUTLINE')
-	nData:PlacePlugin(db.guild, Text)
+	cData:PlacePlugin(db.guild, Text)
 	
 	local join 		= string.join
 	local format 	= string.format
@@ -202,7 +202,7 @@ nData.pluginConstructors["guild"] = function()
 		menuList[3].menuList = {}
 
 		for i = 1, #guildTable do
-			if (guildTable[i][7] and guildTable[i][1] ~= nDatamyname) then
+			if (guildTable[i][7] and guildTable[i][1] ~= cDatamyname) then
 				local classc, levelc = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[guildTable[i][9]], GetQuestDifficultyColor(guildTable[i][3])
 
 				if UnitInParty(guildTable[i][1]) or UnitInRaid(guildTable[i][1]) then
@@ -228,7 +228,7 @@ nData.pluginConstructors["guild"] = function()
 		local total, _, online = GetNumGuildMembers()
 		if #guildTable == 0 then BuildGuildTable() end
 		
-		local anchor, panel, xoff, yoff = nData:DataTextTooltipAnchor(Text)
+		local anchor, panel, xoff, yoff = cData:DataTextTooltipAnchor(Text)
 		local guildName, guildRank = GetGuildInfo('player')
 		
 		GameTooltip:SetOwner(panel, anchor, xoff, yoff)

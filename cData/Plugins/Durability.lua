@@ -1,11 +1,11 @@
-local nData = LibStub("AceAddon-3.0"):GetAddon("nData")
+local cData = LibStub("AceAddon-3.0"):GetAddon("cData")
 
 ------------------------------------------------------------------------
 --	 Durability Plugin Functions
 ------------------------------------------------------------------------
-nData.pluginConstructors["dur"] = function()
+cData.pluginConstructors["dur"] = function()
 
-	db = nData.db.profile
+	db = cData.db.profile
 	
 	Slots = {
 		[1] = {1, "Head", 1000},
@@ -29,7 +29,7 @@ nData.pluginConstructors["dur"] = function()
 
 	local Text  = plugin:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(db.font, db.fontSize,'THINOUTLINE')
-	nData:PlacePlugin(db.dur, Text)
+	cData:PlacePlugin(db.dur, Text)
 
 	local function OnEvent(self)
 		local Total = 0
@@ -59,15 +59,23 @@ nData.pluginConstructors["dur"] = function()
 	plugin:RegisterEvent("UPDATE_INVENTORY_DURABILITY")
 	plugin:RegisterEvent("MERCHANT_SHOW")
 	plugin:RegisterEvent("PLAYER_ENTERING_WORLD")
-	plugin:SetScript("OnMouseDown", function() ToggleCharacter("PaperDollFrame") end)
+	plugin:SetScript("OnMouseDown",function(self,btn)
+		if btn == "LeftButton" then
+			ToggleCharacter("PaperDollFrame")
+		elseif btn == "RightButton" then
+			CastSpellByName("Traveler's Tundra Mammoth")
+		end
+	end)
 	plugin:SetScript("OnEvent", OnEvent)
 	plugin:SetScript("OnEnter", function(self)
 		if not InCombatLockdown() then
-			local anchor, panel, xoff, yoff = nData:DataTextTooltipAnchor(Text)
+			local anchor, panel, xoff, yoff = cData:DataTextTooltipAnchor(Text)
 			GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 			GameTooltip:ClearLines()
 			GameTooltip:AddLine(hexa..PLAYER_NAME.."'s"..hexb.." Durability")
-			GameTooltip:AddLine' '			
+			GameTooltip:AddLine' '
+			GameTooltip:AddDoubleLine("Current "..STAT_AVERAGE_ITEM_LEVEL, format("%.1f", GetAverageItemLevel("player")))
+			GameTooltip:AddLine' '
 			for i = 1, 11 do
 				if Slots[i][3] ~= 1000 then
 					local green, red
@@ -77,7 +85,8 @@ nData.pluginConstructors["dur"] = function()
 				end
 			end
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine("|cffeda55fClick|r to Show Character Panel")
+		GameTooltip:AddLine("|cffeda55fLeft Click|r opens Character Panel.")
+		GameTooltip:AddLine("|cffeda55fRight Click|r summon's Traveler's Tundra Mammoth.")
 		GameTooltip:Show()
 		end
 	end)

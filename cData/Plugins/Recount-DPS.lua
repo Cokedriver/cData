@@ -1,11 +1,11 @@
-local nData = LibStub("AceAddon-3.0"):GetAddon("nData")
+local cData = LibStub("AceAddon-3.0"):GetAddon("cData")
 
 ------------------------------------------------------------------------
 --	 Recount DPS Plugin Functions
 ------------------------------------------------------------------------
-nData.pluginConstructors["recount"] = function()
+cData.pluginConstructors["recount"] = function()
 
-	db = nData.db.profile
+	db = cData.db.profile
 	
 	local plugin = CreateFrame('Frame', nil, Datapanel)
 	plugin:EnableMouse(true)
@@ -14,7 +14,7 @@ nData.pluginConstructors["recount"] = function()
 
 	local Text  = plugin:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(db.font, db.fontSize,'THINOUTLINE')
-	nData:PlacePlugin(db.recount, Text)
+	cData:PlacePlugin(db.recount, Text)
 	plugin:SetAllPoints(Text)
 
 	function OnEvent(self, event, ...)
@@ -81,7 +81,7 @@ nData.pluginConstructors["recount"] = function()
 	plugin:SetScript("OnEnter", function(self)
 		if InCombatLockdown() then return end
 
-		local anchor, panel, xoff, yoff = nData:DataTextTooltipAnchor(Text)
+		local anchor, panel, xoff, yoff = cData:DataTextTooltipAnchor(Text)
 		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 		GameTooltip:ClearLines()
 		GameTooltip:AddLine(hexa..PLAYER_NAME.."'s"..hexb.." Damage")

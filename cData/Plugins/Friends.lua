@@ -1,12 +1,14 @@
-local nData = LibStub("AceAddon-3.0"):GetAddon("nData")
+local cData = LibStub("AceAddon-3.0"):GetAddon("cData")
 
 ------------------------------------------------------------------------
 --	 Friends Plugin Functions
 ------------------------------------------------------------------------
-nData.pluginConstructors["friends"] = function()
+cData.pluginConstructors["friends"] = function()
 
-	db = nData.db.profile
+	db = cData.db.profile
 
+
+	--Cache global variables
 	--Lua functions
 	local type, pairs, select = type, pairs, select
 	local sort, wipe = table.sort, wipe
@@ -79,7 +81,7 @@ nData.pluginConstructors["friends"] = function()
 
 	local Text  = plugin:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(db.font, db.fontSize,'THINOUTLINE')
-	nData:PlacePlugin(db.friends, Text)
+	cData:PlacePlugin(db.friends, Text)
 
 	local menuFrame = CreateFrame("Frame", "FriendDatatextRightClickMenu", UIParent, "UIDropDownMenuTemplate")
 	local menuList = {
@@ -316,12 +318,12 @@ nData.pluginConstructors["friends"] = function()
 			dataValid = true
 		end
 		if totalonline > 0 then
-			local anchor, panel, xoff, yoff = nData:DataTextTooltipAnchor(Text)
+			local anchor, panel, xoff, yoff = cData:DataTextTooltipAnchor(Text)
 			GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 			GameTooltip:ClearLines()
 			GameTooltip:AddDoubleLine(hexa..PLAYER_NAME.."'s"..hexb.." Friends", format(totalOnlineString, totalonline, totalfriends))
 			if onlineFriends > 0 then
-				local anchor, panel, xoff, yoff = nData:DataTextTooltipAnchor(Text)
+				local anchor, panel, xoff, yoff = cData:DataTextTooltipAnchor(Text)
 				GameTooltip:SetOwner(panel, anchor, xoff, yoff)		
 				GameTooltip:AddLine(' ')
 				GameTooltip:AddLine(worldOfWarcraftString)
@@ -360,7 +362,7 @@ nData.pluginConstructors["friends"] = function()
 									if UnitInParty(info[4]) or UnitInRaid(info[4]) then grouped = 1 else grouped = 2 end
 									GameTooltip:AddDoubleLine(format(levelNameString,levelc.r*255,levelc.g*255,levelc.b*255,info[15],classc.r*255,classc.g*255,classc.b*255,info[3],groupedTable[grouped], 255, 0, 0, statusTable[status]),info[2],238,238,238,238,238,238)
 									if IsShiftKeyDown() then
-										if E:GetZoneText(GetCurrentMapAreaID()) == info[14] then zonec = activezone else zonec = inactivezone end
+										if GetZoneText(GetCurrentMapAreaID()) == info[14] then zonec = activezone else zonec = inactivezone end
 										if GetRealmName() == info[10] then realmc = activezone else realmc = inactivezone end
 										GameTooltip:AddDoubleLine(info[14], info[10], zonec.r, zonec.g, zonec.b, realmc.r, realmc.g, realmc.b)
 									end

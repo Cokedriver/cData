@@ -1,11 +1,11 @@
-local nData = LibStub("AceAddon-3.0"):GetAddon("nData")
+local cData = LibStub("AceAddon-3.0"):GetAddon("cData")
 
 ------------------------------------------------------------------------
 --	 Talent Spec Swap Plugin Functions
 ------------------------------------------------------------------------
-nData.pluginConstructors["spec"] = function()
+cData.pluginConstructors["spec"] = function()
 
-	db = nData.db.profile
+	db = cData.db.profile
 	
 	local plugin = CreateFrame('Frame', nil, Datapanel)
 	plugin:EnableMouse(true)
@@ -14,7 +14,7 @@ nData.pluginConstructors["spec"] = function()
 
 	local Text  = plugin:CreateFontString(nil, 'OVERLAY')
 	Text:SetFont(db.font, db.fontSize,'THINOUTLINE')
-	nData:PlacePlugin(db.spec, Text)
+	cData:PlacePlugin(db.spec, Text)
 
 	local talent = {}
 	local active
@@ -39,7 +39,7 @@ nData.pluginConstructors["spec"] = function()
 		int = int - t
 		if int > 0 then return end
 		active = GetActiveSpecGroup(false, false)
-		if nData.playerRole ~= nil then
+		if cData.playerRole ~= nil then
 			Text:SetFormattedText(talentString, hexa..select(2, GetSpecializationInfo(GetSpecialization(false, false, active)))..hexb)
 		else
 			Text:SetText(hexa.."No Spec"..hexb)
@@ -55,13 +55,13 @@ nData.pluginConstructors["spec"] = function()
 	plugin:SetScript('OnEnter', function(self)
 		if InCombatLockdown() then return end
 
-		local anchor, panel, xoff, yoff = nData:DataTextTooltipAnchor(Text)
+		local anchor, panel, xoff, yoff = cData:DataTextTooltipAnchor(Text)
 		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 
 		GameTooltip:ClearLines()
 		GameTooltip:AddLine(hexa..PLAYER_NAME.."'s"..hexb.." Spec")
 		GameTooltip:AddLine' '
-		if nData.playerRole ~= nil then
+		if cData.playerRole ~= nil then
 			for i = 1, GetNumSpecGroups() do
 				if GetSpecialization(false, false, i) then
 					GameTooltip:AddLine(string.join('- ', string.format(talentString, select(2, GetSpecializationInfo(GetSpecialization(false, false, i)))), (i == active and activeString or inactiveString)),1,1,1)
@@ -71,7 +71,7 @@ nData.pluginConstructors["spec"] = function()
 			GameTooltip:AddLine("You have not chosen a Spec yet.")
 		end
 		GameTooltip:AddLine' '		
-		GameTooltip:AddLine("|cffeda55f Click|r to Open Talent Tree")
+		GameTooltip:AddLine("|cffeda55fClick|r to Open Talent Tree")
 		GameTooltip:Show()
 	end)
 
@@ -104,11 +104,7 @@ nData.pluginConstructors["spec"] = function()
 	plugin:SetScript('OnEvent', OnEvent)
 	plugin:SetScript('OnUpdate', Update)
 
-	plugin:SetScript("OnMouseDown", function(self, button)
-		if button == "LeftButton" or "RightButton" then
-			ToggleTalentFrame()
-		end
-	end)
+	plugin:SetScript("OnMouseDown", function() ToggleTalentFrame() end)
 
 	return plugin -- important!
 end

@@ -1,11 +1,11 @@
-local nData = LibStub("AceAddon-3.0"):GetAddon("nData")
+local cData = LibStub("AceAddon-3.0"):GetAddon("cData")
 
 ------------------------------------------------------------------------
 --	 Statistics Plugin Functions
 ------------------------------------------------------------------------
-nData.pluginConstructors["stats"] = function()
+cData.pluginConstructors["stats"] = function()
 
-	db = nData.db.profile
+	db = cData.db.profile
 	
 	local plugin = CreateFrame('Frame', nil, Datapanel)
 	plugin:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -15,22 +15,22 @@ nData.pluginConstructors["stats"] = function()
 
 	local Text  = plugin:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(db.font, db.fontSize,'THINOUTLINE')
-	nData:PlacePlugin(db.stats, Text)
+	cData:PlacePlugin(db.stats, Text)
 
 	local playerClass, englishClass = UnitClass("player");
 
 	local function ShowTooltip(self)
 		if InCombatLockdown() then return end
 	
-		local anchor, panel, xoff, yoff = nData:DataTextTooltipAnchor(Text)
+		local anchor, panel, xoff, yoff = cData:DataTextTooltipAnchor(Text)
 		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 		GameTooltip:ClearLines()
 		GameTooltip:AddLine(hexa..PLAYER_NAME.."'s"..hexb.." Statistics")
 		GameTooltip:AddLine' '		
-		if nData.playerRole == nil then
+		if cData.playerRole == nil then
 			GameTooltip:AddLine("Choose a Specialization to see Stats")
 		else
-			if nData.playerRole == "TANK" then
+			if cData.playerRole == "TANK" then
 				local Total_Dodge = GetDodgeChance()
 				local Total_Parry = GetParryChance()
 				local Total_Block = GetBlockChance()
@@ -40,7 +40,7 @@ nData.pluginConstructors["stats"] = function()
 				GameTooltip:AddDoubleLine(PARRY_CHANCE, format("%.2f%%", Total_Parry),1,1,1)
 				GameTooltip:AddDoubleLine(BLOCK_CHANCE, format("%.2f%%", Total_Block),1,1,1)				
 				
-			elseif nData.playerRole == "HEALER" or nData.playerRole == "CASTER" then
+			elseif cData.playerRole == "HEALER" or cData.playerRole == "CASTER" then
 				local SC = GetSpellCritChance("2")
 				local Total_Spell_Haste = UnitSpellHaste("player")
 				local base, casting = GetManaRegen()
@@ -51,7 +51,7 @@ nData.pluginConstructors["stats"] = function()
 				GameTooltip:AddDoubleLine(STAT_HASTE, format("%.2f%%", Total_Spell_Haste), 1, 1, 1)		
 				GameTooltip:AddDoubleLine(MANA_REGEN, format(manaRegenString, base * 5, casting * 5), 1, 1, 1)
 
-			elseif nData.playerRole == "DAMAGER" then			
+			elseif cData.playerRole == "DAMAGER" then			
 				if englishClass == "HUNTER" then
 					local Total_Range_Haste = GetRangedHaste("player")
 					--local Range_Armor_Pen = GetArmorPenetration();
@@ -149,14 +149,14 @@ nData.pluginConstructors["stats"] = function()
 	local function Update(self, t)
 		int = int - t
 		if int > 0 then return end
-		if nData.playerRole == nil then
+		if cData.playerRole == nil then
 			Text:SetText(hexa.."No Stats"..hexb)
 		else
-			if nData.playerRole == "TANK" then 
+			if cData.playerRole == "TANK" then 
 				UpdateTank(self)
-			elseif nData.playerRole == "HEALER" or nData.playerRole == "CASTER" then
+			elseif cData.playerRole == "HEALER" or cData.playerRole == "CASTER" then
 				UpdateCaster(self)
-			elseif nData.playerRole == "DAMAGER" then
+			elseif cData.playerRole == "DAMAGER" then
 				UpdateDamager(self)
 			end
 		end

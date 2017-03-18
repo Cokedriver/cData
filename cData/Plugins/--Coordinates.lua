@@ -1,11 +1,11 @@
-local nData = LibStub("AceAddon-3.0"):GetAddon("nData")
+local cData = LibStub("AceAddon-3.0"):GetAddon("cData")
 
 ------------------------------------------------------------------------
 --	 Coordinates Plugin Functions
 ------------------------------------------------------------------------
-nData.pluginConstructors["coords"] = function()
+cData.pluginConstructors["coords"] = function()
 
-	db = nData.db.profile
+	db = cData.db.profile
 
 	local plugin = CreateFrame('Frame', nil, Datapanel)
 	plugin:EnableMouse(true)
@@ -14,11 +14,11 @@ nData.pluginConstructors["coords"] = function()
 
 	local Text = plugin:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(db.font, db.fontSize,'THINOUTLINE')
-	nData:PlacePlugin(db.coords, Text)
+	cData:PlacePlugin(db.coords, Text)
 
 	local function Update(self)
-	local px,py=GetPlayerMapPosition("player")
-		Text:SetText(format(hexa.."Loc: "..hexb.."%i , %i",px*100,py*100))
+	local px, py = GetPlayerMapPosition("player")	
+ 			Text:SetText(format(hexa.."Loc: "..hexb..': %.0f x %.0f', px * 100, py * 100))
 	end
 
 	plugin:SetScript("OnUpdate", Update)

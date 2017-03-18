@@ -1,9 +1,10 @@
-## Interface: 70000
-## Title: |cffCC3333 n|rData
-## Version: 7.0.0
+## Interface: 70100
+## Title: cData
+## Notes: Cokedriver's Data Panel Addon
+## Version: 7.1.0
 ## Author: Cokedriver
-## SavedVariables: nDataDB
-## SavedVariablesPerCharacter: nDataDBPerChar
+## SavedVariables: cDataDB
+## SavedVariablesPerCharacter: cDataDBPerChar
 
 
 Libs\LibStub\LibStub.lua
@@ -25,7 +26,7 @@ Libs\AceSerializer-3.0\AceSerializer-3.0.xml
 Libs\LibBasicAdjust-1.0.lua
 Libs\tekShiner.lua
 
-nData.lua
+cData.lua
 
 Plugins\Bags.lua
 Plugins\Battleground.lua

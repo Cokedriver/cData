@@ -1,11 +1,11 @@
-local nData = LibStub("AceAddon-3.0"):GetAddon("nData")
+local cData = LibStub("AceAddon-3.0"):GetAddon("cData")
 
 ------------------------------------------------------------------------
 --	 Call-To-Arms Plugin Functions
 ------------------------------------------------------------------------
-nData.pluginConstructors["calltoarms"] = function()
+cData.pluginConstructors["calltoarms"] = function()
 
-	db = nData.db.profile	
+	db = cData.db.profile	
 	
 	local plugin = CreateFrame('Frame', nil, Datapanel)
 	plugin:EnableMouse(true)
@@ -14,7 +14,7 @@ nData.pluginConstructors["calltoarms"] = function()
 
 	local Text  = plugin:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(db.font, db.fontSize,'THINOUTLINE')
-	nData:PlacePlugin(db.calltoarms, Text)
+	cData:PlacePlugin(db.calltoarms, Text)
 	
 	local function MakeIconString(tank, healer, damage)
 		local str = ""
@@ -74,7 +74,7 @@ nData.pluginConstructors["calltoarms"] = function()
 	local function OnEnter(self)
 		if InCombatLockdown() then return end
 	
-		local anchor, panel, xoff, yoff = nData:DataTextTooltipAnchor(Text)
+		local anchor, panel, xoff, yoff = cData:DataTextTooltipAnchor(Text)
 		GameTooltip:SetOwner(panel, anchor, xoff, yoff)
 		GameTooltip:ClearLines()
 		GameTooltip:AddLine(hexa..PLAYER_NAME.."'s"..hexb.." Call to Arms")

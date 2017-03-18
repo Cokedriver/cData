@@ -1,4 +1,4 @@
-local nData = LibStub("AceAddon-3.0"):NewAddon("nData", "AceEvent-3.0")
+local cData = LibStub("AceAddon-3.0"):NewAddon("cData", "AceEvent-3.0")
 local Adjust = LibStub:GetLibrary("LibBasicAdjust-1.0", true)
 local L = setmetatable({}, { __index = function(t,k)
 	local v = tostring(k)
@@ -8,14 +8,14 @@ end })
 
 
 ------------------------------------------------------------------------
---	 nData Database
+--	 cData Database
 ------------------------------------------------------------------------
 local db
 local defaults = {
 	profile = {
 		enable = true,
 		
-		font = [[Fonts\ARIALN.ttf]],
+		font = [[Fonts\FRIZQT__.ttf]],
 		fontSize = 15,
 			
 		battleground = true,                            	-- enable 3 stats in battleground only that replace stat1,stat2,stat3.
@@ -45,35 +45,35 @@ local defaults = {
 ------------------------------------------------------------------------
 -- Variables that point to frames or other objects:
 ------------------------------------------------------------------------
-local nDataMainPanel, nDataLeftStatPanel, nDataCenterStatPanel, nDataRightStatPanel, nDataBattleGroundStatPanel
+local cDataMainPanel, cDataLeftStatPanel, cDataCenterStatPanel, cDataRightStatPanel, cDataBattleGroundStatPanel
 local currentFightDPS
 local _, class = UnitClass("player")
 local ccolor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
 
 ------------------------------------------------------------------------
---	 nData Functions
+--	 cData Functions
 ------------------------------------------------------------------------
 
-function nData:CreatePanels()
-	if nDataMainPanel then return end -- already done
+function cData:CreatePanels()
+	if cDataMainPanel then return end -- already done
 	
 	-- Create All Panels
 	------------------------------------------------------------------------
-	nDataMainPanel = CreateFrame("Frame", "nDataMainPanel", UIParent)
-	nDataLeftStatPanel = CreateFrame("Frame", "nDataLeftStatPanel", nDataMainPanel)
-	nDataCenterStatPanel = CreateFrame("Frame", "nDataCenterStatPanel", nDataMainPanel)
-	nDataRightStatPanel = CreateFrame("Frame", "nDataRightStatPanel", nDataMainPanel)
-	nDataBattleGroundStatPanel = CreateFrame("Frame", "nDataBattleGroundStatPanel", nDataMainPanel)
+	cDataMainPanel = CreateFrame("Frame", "cDataMainPanel", UIParent)
+	cDataLeftStatPanel = CreateFrame("Frame", "cDataLeftStatPanel", cDataMainPanel)
+	cDataCenterStatPanel = CreateFrame("Frame", "cDataCenterStatPanel", cDataMainPanel)
+	cDataRightStatPanel = CreateFrame("Frame", "cDataRightStatPanel", cDataMainPanel)
+	cDataBattleGroundStatPanel = CreateFrame("Frame", "cDataBattleGroundStatPanel", cDataMainPanel)
 	
 	
 	-- Multi Panel Settings
 	------------------------------------------------------------------------
 	for _, panelz in pairs({
-		nDataMainPanel,
-		nDataLeftStatPanel,
-		nDataCenterStatPanel,
-		nDataRightStatPanel,
-		nDataBattleGroundStatPanel,
+		cDataMainPanel,
+		cDataLeftStatPanel,
+		cDataCenterStatPanel,
+		cDataRightStatPanel,
+		cDataBattleGroundStatPanel,
 	}) do
 		panelz:SetHeight(35)
 		panelz:SetFrameStrata("LOW")	
@@ -82,22 +82,22 @@ function nData:CreatePanels()
 
 	-- Main Panel Settings
 	------------------------------------------------------------------------
-	nDataMainPanel:SetPoint("BOTTOM", UIParent, 0, 0)
-	nDataMainPanel:SetWidth(1200)
-	nDataMainPanel:SetBackdrop({ 
-		bgFile = [[Interface\DialogFrame\UI-DialogBox-Background-Dark]], 
-		edgeFile = [[Interface\AddOns\nData\Media\UI-DialogBox-Border.blp]], 
+	cDataMainPanel:SetPoint("BOTTOM", UIParent, 0, 0)
+	cDataMainPanel:SetWidth(1200)
+	cDataMainPanel:SetBackdrop({ 
+		bgFile = [[Interface\ChatFrame\ChatFrameBackground]], 
+		edgeFile = [[Interface\AddOns\cData\Media\UI-DialogBox-Border.blp]], 
 		edgeSize = 25, insets = { left = 5, right = 5, top = 5, bottom = 5 } 
 	})
-	nDataMainPanel:SetBackdropColor(0, 0, 0, 1)
+	cDataMainPanel:SetBackdropColor(0, 0, 0, 1)
 	
 	
 	-- Left Stat Panel Settings
 	------------------------------------------------------------------------
-	nDataLeftStatPanel:SetPoint("LEFT", nDataMainPanel, 5, 0)
-	nDataLeftStatPanel:SetWidth(1200 / 3)
-	nDataLeftStatPanel:RegisterUnitEvent("PLAYER_ENTERING_WORLD")
-	nDataLeftStatPanel:SetScript("OnEvent", function(self, event, ...)
+	cDataLeftStatPanel:SetPoint("LEFT", cDataMainPanel, 5, 0)
+	cDataLeftStatPanel:SetWidth(1200 / 3)
+	cDataLeftStatPanel:RegisterUnitEvent("PLAYER_ENTERING_WORLD")
+	cDataLeftStatPanel:SetScript("OnEvent", function(self, event, ...)
 		if event == 'PLAYER_ENTERING_WORLD' then
 			local inInstance, instanceType = IsInInstance()
 			if inInstance and (instanceType == 'pvp') then			
@@ -110,34 +110,34 @@ function nData:CreatePanels()
 	
 	-- Center Stat Panel Settings
 	-----------------------------------------------------------------------
-	nDataCenterStatPanel:SetPoint("CENTER", nDataMainPanel, 0, 0)
-	nDataCenterStatPanel:SetWidth(1200 / 3)
+	cDataCenterStatPanel:SetPoint("CENTER", cDataMainPanel, 0, 0)
+	cDataCenterStatPanel:SetWidth(1200 / 3)
 	
 	-- Right Stat Panel Settings
 	-----------------------------------------------------------------------
-	nDataRightStatPanel:SetPoint("RIGHT", nDataMainPanel, -5, 0)
-	nDataRightStatPanel:SetWidth(1200 / 3)
+	cDataRightStatPanel:SetPoint("RIGHT", cDataMainPanel, -5, 0)
+	cDataRightStatPanel:SetWidth(1200 / 3)
 	
 	-- Battleground Stat Panel Settings
 	-----------------------------------------------------------------------
-	nDataBattleGroundStatPanel:SetAllPoints(nDataLeftStatPanel)
+	cDataBattleGroundStatPanel:SetAllPoints(cDataLeftStatPanel)
 	
 	-- Hide Panels When in a Vehicle or Pet Battle
 	------------------------------------------------------------------------
-	nDataMainPanel:RegisterUnitEvent("UNIT_ENTERING_VEHICLE", "player")
-	nDataMainPanel:RegisterUnitEvent("UNIT_EXITED_VEHICLE", "player")
-	nDataMainPanel:RegisterUnitEvent("PET_BATTLE_OPENING_START")
-	nDataMainPanel:RegisterUnitEvent("PET_BATTLE_CLOSE")
-	nDataMainPanel:RegisterUnitEvent("PLAYER_ENTERING_WORLD")
+	cDataMainPanel:RegisterUnitEvent("UNIT_ENTERED_VEHICLE", "player")
+	cDataMainPanel:RegisterUnitEvent("UNIT_EXITED_VEHICLE", "player")
+	cDataMainPanel:RegisterUnitEvent("PET_BATTLE_OPENING_DONE")
+	cDataMainPanel:RegisterUnitEvent("PET_BATTLE_CLOSE")
+	cDataMainPanel:RegisterUnitEvent("PLAYER_ENTERING_WORLD")
 	
 
 	if Adjust then	
-		nDataMainPanel:SetScript("OnEvent", function(self, event, ...)
-			if event == "UNIT_ENTERING_VEHICLE" or event == "PET_BATTLE_OPENING_START" then
-				Adjust:Unregister(nDataMainPanel)	
+		cDataMainPanel:SetScript("OnEvent", function(self, event, ...)
+			if event == "UNIT_ENTERED_VEHICLE" or event == "PET_BATTLE_OPENING_DONE" then
+				Adjust:Unregister(cDataMainPanel)	
 				self:Hide()
 			elseif event == "UNIT_EXITED_VEHICLE" or event == "PET_BATTLE_CLOSE" or event == "PLAYER_ENTERING_WORLD" then	
-				Adjust:RegisterBottom(nDataMainPanel)
+				Adjust:RegisterBottom(cDataMainPanel)
 				self:Show()
 			end
 		end)	
@@ -145,7 +145,14 @@ function nData:CreatePanels()
 
 end
 
-function nData:SetBattlegroundPanel()
+function cData:SetBattlegroundPanel()
+
+	--WoW API / Variables
+	local GetNumBattlefieldScores = GetNumBattlefieldScores
+	local GetBattlefieldScore = GetBattlefieldScore
+	local GetCurrentMapAreaID = GetCurrentMapAreaID
+	local GetBattlefieldStatInfo = GetBattlefieldStatInfo
+	local GetBattlefieldStatData = GetBattlefieldStatData
 	
 	--Map IDs
 	local WSG = 443
@@ -156,9 +163,12 @@ function nData:SetBattlegroundPanel()
 	local EOTS = 482
 	local TBFG = 736
 	local AB = 461
+	local TOK = 856
+	local SSM = 860
+	local DG = 935
 
-	nDataBattleGroundStatPanel:SetScript('OnEnter', function(self)
-		local numScores = GetNumBattlefieldScores()
+	cDataBattleGroundStatPanel:SetScript('OnEnter', function(self)
+		--[[local numScores = GetNumBattlefieldScores()
 		for i=1, numScores do
 			local name, killingBlows, honorableKills, deaths, honorGained, faction, race, class, classToken, damageDone, healingDone, bgRating, ratingChange = GetBattlefieldScore(i)
 			if ( name ) then
@@ -196,27 +206,70 @@ function nData:SetBattlegroundPanel()
 					GameTooltip:Show()
 				end
 			end
-		end
+		end]]
+		
+		local CurrentMapID = GetCurrentMapAreaID()
+		for index=1, GetNumBattlefieldScores() do
+			name = GetBattlefieldScore(index)
+			if name then
+				GameTooltip:SetOwner(self, 'ANCHOR_TOPLEFT', 0, 4)
+				GameTooltip:ClearLines()
+				GameTooltip:SetPoint('BOTTOM', self, 'TOP', 0, 1)
+				GameTooltip:ClearLines()
+				GameTooltip:AddLine("Stats for : "..hexa..name..hexb)
+				GameTooltip:AddLine(" ")
+
+				--Add extra statistics to watch based on what BG you are in.
+				if CurrentMapID == WSG or CurrentMapID == TP then
+					GameTooltip:AddDoubleLine(GetBattlefieldStatInfo(1), GetBattlefieldStatData(index, 1),1,1,1)
+					GameTooltip:AddDoubleLine(GetBattlefieldStatInfo(2), GetBattlefieldStatData(index, 2),1,1,1)
+				elseif CurrentMapID == EOTS then
+					GameTooltip:AddDoubleLine(GetBattlefieldStatInfo(1), GetBattlefieldStatData(index, 1),1,1,1)
+				elseif CurrentMapID == AV then
+					GameTooltip:AddDoubleLine(GetBattlefieldStatInfo(1), GetBattlefieldStatData(index, 1),1,1,1)
+					GameTooltip:AddDoubleLine(GetBattlefieldStatInfo(2), GetBattlefieldStatData(index, 2),1,1,1)
+					GameTooltip:AddDoubleLine(GetBattlefieldStatInfo(3), GetBattlefieldStatData(index, 3),1,1,1)
+					GameTooltip:AddDoubleLine(GetBattlefieldStatInfo(4), GetBattlefieldStatData(index, 4),1,1,1)
+				elseif CurrentMapID == SOTA then
+					GameTooltip:AddDoubleLine(GetBattlefieldStatInfo(1), GetBattlefieldStatData(index, 1),1,1,1)
+					GameTooltip:AddDoubleLine(GetBattlefieldStatInfo(2), GetBattlefieldStatData(index, 2),1,1,1)
+				elseif CurrentMapID == IOC or CurrentMapID == TBFG or CurrentMapID == AB then
+					GameTooltip:AddDoubleLine(GetBattlefieldStatInfo(1), GetBattlefieldStatData(index, 1),1,1,1)
+					GameTooltip:AddDoubleLine(GetBattlefieldStatInfo(2), GetBattlefieldStatData(index, 2),1,1,1)
+				elseif CurrentMapID == TOK then
+					GameTooltip:AddDoubleLine(GetBattlefieldStatInfo(1), GetBattlefieldStatData(index, 1),1,1,1)
+					GameTooltip:AddDoubleLine(GetBattlefieldStatInfo(2), GetBattlefieldStatData(index, 2),1,1,1)
+				elseif CurrentMapID == SSM then
+					GameTooltip:AddDoubleLine(GetBattlefieldStatInfo(1), GetBattlefieldStatData(index, 1),1,1,1)
+				elseif CurrentMapID == DG then
+					GameTooltip:AddDoubleLine(GetBattlefieldStatInfo(1), GetBattlefieldStatData(index, 1),1,1,1)
+					GameTooltip:AddDoubleLine(GetBattlefieldStatInfo(2), GetBattlefieldStatData(index, 2),1,1,1)
+					GameTooltip:AddDoubleLine(GetBattlefieldStatInfo(3), GetBattlefieldStatData(index, 3),1,1,1)
+					GameTooltip:AddDoubleLine(GetBattlefieldStatInfo(4), GetBattlefieldStatData(index, 4),1,1,1)
+				end
+				break
+			end
+		end		
 	end) 
-	nDataBattleGroundStatPanel:SetScript('OnLeave', function(self) GameTooltip:Hide() end)
+	cDataBattleGroundStatPanel:SetScript('OnLeave', function(self) GameTooltip:Hide() end)
 
 	local f = CreateFrame('Frame', nil)
 	f:EnableMouse(true)
 
-	local Text1  = nDataBattleGroundStatPanel:CreateFontString(nil, 'OVERLAY')
+	local Text1  = cDataBattleGroundStatPanel:CreateFontString(nil, 'OVERLAY')
 	Text1:SetFont(db.font, db.fontSize,'THINOUTLINE')
-	Text1:SetPoint('LEFT', nDataBattleGroundStatPanel, 30, 0)
-	Text1:SetHeight(nDataMainPanel:GetHeight())
+	Text1:SetPoint('LEFT', cDataBattleGroundStatPanel, 30, 0)
+	Text1:SetHeight(cDataMainPanel:GetHeight())
 
-	local Text2  = nDataBattleGroundStatPanel:CreateFontString(nil, 'OVERLAY')
+	local Text2  = cDataBattleGroundStatPanel:CreateFontString(nil, 'OVERLAY')
 	Text2:SetFont(db.font, db.fontSize,'THINOUTLINE')
-	Text2:SetPoint('CENTER', nDataBattleGroundStatPanel, 0, 0)
-	Text2:SetHeight(nDataMainPanel:GetHeight())
+	Text2:SetPoint('CENTER', cDataBattleGroundStatPanel, 0, 0)
+	Text2:SetHeight(cDataMainPanel:GetHeight())
 
-	local Text3  = nDataBattleGroundStatPanel:CreateFontString(nil, 'OVERLAY')
+	local Text3  = cDataBattleGroundStatPanel:CreateFontString(nil, 'OVERLAY')
 	Text3:SetFont(db.font, db.fontSize,'THINOUTLINE')
-	Text3:SetPoint('RIGHT', nDataBattleGroundStatPanel, -30, 0)
-	Text3:SetHeight(nDataMainPanel:GetHeight())
+	Text3:SetPoint('RIGHT', cDataBattleGroundStatPanel, -30, 0)
+	Text3:SetHeight(cDataMainPanel:GetHeight())
 
 	local int = 2
 	local function Update(self, t)
@@ -249,12 +302,12 @@ function nData:SetBattlegroundPanel()
 		if event == 'PLAYER_ENTERING_WORLD' then
 			local inInstance, instanceType = IsInInstance()
 			if inInstance and (instanceType == 'pvp') then			
-				nDataBattleGroundStatPanel:Show()
+				cDataBattleGroundStatPanel:Show()
 			else
 				Text1:SetText('')
 				Text2:SetText('')
 				Text3:SetText('')
-				nDataBattleGroundStatPanel:Hide()
+				cDataBattleGroundStatPanel:Hide()
 			end
 		end
 	end
@@ -265,10 +318,10 @@ function nData:SetBattlegroundPanel()
 	Update(f, 10)
 end
 
-function nData:PlacePlugin(position, plugin)
-	local left = nDataLeftStatPanel
-	local center = nDataCenterStatPanel
-	local right = nDataRightStatPanel
+function cData:PlacePlugin(position, plugin)
+	local left = cDataLeftStatPanel
+	local center = cDataCenterStatPanel
+	local right = cDataRightStatPanel
 
 	-- Left Panel Data
 	if position == "P1" then
@@ -331,7 +384,7 @@ function nData:PlacePlugin(position, plugin)
 	end
 end
 
-function nData:DataTextTooltipAnchor(self)
+function cData:DataTextTooltipAnchor(self)
 	local panel = self:GetParent()
 	local anchor = 'GameTooltip'
 	local xoff = 1
@@ -339,9 +392,9 @@ function nData:DataTextTooltipAnchor(self)
 	
 	
 	for _, panel in pairs ({
-		nDataLeftStatPanel,
-		nDataCenterStatPanel,
-		nDataRightStatPanel,
+		cDataLeftStatPanel,
+		cDataCenterStatPanel,
+		cDataRightStatPanel,
 	})	do
 		anchor = 'ANCHOR_TOP'
 	end	
@@ -349,18 +402,24 @@ function nData:DataTextTooltipAnchor(self)
 end	
 
 
-function nData:OnInitialize()
+function cData:OnInitialize()
 	-- Assuming the .toc says ## SavedVariables: MyAddonDB
-	self.db = LibStub("AceDB-3.0"):New("nDataDB", defaults, true)
+	self.db = LibStub("AceDB-3.0"):New("cDataDB", defaults, true)
 	db = self.db.profile
 	
 	if not db.enable then return end
 	
 	self:SetUpOptions();
-	self:CreatePanels() -- factor this giant blob out into its own function to keep things clean
+	self:CreatePanels(); -- factor this giant blob out into its own function to keep things clean
+	self:SetBattlegroundPanel();
+	
+	SlashCmdList['RELOADUI'] = function()
+		ReloadUI()
+	end
+	SLASH_RELOADUI1 = '/rl'	
 end
 
-function nData:OnEnable()
+function cData:OnEnable()
 
 	local db = self.db.profile
 	PLAYER_NAME = UnitName("player")
@@ -396,7 +455,7 @@ function nData:OnEnable()
 	self:Refresh()
 end
 
-function nData:Refresh()
+function cData:Refresh()
 	db = self.db.profile
 
 	if InCombatLockdown() then
@@ -405,7 +464,7 @@ function nData:Refresh()
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 end
 
-function nData:SetFontString(parent, file, size, flags)
+function cData:SetFontString(parent, file, size, flags)
 	local fs = parent:CreateFontString(nil, "OVERLAY")
 	fs:SetFont(file, size, flags)
 	fs:SetJustifyH("LEFT")
@@ -421,6 +480,10 @@ local isCaster = {
 		nil, -- 250 - Blood - (TANK) 
 		nil, -- 251 - Frost - (MELEE_DPS)
 		nil, -- 252 - Unholy - (MELEE_DPS)
+	},
+	DEMONHUNTER = {
+		nil, -- 577 - Havoc - (TANK)
+		nil, -- 581 - Vengeance - (MELEE_DPS)
 	},
 	DRUID = { 
 		true, -- 102 - Balance - (CASTER_DPS)
@@ -475,7 +538,7 @@ local isCaster = {
 	},
 }
 
-function nData:UpdatePlayerRole()	
+function cData:UpdatePlayerRole()	
 	local spec = GetSpecialization()
 	if not spec then
 		self.playerRole = nil
@@ -493,13 +556,13 @@ function nData:UpdatePlayerRole()
 	self.playerRole = specRole
 end
 
-function nData:SetUpOptions()
+function cData:SetUpOptions()
 	local options = self:GetOptions()
 
 	-- @PHANX: add this to your options table instead of registering it separately:
 	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 
-	LibStub("AceConfig-3.0"):RegisterOptionsTable("nData", options)
+	LibStub("AceConfig-3.0"):RegisterOptionsTable("cData", options)
 
 	-- @PHANX: You could write out each subkey but let's be lazy:
 	local panels = {}
@@ -507,10 +570,10 @@ function nData:SetUpOptions()
 	local Dialog = LibStub("AceConfigDialog-3.0")
 
 	-- Use the "welcome" panel as the main one:
-	self.optionsFrame = Dialog:AddToBlizOptions("nData", "nData", nil, "datatext")
+	self.optionsFrame = Dialog:AddToBlizOptions("cData", "cData", nil, "datatext")
 
 	-- Add the profile panel last:
-	Dialog:AddToBlizOptions("nData", options.args.profile.name, "nData", "profile")
+	Dialog:AddToBlizOptions("cData", options.args.profile.name, "cData", "profile")
 
 end
 
@@ -519,14 +582,14 @@ end
 ------------------------------------------------------------------------
 -- This can be simplified hugely by using a table, instead of a bunch of if/end blocks.
 
-nData.pluginConstructors = {}
+cData.pluginConstructors = {}
 		
 ------------------------------------------------------------------------
---	 nData Options
+--	 cData Options
 ------------------------------------------------------------------------
 
 local options
-function nData:GetOptions()
+function cData:GetOptions()
 	if options then
 		return options
 	end
@@ -546,7 +609,7 @@ function nData:GetOptions()
 	
 	options = {
 		type = "group",
-		name = L["nData"],
+		name = L["cData"],
 		childGroups = "tree",
 		get = function(info) return db[ info[#info] ] end,
 		set = function(info, value) db[ info[#info] ] = value;   end,
@@ -554,7 +617,7 @@ function nData:GetOptions()
 			datatext = { 
 				type = "group",
 				order = 1,
-				name = "nData",
+				name = "cData",
 				args = {			
 					reloadUI = {
 						type = "execute",
