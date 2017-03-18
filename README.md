@@ -24,10 +24,10 @@ There are 12 Stats included with cData but only 9 positions so you can choose wh
 * This stat shows you your current spec. When the stat is clicked it will open your Specialization window. 
 ### Statatistics 
 * This stat is class specific. 
-⋅⋅* Tank Class = Shows your current Armor. 
-⋅⋅* Melee Class = Shows your current Attack Power. 
-⋅⋅* Caster/Healer = Shows your current Spell Power. 
-⋅⋅* Tooltip also changes per class.
+** Tank Class = Shows your current Armor. 
+** Melee Class = Shows your current Attack Power. 
+** Caster/Healer = Shows your current Spell Power. 
+** Tooltip also changes per class.
 
 ### System 
 * This stat show your current FPS and MS.
@@ -46,5 +46,5 @@ Any feed back would be great.
 * [Treeston](http://www.mmo-champion.com/members/562614-Treeston) from MMO-Champions.
 * And Many others along the way.
 
-##### Thank you all for your help and understanding that one mans dream can become a reality.
-##### Cokedrivers
+#### Thank you all for your help and understanding that one mans dream can become a reality.
+#### Cokedrivers
