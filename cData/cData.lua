@@ -281,15 +281,15 @@ function cData:SetBattlegroundPanel()
 			for i=1, numScores do
 				local name, killingBlows, honorableKills, deaths, honorGained, faction, race, class, classToken, damageDone, healingDone, bgRating, ratingChange = GetBattlefieldScore(i)
 				if healingDone > damageDone then
-					dmgtxt = ("Healing : "..hexa..healingDone..hexb)
+					dmgtxt = (hexa.."Healing : "..hexb..healingDone)
 				else
-					dmgtxt = ("Damage : "..hexa..damageDone..hexb)
+					dmgtxt = (hexa.."Damage : "..hexb..damageDone)
 				end
 				if ( name ) then
 					if ( name == PLAYER_NAME ) then
-						Text2:SetText("Honor : "..hexa..format('%d', honorGained)..hexb)
+						Text2:SetText(hexa.."Honor : "..hexb..format('%d', honorGained))
 						Text1:SetText(dmgtxt)
-						Text3:SetText("Killing Blows : "..hexa..killingBlows..hexb)
+						Text3:SetText(hexa.."Killing Blows : "..hexb..killingBlows)
 					end   
 				end
 			end 
@@ -412,7 +412,7 @@ function cData:OnInitialize()
 	self:SetUpOptions();
 	self:CreatePanels(); -- factor this giant blob out into its own function to keep things clean
 	self:SetBattlegroundPanel();
-	
+
 	SlashCmdList['RELOADUI'] = function()
 		ReloadUI()
 	end

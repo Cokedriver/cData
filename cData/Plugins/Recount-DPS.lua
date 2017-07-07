@@ -7,6 +7,23 @@ cData.pluginConstructors["recount"] = function()
 
 	db = cData.db.profile
 	
+	local math_abs=math.abs;
+	local math_floor=math.floor;
+	local math_log10=math.log10;
+	local math_max=math.max;
+	local tostring=tostring;
+	 
+	local NumberCaps={"K","M","B","T"};
+	local function AbbreviateNumber(val)
+		local exp=math_max(0,math_floor(math_log10(math_abs(val))));
+		if exp<3 then return tostring(math_floor(val)); end
+	 
+		local factor=math_floor(exp/3);
+		local precision=math_max(0,2-exp%3);
+		return ((val<0 and "-" or "").."%0."..precision.."f%s"):format(val/1000^factor,NumberCaps[factor] or "e "..(factor*3));
+	end
+
+	
 	local plugin = CreateFrame('Frame', nil, Datapanel)
 	plugin:EnableMouse(true)
 	plugin:SetFrameStrata("MEDIUM")
@@ -16,6 +33,7 @@ cData.pluginConstructors["recount"] = function()
 	Text:SetFont(db.font, db.fontSize,'THINOUTLINE')
 	cData:PlacePlugin(db.recount, Text)
 	plugin:SetAllPoints(Text)
+		
 
 	function OnEvent(self, event, ...)
 		if event == "PLAYER_LOGIN" then
@@ -39,7 +57,7 @@ cData.pluginConstructors["recount"] = function()
 	end
 
 	function plugin:updateDPS()
-		Text:SetText(hexa.."DPS: "..hexb.. plugin.getDPS() .. "|r")
+		Text:SetText(hexa.."DPS: "..hexb.. AbbreviateNumber(plugin.getDPS()) .. "|r")
 	end
 
 	function plugin:getDPS()
@@ -92,11 +110,11 @@ cData.pluginConstructors["recount"] = function()
 			-- format the number
 			dps = math.floor(10 * dps + 0.5) / 10
 			GameTooltip:AddLine("Recount")
-			GameTooltip:AddDoubleLine("Personal Damage:", damage, 1, 1, 1, 0.8, 0.8, 0.8)
-			GameTooltip:AddDoubleLine("Personal DPS:", dps, 1, 1, 1, 0.8, 0.8, 0.8)
+			GameTooltip:AddDoubleLine("Personal Damage:", AbbreviateNumber(damage), 1, 1, 1, 0.8, 0.8, 0.8)
+			GameTooltip:AddDoubleLine("Personal DPS:", AbbreviateNumber(dps), 1, 1, 1, 0.8, 0.8, 0.8)
 			GameTooltip:AddLine(" ")
-			GameTooltip:AddDoubleLine("Raid Damage:", raid_damage, 1, 1, 1, 0.8, 0.8, 0.8)
-			GameTooltip:AddDoubleLine("Raid DPS:", raid_dps, 1, 1, 1, 0.8, 0.8, 0.8)
+			GameTooltip:AddDoubleLine("Raid Damage:", AbbreviateNumber(raid_damage), 1, 1, 1, 0.8, 0.8, 0.8)
+			GameTooltip:AddDoubleLine("Raid DPS:", AbbreviateNumber(raid_dps), 1, 1, 1, 0.8, 0.8, 0.8)
 			GameTooltip:AddLine(" ")
 			GameTooltip:AddLine("|cffeda55fLeft Click|r to toggle Recount")
 			GameTooltip:AddLine("|cffeda55fRight Click|r to reset data")
