@@ -1,5 +1,5 @@
 local cData = LibStub("AceAddon-3.0"):NewAddon("cData", "AceEvent-3.0")
-local Adjust = LibStub:GetLibrary("LibBasicAdjust-1.0", true)
+--local Adjust = LibStub:GetLibrary("LibJostle-3.0", true)
 local L = setmetatable({}, { __index = function(t,k)
 	local v = tostring(k)
 	rawset(t, k, v)
@@ -82,7 +82,7 @@ function cData:CreatePanels()
 
 	-- Main Panel Settings
 	------------------------------------------------------------------------
-	cDataMainPanel:SetPoint("BOTTOM", UIParent, 0, 0)
+	cDataMainPanel:SetPoint("BOTTOM", UIParent, 0, -4)
 	cDataMainPanel:SetWidth(1200)
 	cDataMainPanel:SetBackdrop({ 
 		bgFile = [[Interface\ChatFrame\ChatFrameBackground]], 
@@ -124,24 +124,35 @@ function cData:CreatePanels()
 	
 	-- Hide Panels When in a Vehicle or Pet Battle
 	------------------------------------------------------------------------
+
 	cDataMainPanel:RegisterUnitEvent("UNIT_ENTERED_VEHICLE", "player")
 	cDataMainPanel:RegisterUnitEvent("UNIT_EXITED_VEHICLE", "player")
-	cDataMainPanel:RegisterUnitEvent("PET_BATTLE_OPENING_DONE")
-	cDataMainPanel:RegisterUnitEvent("PET_BATTLE_CLOSE")
-	cDataMainPanel:RegisterUnitEvent("PLAYER_ENTERING_WORLD")
+	cDataMainPanel:RegisterEvent("UNIT_EXITING_VEHICLE")
+	cDataMainPanel:RegisterEvent("UNIT_EXITED_VEHICLE")
+	cDataMainPanel:RegisterEvent("PET_BATTLE_OPENING_DONE")
+	cDataMainPanel:RegisterEvent("PET_BATTLE_CLOSE")
+	cDataMainPanel:RegisterEvent("PLAYER_ENTERING_WORLD")
 	
-
-	if Adjust then	
-		cDataMainPanel:SetScript("OnEvent", function(self, event, ...)
-			if event == "UNIT_ENTERED_VEHICLE" or event == "PET_BATTLE_OPENING_DONE" then
-				Adjust:Unregister(cDataMainPanel)	
-				self:Hide()
-			elseif event == "UNIT_EXITED_VEHICLE" or event == "PET_BATTLE_CLOSE" or event == "PLAYER_ENTERING_WORLD" then	
-				Adjust:RegisterBottom(cDataMainPanel)
-				self:Show()
+	cDataMainPanel:SetScript("OnEvent", function(self, event, ...)
+		if event == "UNIT_EXITED_VEHICLE" or event == "PET_BATTLE_CLOSE" or event == "PLAYER_ENTERING_WORLD" then	
+			if not InCombatLockdown() then
+				local cPanelShow = function() end
+				MainMenuBar:ClearAllPoints() 
+				MainMenuBar:SetPoint("BOTTOM",cDataMainPanel,"TOP",0,-4) 
+				MainMenuBar.ClearAllPoints = cPanelShow 
+				MainMenuBar.SetPoint = cPanelShow
+				
+				OverrideActionBar:ClearAllPoints() 
+				OverrideActionBar:SetPoint("BOTTOM",cDataMainPanel,"TOP",0,8) 
+				OverrideActionBar.ClearAllPoints = cPanelShow 
+				OverrideActionBar.SetPoint = cPanelShow
 			end
-		end)	
-	end
+			self:Show()
+		elseif event == "UNIT_ENTERED_VEHICLE" or event == "PET_BATTLE_OPENING_DONE" then
+			OverrideActionBar:SetPoint("BOTTOM",UIParent)
+			self:Hide()
+		end
+	end)
 
 end
 
@@ -168,45 +179,6 @@ function cData:SetBattlegroundPanel()
 	local DG = 935
 
 	cDataBattleGroundStatPanel:SetScript('OnEnter', function(self)
-		--[[local numScores = GetNumBattlefieldScores()
-		for i=1, numScores do
-			local name, killingBlows, honorableKills, deaths, honorGained, faction, race, class, classToken, damageDone, healingDone, bgRating, ratingChange = GetBattlefieldScore(i)
-			if ( name ) then
-				if ( name == UnitName('player') ) then
-					GameTooltip:SetOwner(self, 'ANCHOR_TOPLEFT', 0, 4)
-					GameTooltip:ClearLines()
-					GameTooltip:SetPoint('BOTTOM', self, 'TOP', 0, 1)
-					GameTooltip:ClearLines()
-					GameTooltip:AddLine("Stats for : "..hexa..name..hexb)
-					GameTooltip:AddLine' '
-					GameTooltip:AddDoubleLine("Killing Blows:", killingBlows,1,1,1)
-					GameTooltip:AddDoubleLine("Honorable Kills:", honorableKills,1,1,1)
-					GameTooltip:AddDoubleLine("Deaths:", deaths,1,1,1)
-					GameTooltip:AddDoubleLine("Honor Gained:", format('%d', honorGained),1,1,1)
-					GameTooltip:AddDoubleLine("Damage Done:", damageDone,1,1,1)
-					GameTooltip:AddDoubleLine("Healing Done:", healingDone,1,1,1)
-					--Add extra statistics to watch based on what BG you are in.
-					if curmapid == WSG or curmapid == TP then 
-						GameTooltip:AddDoubleLine("Flags Captured:",GetBattlefieldStatData(i, 1),1,1,1)
-						GameTooltip:AddDoubleLine("Flags Returned:",GetBattlefieldStatData(i, 2),1,1,1)
-					elseif curmapid == EOTS then
-						GameTooltip:AddDoubleLine("Flags Captured:",GetBattlefieldStatData(i, 1),1,1,1)
-					elseif curmapid == AV then
-						GameTooltip:AddDoubleLine("Graveyards Assaulted:",GetBattlefieldStatData(i, 1),1,1,1)
-						GameTooltip:AddDoubleLine("Graveyards Defended:",GetBattlefieldStatData(i, 2),1,1,1)
-						GameTooltip:AddDoubleLine("Towers Assaulted:",GetBattlefieldStatData(i, 3),1,1,1)
-						GameTooltip:AddDoubleLine("Towers Defended:",GetBattlefieldStatData(i, 4),1,1,1)
-					elseif curmapid == SOTA then
-						GameTooltip:AddDoubleLine("Demolishers Destroyed:",GetBattlefieldStatData(i, 1),1,1,1)
-						GameTooltip:AddDoubleLine("Gates Destroyed:",GetBattlefieldStatData(i, 2),1,1,1)
-					elseif curmapid == IOC or curmapid == TBFG or curmapid == AB then
-						GameTooltip:AddDoubleLine("Bases Assaulted:",GetBattlefieldStatData(i, 1),1,1,1)
-						GameTooltip:AddDoubleLine("Bases Defended:",GetBattlefieldStatData(i, 2),1,1,1)
-					end					
-					GameTooltip:Show()
-				end
-			end
-		end]]
 		
 		local CurrentMapID = GetCurrentMapAreaID()
 		for index=1, GetNumBattlefieldScores() do

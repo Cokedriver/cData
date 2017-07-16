@@ -16,7 +16,7 @@ if not Adjust then
 	return
 end
 
-local blizzardFrames = {'MainMenuBar', 'OverrideActionBar'}
+local blizzardFrames = {'MainMenuBar', 'OverrideActionBar', 'ExtraActionBarFrame',}
 
 local blizzardFramesData = {}
 
@@ -214,7 +214,7 @@ function Adjust:Refresh(...)
 			local frameData = blizzardFramesData[frame]
 			if (select(2, frame:GetPoint(1)) ~= UIParent and select(2, frame:GetPoint(1)) ~= WorldFrame) then
 				-- do nothing
-			elseif frame == MainMenuBar and OverrideActionBar and Gypsy_HotBarCapsule then
+			elseif frame == MainMenuBar and OverrideActionBar then
 				-- do nothing
 			elseif frame == MainMenuBar or OverrideActionBar or not (frameData.lastScale and frame.GetScale and frameData.lastScale == frame:GetScale()) or not (frameData.lastX and frameData.lastY and (not isClose(frameData.lastX, frame:GetLeft()) or not isClose(frameData.lastY, frame:GetTop()))) then
 				local anchor

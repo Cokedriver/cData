@@ -23,7 +23,8 @@ Libs\AceConfig-3.0\AceConfig-3.0.xml
 Libs\AceComm-3.0\AceComm-3.0.xml
 Libs\AceTab-3.0\AceTab-3.0.xml
 Libs\AceSerializer-3.0\AceSerializer-3.0.xml
-Libs\LibBasicAdjust-1.0.lua
+Libs\LibJostle-3.0\LibJostle-3.0.lua
+--Libs\LibBasicAdjust-1.0.lua
 Libs\tekShiner.lua
 
 cData.lua
